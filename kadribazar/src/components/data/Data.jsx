@@ -1,0 +1,58 @@
+const cartItems = [
+  {
+    id: 1,
+    name: "Chanel Coco Noir Eau De",
+    brand: "Chanel",
+    brandColor: "text-red-400",
+    img: "https://cdn.dummyjson.com/product-images/perfume/chanel-noir/thumbnail.webp",
+    price: 129.99,
+    qty: 3,
+  },
+  {
+    id: 2,
+    name: "Dior J'adore",
+    brand: "Dior",
+    brandColor: "text-red-400",
+    img: "https://cdn.dummyjson.com/product-images/perfume/dior-jadore/thumbnail.webp",
+    price: 89.99,
+    qty: 1,
+  },
+  {
+    id: 3,
+    name: "Beef Steak",
+    brand: "",
+    brandColor: "",
+    img: "https://cdn.dummyjson.com/product-images/food/beef-steak/thumbnail.webp",
+    price: 12.99,
+    qty: 2,
+  },
+  {
+    id: 4,
+    name: "Dog Food",
+    brand: "",
+    brandColor: "",
+    img: "https://cdn.dummyjson.com/product-images/food/dog-food/thumbnail.webp",
+    price: 10.99,
+    qty: 1,
+  },
+  {
+    id: 5,
+    name: "Eggs",
+    brand: "",
+    brandColor: "",
+    img: "https://cdn.dummyjson.com/product-images/food/eggs/thumbnail.webp",
+    price: 2.99,
+    qty: 1,
+  },
+  {
+    id: 6,
+    name: "Ice Cream",
+    brand: "",
+    brandColor: "",
+    img: "https://cdn.dummyjson.com/product-images/food/ice-cream/thumbnail.webp",
+    price: 5.49,
+    qty: 1,
+  },
+];
+
+export default cartItems
