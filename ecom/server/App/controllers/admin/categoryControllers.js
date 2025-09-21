@@ -1,0 +1,225 @@
+const { categoryModel } = require("../../models/categoryModel");
+
+let categoryCreate = async (req, res) => {
+    console.log(req.body);
+
+    let insertObj = {...req.body};
+
+    if(req.file && req.file.filename){
+        insertObj["categoryImage"] = req.file.filename
+    }
+    try {
+        let categoryCollection = new categoryModel(insertObj);
+        let categoryResult = await categoryCollection.save();
+
+        let resObj = {
+            status: "success",
+            message: "Category created successfully",
+            staticPath: process.env.CATEGORY_IMAGE_PATH,
+            categoryResult
+        }
+        console.log(resObj);
+        res.send(resObj);
+    }
+    catch (err) {
+        let errorMessage;
+        console.log(err);
+        if (err.code == 11000) {
+            errorMessage = "Category Name Already Exists...";
+        }
+        if (err.errors) {
+            errorMessage = err.errors.categoryName?.message || "Validation error";
+        }
+        let resObj = {
+            status: "failed",
+            message: errorMessage,
+            error: err
+        }
+        res.send(resObj);
+    }
+}
+
+
+let categoryViewAll = async (req, res) => {
+
+    let skip = 0;
+    let limit = 5;
+    try {
+        if (req.query.limit) {
+            limit = parseInt(req.query.limit);
+        }
+        
+        if (req.query.page) {
+            skip = (req.query.page - 1) * limit;
+        }
+
+        let categoryData = await categoryModel.find().skip(skip).limit(limit);
+
+        let categoryDataLength = await categoryModel.find();
+
+        let resObj = {
+            status: "success",
+            message: "category retrieved successfully",
+            categoryData,
+            length: categoryDataLength.length,
+            staticPath: process.env.CATEGORY_IMAGE_PATH,
+            totalPage: Math.ceil(categoryDataLength.length / limit)
+        }
+
+        res.send(resObj);
+    }
+
+    catch (err) {
+        let resObj = {
+            status: "failed",
+            message: "category not found",
+            error: err
+        }
+        res.send(resObj);
+    }
+}
+
+let categoryViewById = async (req, res) => {
+
+    let categoryId = req.params.id;
+
+    try {
+        let categoryData = await categoryModel.findById(categoryId);
+
+        let resObj = {
+            status: "success",
+            message: "category retrieved successfully",
+            categoryData
+        }
+
+        res.send(resObj);
+
+    }
+    catch (err) {
+        let resObj = {
+            status: "failed",
+            message: "category not found",
+            error: err
+        }
+        res.send(resObj);
+    }
+}
+
+let categoryDeleteAll = async (req, res) => {
+
+    let deleteObj;
+
+    categoryModel.deleteMany({})
+        .then((delResp) => {
+            deleteObj = {
+                status: "success",
+                message: "All categorys deleted successfully",
+                delResp
+            }
+            res.send(deleteObj);
+        })
+        .catch((err) => {
+            deleteObj = {
+                status: "failed",
+                message: "Error deleting categorys",
+                error: err
+            }
+            res.send(deleteObj);
+        });
+}
+
+let categoryMultiDeleteById = async (req, res) => {
+    let categoryIds = req.body.ids;
+
+    let deleteObj;
+
+    categoryModel.deleteMany({ _id: categoryIds })
+        .then((delResp) => {
+            deleteObj = {
+                status: "success",
+                message: "categorys deleted successfully",
+                delResp
+            }
+            res.send(deleteObj);
+        })
+        .catch((err) => {
+            deleteObj = {
+                status: "failed",
+                message: "categorys not Deleted",
+                error: err
+            }
+
+            res.send(deleteObj);
+        });
+}
+
+let categoryStatusUpdate = async (req, res) => {
+
+    let { ids } = req.body;
+
+    try {
+        let categoryUpdate = await categoryModel.updateMany(
+            {
+                _id: ids
+            },
+            [
+                {
+                    $set: {
+                        categoryStatus: { $eq: [false, "$categoryStatus"] }
+                    }
+                }
+            ]
+        )
+        let resObj = {
+            status: "success",
+            message: "category status updated successfully",
+            categoryUpdate
+        }
+        res.send(resObj);
+    }
+    catch (err) {
+        let resObj = {
+            status: "failed",
+            message: "category not found",
+            error: err
+        }
+        res.send(resObj);
+    }
+}
+
+let categoryUpdate = async (req, res) => {
+    let { id } = req.params;
+    console.log(id);
+    try {
+        let categoryUpdate = await categoryModel.updateOne(
+            {
+                _id: id
+            },
+            {
+                $set: {
+                    categoryName: req.body.categoryName,
+                    categoryCode: req.body.categoryCode,
+                    categoryOrder: req.body.categoryOrder,
+                    categoryStatus: req.body.categoryStatus
+                }
+            })
+        let resObj = {
+            status: "success",
+            message: "category updated successfully",
+            categoryUpdate
+        }
+        res.send(resObj);
+    }
+    catch (err) {
+        deleteObj = {
+            status: "failed",
+            message: "category not found",
+            error: err
+        }
+
+        res.send(deleteObj);
+    }
+
+}
+
+module.exports = { categoryCreate, categoryViewAll, categoryViewById, categoryDeleteAll, categoryMultiDeleteById, categoryStatusUpdate, categoryUpdate };
