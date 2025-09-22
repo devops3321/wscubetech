@@ -138,87 +138,95 @@ export default function CategoryAdd() {
   };
 
   return (
-    <section>
-      < ToastContainer />
-      <div className='mt-5'>
-        <hr className='border-t border-gray-600' />
-        <h1 className='font-semibold p-4 text-xl text-gray-400'> <span><Link to={"/dashboard"} className='hover:text-blue-900'>Home</Link> / <Link to={"/category/add"} className='hover:text-blue-900'>Category</Link> / Add</span></h1>
-        <hr className='border-t border-gray-600 mb-5' />
-      </div>
-      <div className="max-w-[1400px] mx-auto px-3">
-        <div className='flex flex-col md:flex-row bg-[#F1F5F9] px-2 rounded-t-lg border border-black-200 items-center justify-between mt-9 py-4'>
-          <h1 className='text-3xl font-semibold mb-3 ms-2'>{funObj}</h1>
+    <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
+      <ToastContainer />
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
+            <Link to={"/dashboard"} className="hover:text-blue-700 transition-colors">Home</Link>
+            <span className="text-gray-400">/</span>
+            <Link to={"/category/add"} className="hover:text-blue-700 transition-colors">Category</Link>
+            <span className="text-gray-400">/</span>
+            <span className="text-blue-700">{funObj}</span>
+          </h1>
         </div>
-        <form onSubmit={saveCategory} className='bg-white p-6 rounded-b-lg border border-black-200'>
-          <div className='flex flex-col md:flex-row gap-8 p-4'>
-            {/* Category Image */}
-            <div className="flex-1">
-              <label htmlFor="categoryImage" className='block font-bold mb-2'>Category Image</label>
-              <div
-                className="border border-dashed border-2 border-gray-300 rounded-lg bg-white flex flex-col items-center justify-center h-60 mb-4 cursor-pointer relative"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onClick={() => document.getElementById('categoryImageInput').click()}
-                style={{ position: 'relative' }}
-              >
-                {imagePreview ? (
-                  <div className="relative w-full h-full flex flex-col items-center justify-center">
-                    <img src={imagePreview} alt="Preview" className="h-full object-contain" />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 text-xs hover:bg-red-800 z-10"
-                      style={{ zIndex: 2 }}
-                    >
-                      Remove/Change
-                    </button>
-                    <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
-                  </div>
-                ) : (
-                  <span className="text-gray-400">Drag & drop or click to upload</span>
-                )}
-                <input
-                  type="file"
-                  id="categoryImageInput"
-                  name="categoryImage"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
+        <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-6">{funObj}</h2>
+          <form onSubmit={saveCategory}>
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Category Image */}
+              <div className="flex-1">
+                <label htmlFor="categoryImage" className="block font-medium mb-2 text-gray-700">Category Image</label>
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center h-60 mb-4 cursor-pointer relative hover:border-blue-400 transition-all"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('categoryImageInput').click()}
+                  style={{ position: 'relative' }}
+                >
+                  {imagePreview ? (
+                    <div className="relative w-full h-full flex flex-col items-center justify-center">
+                      <img src={imagePreview} alt="Preview" className="h-full object-contain rounded-lg border border-gray-200 shadow-sm" />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 text-xs hover:bg-red-800 shadow z-10"
+                        style={{ zIndex: 2 }}
+                      >
+                        Remove/Change
+                      </button>
+                      <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">Drag & drop or click to upload</span>
+                  )}
+                  <input
+                    type="file"
+                    id="categoryImageInput"
+                    name="categoryImage"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+              {/* Category Name & Order */}
+              <div className="flex-1 flex flex-col gap-6 justify-between">
+                <div>
+                  <label htmlFor="categoryName" className="block font-medium mb-2 text-gray-700">Category Name</label>
+                  <input
+                    type="text"
+                    id="categoryName"
+                    name="categoryName"
+                    value={formValue.categoryName}
+                    onChange={(e) => {
+                      setformValue({ ...formValue, categoryName: e.target.value })
+                    }}
+                    className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
+                    placeholder="Category Name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="categoryOrder" className="block font-medium mb-2 text-gray-700">Order</label>
+                  <input
+                    type="text"
+                    id="categoryOrder"
+                    name="categoryOrder"
+                    value={formValue.categoryOrder}
+                    onChange={(e) => {
+                      setformValue({ ...formValue, categoryOrder: e.target.value })
+                    }}
+                    className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
+                    placeholder="Order"
+                    required
+                  />
+                </div>
               </div>
             </div>
-            {/* Category Name & Order */}
-            <div className="flex-1">
-              <label htmlFor="categoryName" className='block font-bold mb-2'>Category Name</label>
-              <input
-                type="text"
-                id="categoryName"
-                name="categoryName"
-                value={formValue.categoryName}
-                onChange={(e) => {
-                  setformValue({ ...formValue, categoryName: e.target.value })
-                }}
-                className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'
-                placeholder='Category Name'
-                required
-              />
-              <label htmlFor="categoryOrder" className='block font-bold mb-2'>Order</label>
-              <input
-                type="text"
-                id="categoryOrder"
-                name="categoryOrder"
-                value={formValue.categoryOrder}
-                onChange={(e) => {
-                  setformValue({ ...formValue, categoryOrder: e.target.value })
-                }}
-                className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium'
-                placeholder='Order'
-                required
-              />
-            </div>
-          </div>
-          <button type="submit" className="mt-4 text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm ms-4 px-5 py-2.5">{funObj}</button>
-        </form>
+            <button type="submit" className="mt-8 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">{funObj}</button>
+          </form>
+        </div>
       </div>
     </section>
   );
