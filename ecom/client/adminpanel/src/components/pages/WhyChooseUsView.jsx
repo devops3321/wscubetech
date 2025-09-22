@@ -1,11 +1,49 @@
 import React from 'react'
+import { useEffect } from 'react';
 import { FaFilter, FaPen } from "react-icons/fa";
 import { Link } from 'react-router-dom'
-
+import { ToastContainer, toast } from 'react-toastify';
+import ResponsivePagination from 'react-responsive-pagination';
+import axios from 'axios';
 
 export default function WhyChooseUsView() {
+  let apiBaseurl = import.meta.env.VITE_APIBASEURL;
+
+  let [whychooseusData, setwhychooseusData] = React.useState([]);
+  let [currentPage, setCurrentPage] = React.useState(1);
+  let [limit, setLimit] = React.useState(5);
+  let [totalPage, setTotalPage] = React.useState(0);
+  let [staticPath, setStaticPath] = React.useState([]);
+
+  let getWhyChooseUsData = async () => {
+    axios.get(`${apiBaseurl}whychooseus/view`,
+      {
+        params: {
+          page: currentPage,
+          limit: limit
+        }
+      }
+    )
+      .then((response) => response.data)
+      .then((finResponse) => {
+        setwhychooseusData(Array.isArray(finResponse.whychooseusData) ? finResponse.whychooseusData : []);
+        setTotalPage(finResponse.totalPage || 0);
+        setStaticPath(finResponse.staticPath || []);
+      })
+      .catch(() => {
+        toast.error("Failed to fetch why choose us data.");
+        setwhychooseusData([]); // fallback to empty array on error
+      });
+  }
+
+
+  useEffect(() => {
+    getWhyChooseUsData();
+  }, [currentPage, limit]);
+
   return (
     <section>
+      <ToastContainer />
       <div className='mt-5'>
         <hr className='border-t border-gray-600' />
         <h1 className='font-semibold p-4 text-xl text-gray-400'> <span><Link to={"/dashboard"} className='hover:text-blue-900'>Home</Link> / <Link to={"/whychooseus/view"} className='hover:text-blue-900'>Why Choose Us</Link> / View</span></h1>
@@ -36,34 +74,42 @@ export default function WhyChooseUsView() {
             </tr>
           </thead>
           <tbody>
-            {[1, 2].map((row, i) => (
+            {
+            whychooseusData.length >=1 ?
+            (
+            whychooseusData.map((row, i) => (
               <tr
-                key={i}
+                key={row._id}
                 className="bg-[#232B38] text-white transition-colors duration-200 hover:bg-[#374151]"
               >
                 <td className="px-4 py-2 align-middle sticky left-0 w-12 z-10" style={{ background: 'inherit' }}>
                   <input type="checkbox" className="accent-blue-600 w-5 h-5" />
                 </td>
                 <td className="px-4 py-6 align-middle sticky left-12 w-48 z-10" style={{ background: 'inherit' }}>
-                  Neil Sims
+                  {row.whychooseusTitle}
                 </td>
                 <td className="px-4 py-2 align-middle text-center">
                   <div className="flex justify-center items-center h-full">
-                    <img src="https://packshifts.in/images/iso.png" alt="" className='w-12 h-12 object-cover' />
+                    <img src={`${staticPath}${row.whychooseusImage}`} alt="" className='w-12 h-12 object-cover' />
                   </div>
                 </td>
-                <td className="px-4 py-2 align-middle text-center"> CEO of SunPark </td>
-                <td className="px-4 py-2 align-middle text-center w-1/8">1</td>
+                <td className="px-4 py-2 align-middle text-center"> {row.whychooseusDescription} </td>
+                <td className="px-4 py-2 align-middle text-center w-1/8">{row.whychooseusOrder}</td>
                 <td className="px-4 py-2 align-middle text-center w-1/8">
-                  <span
-                    className={`px-5 py-2 rounded-lg font-semibold transition-colors duration-200 cursor-pointer
-                      ${i === 0
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-red-600 hover:bg-red-700"
-                      }`}
-                  >
-                    {i === 0 ? "Active" : "Deactivate"}
-                  </span>
+                          {
+                            row.whychooseusStatus ?
+                              (
+                                <span className="px-5 py-2 rounded-lg font-semibold transition-colors duration-200 cursor-pointer bg-green-600 hover:bg-green-700">
+                                  Active
+                                </span>
+                              )
+                              :
+                              (
+                                <span className="px-5 py-2 rounded-lg font-semibold transition-colors duration-200 cursor-pointer bg-red-600 hover:bg-red-700">
+                                  Deactivate
+                                </span>
+                              )
+                          }
                 </td>
                 <td className="px-4 py-2 align-middle text-center w-1/6">
                   <button className="bg-blue-700 hover:bg-blue-800 text-white p-2 rounded-full">
@@ -71,7 +117,17 @@ export default function WhyChooseUsView() {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+          )
+            : 
+            (
+                    <tr>
+                      <td colSpan="7" className="text-center py-4 text-2xl font-bold text-gray-400">
+                        No Why Choose Us available.
+                      </td>
+                    </tr>
+            )
+            }
           </tbody>
         </table>
       </div>

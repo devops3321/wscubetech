@@ -5,7 +5,6 @@ import Dropzone from "dropzone";
 import "dropzone/dist/dropzone.css";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 
 
 export default function CategoryAdd() {
@@ -17,6 +16,7 @@ export default function CategoryAdd() {
     categoryImage: "",
     categoryOrder: ""
   });
+
   const apiBaseurl = import.meta.env.VITE_APIBASEURL;
 
   let saveCategory = (e) => {
@@ -79,6 +79,7 @@ export default function CategoryAdd() {
 
   return (
     <section>
+      < ToastContainer />
       <div className='mt-5'>
         <hr className='border-t border-gray-600' />
         <h1 className='font-semibold p-4 text-xl text-gray-400'> <span><Link to={"/dashboard"} className='hover:text-blue-900'>Home</Link> / <Link to={"/category/add"} className='hover:text-blue-900'>Category</Link> / Add</span></h1>

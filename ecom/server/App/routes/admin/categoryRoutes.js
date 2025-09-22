@@ -11,18 +11,18 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname)
   }
-})
+});
 
 
 const upload = multer({ storage: storage })
 
-categoryRoutes.post("/create",upload.single('categoryImage'), categoryCreate)
+categoryRoutes.post("/create", upload.single('categoryImage'), categoryCreate)
 
 categoryRoutes.get("/view", categoryViewAll)
 
 categoryRoutes.get("/view/:id", categoryViewById)
 
-categoryRoutes.delete("/delete",categoryDeleteAll)
+categoryRoutes.delete("/delete", categoryDeleteAll)
 
 categoryRoutes.delete("/multidelete", categoryMultiDeleteById)
 
@@ -30,4 +30,4 @@ categoryRoutes.post("/statusupdate", categoryStatusUpdate);
 
 categoryRoutes.put("/update/:id", categoryUpdate)
 
-module.exports = {categoryRoutes};
+module.exports = { categoryRoutes };
