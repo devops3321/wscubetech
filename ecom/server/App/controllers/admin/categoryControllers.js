@@ -39,7 +39,6 @@ let categoryCreate = async (req, res) => {
     }
 }
 
-
 let categoryViewAll = async (req, res) => {
 
     let skip = 0;
@@ -154,36 +153,31 @@ let categoryMultiDeleteById = async (req, res) => {
         });
 }
 
-let CategoriestatusUpdate = async (req, res) => {
-
+let categoryStatusUpdate = async (req, res) => {
     let { ids } = req.body;
-
     try {
         let categoryUpdate = await categoryModel.updateMany(
-            {
-                _id: ids
-            },
+            { _id: ids },
             [
                 {
                     $set: {
-                        Categoriestatus: { $eq: [false, "$Categoriestatus"] }
+                        categoryStatus: { $eq: [false, "$categoryStatus"] }
                     }
                 }
             ]
-        )
+        );
         let resObj = {
             status: "success",
             message: "category status updated successfully",
             categoryUpdate
-        }
+        };
         res.send(resObj);
-    }
-    catch (err) {
+    } catch (err) {
         let resObj = {
             status: "failed",
             message: "category not found",
             error: err
-        }
+        };
         res.send(resObj);
     }
 }
@@ -201,8 +195,8 @@ let categoryUpdate = async (req, res) => {
             updateObj.categoryImage = req.file.filename;
         }
         // Optionally update status if provided
-        if (typeof req.body.Categoriestatus !== 'undefined') {
-            updateObj.Categoriestatus = req.body.Categoriestatus;
+        if (typeof req.body.categoryStatus !== 'undefined') {
+            updateObj.categoryStatus = req.body.categoryStatus;
         }
         // Optionally update code if provided
         if (typeof req.body.categoryCode !== 'undefined') {
@@ -229,4 +223,4 @@ let categoryUpdate = async (req, res) => {
 
 }
 
-module.exports = { categoryCreate, categoryViewAll, categoryViewById, categoryDeleteAll, categoryMultiDeleteById, CategoriestatusUpdate, categoryUpdate };
+module.exports = { categoryCreate, categoryViewAll, categoryViewById, categoryDeleteAll, categoryMultiDeleteById, categoryStatusUpdate, categoryUpdate };
