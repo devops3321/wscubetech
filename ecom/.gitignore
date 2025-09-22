@@ -26,3 +26,10 @@ dist-ssr
 # images
 *.png
 *.jpg
+
+# next js 
+.next
+out
+build
+
+# dotenv environment variables file
