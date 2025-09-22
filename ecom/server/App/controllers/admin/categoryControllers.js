@@ -59,7 +59,7 @@ let categoryViewAll = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "category retrieved successfully",
+            message: "Categories retrieved successfully",
             categoryData,
             length: categoryDataLength.length,
             staticPath: process.env.CATEGORY_IMAGE_PATH,
@@ -72,7 +72,7 @@ let categoryViewAll = async (req, res) => {
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "category not found",
+            message: "Category not found",
             error: err
         }
         res.send(resObj);
@@ -88,7 +88,7 @@ let categoryViewById = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "category retrieved successfully",
+            message: "Categories retrieved successfully",
             categoryData,
             staticPath: process.env.CATEGORY_IMAGE_PATH
         }
@@ -99,7 +99,7 @@ let categoryViewById = async (req, res) => {
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "category not found",
+            message: "Category not found",
             error: err
         }
         res.send(resObj);
@@ -114,7 +114,7 @@ let categoryDeleteAll = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "All categorys deleted successfully",
+                message: "All Categories deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -122,7 +122,7 @@ let categoryDeleteAll = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "Error deleting categorys",
+                message: "Error deleting Categories",
                 error: err
             }
             res.send(deleteObj);
@@ -138,7 +138,7 @@ let categoryMultiDeleteById = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "categorys deleted successfully",
+                message: "Categories deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -146,7 +146,7 @@ let categoryMultiDeleteById = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "categorys not Deleted",
+                message: "Categories not Deleted",
                 error: err
             }
 
@@ -154,7 +154,7 @@ let categoryMultiDeleteById = async (req, res) => {
         });
 }
 
-let categoryStatusUpdate = async (req, res) => {
+let CategoriestatusUpdate = async (req, res) => {
 
     let { ids } = req.body;
 
@@ -166,7 +166,7 @@ let categoryStatusUpdate = async (req, res) => {
             [
                 {
                     $set: {
-                        categoryStatus: { $eq: [false, "$categoryStatus"] }
+                        Categoriestatus: { $eq: [false, "$Categoriestatus"] }
                     }
                 }
             ]
@@ -201,8 +201,8 @@ let categoryUpdate = async (req, res) => {
             updateObj.categoryImage = req.file.filename;
         }
         // Optionally update status if provided
-        if (typeof req.body.categoryStatus !== 'undefined') {
-            updateObj.categoryStatus = req.body.categoryStatus;
+        if (typeof req.body.Categoriestatus !== 'undefined') {
+            updateObj.Categoriestatus = req.body.Categoriestatus;
         }
         // Optionally update code if provided
         if (typeof req.body.categoryCode !== 'undefined') {
@@ -229,4 +229,4 @@ let categoryUpdate = async (req, res) => {
 
 }
 
-module.exports = { categoryCreate, categoryViewAll, categoryViewById, categoryDeleteAll, categoryMultiDeleteById, categoryStatusUpdate, categoryUpdate };
+module.exports = { categoryCreate, categoryViewAll, categoryViewById, categoryDeleteAll, categoryMultiDeleteById, CategoriestatusUpdate, categoryUpdate };
