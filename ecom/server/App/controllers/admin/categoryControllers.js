@@ -89,7 +89,8 @@ let categoryViewById = async (req, res) => {
         let resObj = {
             status: "success",
             message: "category retrieved successfully",
-            categoryData
+            categoryData,
+            staticPath: process.env.CATEGORY_IMAGE_PATH
         }
 
         res.send(resObj);
@@ -189,35 +190,41 @@ let categoryStatusUpdate = async (req, res) => {
 
 let categoryUpdate = async (req, res) => {
     let { id } = req.params;
-    console.log(id);
     try {
+        // Build update object
+        let updateObj = {
+            categoryName: req.body.categoryName,
+            categoryOrder: req.body.categoryOrder,
+        };
+        // Only update categoryImage if a new file is uploaded
+        if (req.file && req.file.filename) {
+            updateObj.categoryImage = req.file.filename;
+        }
+        // Optionally update status if provided
+        if (typeof req.body.categoryStatus !== 'undefined') {
+            updateObj.categoryStatus = req.body.categoryStatus;
+        }
+        // Optionally update code if provided
+        if (typeof req.body.categoryCode !== 'undefined') {
+            updateObj.categoryCode = req.body.categoryCode;
+        }
         let categoryUpdate = await categoryModel.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: {
-                    categoryName: req.body.categoryName,
-                    categoryCode: req.body.categoryCode,
-                    categoryOrder: req.body.categoryOrder,
-                    categoryStatus: req.body.categoryStatus
-                }
-            })
+            { _id: id },
+            { $set: updateObj }
+        );
         let resObj = {
             status: "success",
             message: "category updated successfully",
             categoryUpdate
-        }
+        };
         res.send(resObj);
-    }
-    catch (err) {
-        deleteObj = {
+    } catch (err) {
+        let resObj = {
             status: "failed",
             message: "category not found",
             error: err
-        }
-
-        res.send(deleteObj);
+        };
+        res.send(resObj);
     }
 
 }

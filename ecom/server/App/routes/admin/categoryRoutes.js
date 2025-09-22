@@ -28,6 +28,6 @@ categoryRoutes.delete("/multidelete", categoryMultiDeleteById)
 
 categoryRoutes.post("/statusupdate", categoryStatusUpdate);
 
-categoryRoutes.put("/update/:id", categoryUpdate)
+categoryRoutes.put("/update/:id", upload.single('categoryImage'), categoryUpdate)
 
 module.exports = { categoryRoutes };
