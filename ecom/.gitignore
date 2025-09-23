@@ -26,6 +26,16 @@ dist-ssr
 # images
 *.png
 *.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.webp
+*.avif
+*.tiff
+*.psd
+*.ai
+
 
 # next js 
 .next

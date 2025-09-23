@@ -2,16 +2,14 @@ import React from 'react'
 
 export default function Footer() {
   return (
-    <div>
-        <footer>
-            <div className="w-full">
-                <hr className="border-t border-gray-400 border-2 my-4 w-full" />
-                <div className="p-4 flex justify-between w-full">                
-                    <p>2025 WsCube Tech™. All Rights Reserved. Design By WsCube Tech</p>
-                    <p>Design By WsCube Tech</p>
-                </div>
-            </div>
-        </footer>
-    </div>
+    <footer className="w-full bg-gradient-to-r from-blue-100 via-blue-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 shadow-2xl rounded-t-3xl border-t border-blue-200 dark:border-gray-700 mt-8">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <hr className="border-t border-blue-200 dark:border-gray-700 my-4 w-full" />
+        <div className="flex flex-col md:flex-row justify-between items-center gap-2 text-sm text-blue-900 dark:text-gray-200">
+          <p>2025 WsCube Tech™. All Rights Reserved.</p>
+          <p>Design By WsCube Tech</p>
+        </div>
+      </div>
+    </footer>
   )
 }

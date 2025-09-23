@@ -105,7 +105,7 @@ export default function ColorAdd() {
                     name="colorCode"
                     value={formValue.colorCode}
                     onChange={(e) => setformValue({ ...formValue, colorCode: e.target.value })}
-                    className="shadow-lg border border-gray-300 w-16 h-12 p-1 rounded-lg"
+                    className="shadow-lg border border-gray-300 w-26 h-12 p-1 rounded-lg"
                     required
                   />
                 </div>

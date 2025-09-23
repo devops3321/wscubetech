@@ -94,7 +94,6 @@ export default function CategoryView() {
     }
   }
 
-
   useEffect(() => {
     getCategoryData();
   }, [currentPage, limit]);

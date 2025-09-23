@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { FaUser } from "react-icons/fa";
 import { FaRegDotCircle } from "react-icons/fa";
 import { FaMessage } from "react-icons/fa6";
@@ -16,6 +16,7 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { Link } from 'react-router-dom';
 
 export default function Sidebar() {
+    // ...existing state declarations...
     const [openUsers, setOpenUsers] = useState(false);
     const [openEnquires, setOpenEnquires] = useState(false);
     const [openColors, setOpenColors] = useState(false);
@@ -32,25 +33,24 @@ export default function Sidebar() {
     const [openFaqs, setOpenFaqs] = useState(false);
     const [openTnc, setOpenTnc] = useState(false);
 
-
     return (
         <div>
-            <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button" className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+            <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button" className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-gray-400 dark:hover:bg-blue-700 dark:focus:ring-blue-600">
                 <span className="sr-only">Open sidebar</span>
                 <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                 </svg>
             </button>
 
-            <aside id="sidebar-multi-level-sidebar" className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-                <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+            <aside id="sidebar-multi-level-sidebar" className="w-full md:fixed md:top-0 md:left-0 md:z-40 md:w-64 md:h-screen md:transition-transform md:-translate-x-full md:sm:translate-x-0 bg-transparent">
+                <div className="h-full px-3 py-4 overflow-y-auto bg-gradient-to-b from-blue-100 via-blue-50 to-white dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 shadow-2xl rounded-r-3xl border-r border-blue-200 dark:border-gray-700">
                     <div className='mb-4'>
-                        <Link to={'/dashboard'}><img className="ms-4 my-1" src="https://www.wscubetech.com/images/ws-cube-white-logo.svg" alt="companyLogo" /></Link>
-                        <hr className="w-full border-t border-gray-300 my-4" />
+                        <Link to={'/dashboard'}><img className="ms-4 my-1 w-46 h-12 dark:invert" src="https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/company-profile/logo/cccfbdab-3bec-439f-88b9-5694698cd302-1670132652.png" alt="companyLogo" /></Link>
+                        <hr className="w-full border-t border-blue-200 dark:border-gray-700 my-4" />
                     </div>
                     <ul className="space-y-2 font-medium">
                         <li>
-                            <Link to={"/dashboard"} className="flex cursor-pointer items-center mb-5 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <Link to={"/dashboard"} className="flex cursor-pointer items-center mb-5 p-2 text-blue-900 rounded-xl bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group">
                                 <svg className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                                     <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
                                     <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
@@ -73,7 +73,7 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openUsers ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/viewuser'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span> View User</Link>
+                                    <Link to={'/viewuser'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span> View User</Link>
                                 </li>
 
                             </ul>
@@ -93,10 +93,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openEnquires ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'contactenquirymgmt'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Contact Enquiries</Link>
+                                    <Link to={'contactenquirymgmt'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Contact Enquiries</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/newsletter'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Newsletters</Link>
+                                    <Link to={'/newsletter'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Newsletters</Link>
                                 </li>
                             </ul>
                         </li>
@@ -115,10 +115,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openColors ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/color/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Color</Link>
+                                    <Link to={'/color/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Color</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/color/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Color</Link>
+                                    <Link to={'/color/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Color</Link>
                                 </li>
                             </ul>
                         </li>
@@ -137,10 +137,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openMaterials ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/material/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Material</Link>
+                                    <Link to={'/material/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Material</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/material/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Material</Link>
+                                    <Link to={'/material/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Material</Link>
                                 </li>
                             </ul>
                         </li>
@@ -159,10 +159,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openParentCategories ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/category/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Category</Link>
+                                    <Link to={'/category/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Category</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/category/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Category</Link>
+                                    <Link to={'/category/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Category</Link>
                                 </li>
                             </ul>
                         </li>
@@ -181,10 +181,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openSubCategories ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/subcategory/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Sub Category</Link>
+                                    <Link to={'/subcategory/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Sub Category</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/subcategory/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Sub Category</Link>
+                                    <Link to={'/subcategory/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Sub Category</Link>
                                 </li>
                             </ul>
                         </li>
@@ -203,10 +203,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openSubSubCategories ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/subsubcategory/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Sub Sub Category</Link>
+                                    <Link to={'/subsubcategory/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Sub Sub Category</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/subsubcategory/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Sub Sub Category</Link>
+                                    <Link to={'/subsubcategory/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Sub Sub Category</Link>
                                 </li>
                             </ul>
                         </li>
@@ -225,10 +225,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openProducts ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/product/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Product</Link>
+                                    <Link to={'/product/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Product</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/product/product-items'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Product</Link>
+                                    <Link to={'/product/product-items'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Product</Link>
                                 </li>
                             </ul>
                         </li>
@@ -247,10 +247,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openWhyChooseUs ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/whychooseus/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Why Choose Us</Link>
+                                    <Link to={'/whychooseus/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Why Choose Us</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/whychooseus/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Why Choose Us</Link>
+                                    <Link to={'/whychooseus/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Why Choose Us</Link>
                                 </li>
                             </ul>
                         </li>
@@ -269,7 +269,7 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openOrders ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/orders'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Orders</Link>
+                                    <Link to={'/orders'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Orders</Link>
                                 </li>
                             </ul>
                         </li>
@@ -288,10 +288,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openSlider ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/slider/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Slider</Link>
+                                    <Link to={'/slider/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Slider</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/slider/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Slider</Link>
+                                    <Link to={'/slider/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Slider</Link>
                                 </li>
                             </ul>
                         </li>
@@ -310,10 +310,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openCountry ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/country/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Country</Link>
+                                    <Link to={'/country/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Country</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/country/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Country</Link>
+                                    <Link to={'/country/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Country</Link>
                                 </li>
                             </ul>
                         </li>
@@ -332,10 +332,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openTestimonials ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/testimonial/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Testimonial</Link>
+                                    <Link to={'/testimonial/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Testimonial</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/testimonial/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Testimonial</Link>
+                                    <Link to={'/testimonial/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Testimonial</Link>
                                 </li>
                             </ul>
                         </li>
@@ -354,10 +354,10 @@ export default function Sidebar() {
                             </button>
                             <ul id="dropdown" className={`${openFaqs ? '' : 'hidden'} py-2 space-y-2`}>
                                 <li>
-                                    <Link to={'/faq/add'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>Add Faq</Link>
+                                    <Link to={'/faq/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Faq</Link>
                                 </li>
                                 <li>
-                                    <Link to={'/faq/view'} className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-2 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"> <span className='me-3'><FaRegDotCircle /></span>View Faq</Link>
+                                    <Link to={'/faq/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Faq</Link>
                                 </li>
                             </ul>
                         </li>
@@ -374,6 +374,17 @@ export default function Sidebar() {
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                 </svg>
                             </button>
+                            {/* Example dropdown for T&C if needed: */}
+                            {/*
+                            <ul id="dropdown" className={`${openTnc ? '' : 'hidden'} py-2 space-y-2`}>
+                                <li>
+                                    <Link to={'/tnc/add'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>Add Terms & Conditions</Link>
+                                </li>
+                                <li>
+                                    <Link to={'/tnc/view'} className="flex items-center w-full p-2 text-blue-900 transition-all duration-200 rounded-xl pl-2 bg-white shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:text-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:shadow-lg group"> <span className='me-3 text-blue-400 group-hover:text-blue-700 dark:text-blue-300 dark:group-hover:text-blue-200'><FaRegDotCircle /></span>View Terms & Conditions</Link>
+                                </li>
+                            </ul>
+                            */}
                         </li>
                     </ul>
                 </div>

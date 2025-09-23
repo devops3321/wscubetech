@@ -12,7 +12,7 @@ const { faqRoutes } = require("./App/routes/admin/faqRoutes");
 const { categoryRoutes } = require("./App/routes/admin/categoryRoutes");
 const { whychooseusRoutes } = require("./App/routes/admin/whychooseusRoutes");
 const { sliderRoutes } = require("./App/routes/admin/sliderRoutes");
-// const { testimonialRoutes } = require("./App/routes/admin/testimonialRoutes");
+const { testimonialRoutes } = require("./App/routes/admin/testimonialRoutes");
 App.use(cors());
 App.use(express.json());
 
@@ -31,7 +31,7 @@ App.use("/faq", faqRoutes);
 App.use("/category", categoryRoutes);
 App.use("/whychooseus", whychooseusRoutes);
 App.use("/slider", sliderRoutes);
-// App.use("/testimonial", testimonialRoutes);
+App.use("/testimonial", testimonialRoutes);
 
 // http://localhost:<port>/
 mongoose.connect(process.env.MONGO_URL)
