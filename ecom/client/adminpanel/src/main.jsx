@@ -60,6 +60,7 @@ createRoot(document.getElementById('root')).render(
           <Route path={'/subsubcategory/view'} element={<SubSubCategoryView />} />
           <Route path={'/product/add'} element={<ProductAdd />} />
           <Route path={'/product/product-items'} element={<ProductItems />} />
+          <Route path={'/editwhychooseus/:id?'} element={<WhyChooseUsAdd />} />
           <Route path={'/whychooseus/add'} element={<WhyChooseUsAdd />} />
           <Route path={'/whychooseus/view'} element={<WhyChooseUsView />} />
           <Route path={'/orders'} element={<Orders />} />

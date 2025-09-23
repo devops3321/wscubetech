@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
   }
 });
 
+
 const upload = multer({ storage: storage })
 
 whychooseusRoutes.post("/create", upload.single('whychooseusImage'), whychooseusCreate)
@@ -27,6 +28,6 @@ whychooseusRoutes.delete("/multidelete", whychooseusMultiDeleteById)
 
 whychooseusRoutes.post("/statusupdate", whychooseusStatusUpdate);
 
-whychooseusRoutes.put("/update/:id", whychooseusUpdate)
+whychooseusRoutes.put("/update/:id", upload.single('whychooseusImage'), whychooseusUpdate)
 
 module.exports = { whychooseusRoutes };

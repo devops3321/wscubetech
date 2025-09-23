@@ -14,31 +14,30 @@ let whychooseusCreate = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "Whychooseus Entry created successfully",
+            message: "WhyChooseUs created successfully",
             staticPath: process.env.WHYCHOOSEUS_IMAGE_PATH,
             whychooseusResult
         }
         console.log(resObj);
-        res.send(resObj);
+        res.status(201).json(resObj);
     }
     catch (err) {
         let errorMessage;
         console.log(err);
         if (err.code == 11000) {
-            errorMessage = "Whychooseus Name Already Exists...";
+            errorMessage = "WhyChooseUs Title or Description Already Exists...";
         }
         if (err.errors) {
-            errorMessage = err.errors.whychooseusName?.message || "Validation error";
+            errorMessage = err.errors.whychooseusTitle?.message || err.errors.whychooseusDescription?.message || "Validation error";
         }
         let resObj = {
             status: "failed",
             message: errorMessage,
-            error: err
+            error: err.message || err
         }
-        res.send(resObj);
+        res.status(400).json(resObj);
     }
 }
-
 
 let whychooseusViewAll = async (req, res) => {
 
@@ -59,20 +58,19 @@ let whychooseusViewAll = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "Whychooseus Entry retrieved successfully",
+            message: "WhyChooseUs items retrieved successfully",
             whychooseusData,
             length: whychooseusDataLength.length,
             staticPath: process.env.WHYCHOOSEUS_IMAGE_PATH,
             totalPage: Math.ceil(whychooseusDataLength.length / limit)
         }
-
         res.send(resObj);
     }
 
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "whychooseus Entry not found",
+            message: "WhyChooseUs not found",
             error: err
         }
         res.send(resObj);
@@ -88,17 +86,17 @@ let whychooseusViewById = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "Whychooseus Entry retrieved successfully",
-            whychooseusData
+            message: "WhyChooseUs item retrieved successfully",
+            whychooseusData,
+            staticPath: process.env.WHYCHOOSEUS_IMAGE_PATH
         }
-
         res.send(resObj);
 
     }
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "Whychooseus Entry not found",
+            message: "WhyChooseUs item not found",
             error: err
         }
         res.send(resObj);
@@ -113,7 +111,7 @@ let whychooseusDeleteAll = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "All Whychooseus Entries deleted successfully",
+                message: "All WhyChooseUs items deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -121,7 +119,7 @@ let whychooseusDeleteAll = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "Error deleting Whychooseus Entries",
+                message: "Error deleting WhyChooseUs items",
                 error: err
             }
             res.send(deleteObj);
@@ -137,7 +135,7 @@ let whychooseusMultiDeleteById = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "Whychooseus Entries deleted successfully",
+                message: "WhyChooseUs items deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -145,23 +143,18 @@ let whychooseusMultiDeleteById = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "Whychooseus Entries not Deleted",
+                message: "WhyChooseUs items not deleted",
                 error: err
             }
-
             res.send(deleteObj);
         });
 }
 
 let whychooseusStatusUpdate = async (req, res) => {
-
     let { ids } = req.body;
-
     try {
         let whychooseusUpdate = await whychooseusModel.updateMany(
-            {
-                _id: ids
-            },
+            { _id: ids },
             [
                 {
                     $set: {
@@ -169,55 +162,61 @@ let whychooseusStatusUpdate = async (req, res) => {
                     }
                 }
             ]
-        )
+        );
         let resObj = {
             status: "success",
-            message: "Whychooseus status updated successfully",
+            message: "WhyChooseUs status updated successfully",
             whychooseusUpdate
-        }
+        };
         res.send(resObj);
-    }
-    catch (err) {
+    } catch (err) {
         let resObj = {
             status: "failed",
-            message: "Whychooseus Entry not found",
+            message: "WhyChooseUs not found",
             error: err
-        }
+        };
         res.send(resObj);
     }
 }
 
 let whychooseusUpdate = async (req, res) => {
     let { id } = req.params;
-    console.log(id);
     try {
+        // Build update object
+        let updateObj = {
+            whychooseusTitle: req.body.whychooseusTitle,
+            whychooseusDescription: req.body.whychooseusDescription,
+            whychooseusOrder: req.body.whychooseusOrder,
+        };
+        // Only update whychooseusImage if a new file is uploaded
+        if (req.file && req.file.filename) {
+            updateObj.whychooseusImage = req.file.filename;
+        }
+        // Optionally update status if provided
+        if (typeof req.body.whychooseusStatus !== 'undefined') {
+            updateObj.whychooseusStatus = req.body.whychooseusStatus;
+        }
+        // Optionally update code if provided
+        if (typeof req.body.whychooseusCode !== 'undefined') {
+            updateObj.whychooseusCode = req.body.whychooseusCode;
+        }
         let whychooseusUpdate = await whychooseusModel.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: {
-                    whychooseusName: req.body.whychooseusName,
-                    whychooseusCode: req.body.whychooseusCode,
-                    whychooseusOrder: req.body.whychooseusOrder,
-                    whychooseusStatus: req.body.whychooseusStatus
-                }
-            })
+            { _id: id },
+            { $set: updateObj }
+        );
         let resObj = {
             status: "success",
-            message: "Whychooseus Entry updated successfully",
+            message: "WhyChooseUs updated successfully",
             whychooseusUpdate
-        }
+        };
         res.send(resObj);
-    }
-    catch (err) {
-        deleteObj = {
+    } catch (err) {
+        let resObj = {
             status: "failed",
-            message: "Whychooseus Entry not found",
+            message: "WhyChooseUs not found",
             error: err
-        }
-
-        res.send(deleteObj);
+        };
+        res.send(resObj);
     }
 
 }

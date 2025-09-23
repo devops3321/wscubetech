@@ -14,6 +14,11 @@ App.use(express.json());
 
 // Allow upload folder for react app
 App.use("/uploads/category", express.static("uploads/category"));
+App.use("/uploads/whychooseus", express.static("uploads/whychooseus"));
+App.use("/uploads/material", express.static("uploads/material"));
+App.use("/uploads/color", express.static("uploads/color"));
+App.use("/uploads/country", express.static("uploads/country"));
+App.use("/uploads/faq", express.static("uploads/faq"));
 // http://localhost:<port>/admin/login
 App.use("/admin", adminRoutes);
 App.use("/color", colorRoutes);
