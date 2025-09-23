@@ -64,11 +64,13 @@ createRoot(document.getElementById('root')).render(
           <Route path={'/whychooseus/add'} element={<WhyChooseUsAdd />} />
           <Route path={'/whychooseus/view'} element={<WhyChooseUsView />} />
           <Route path={'/orders'} element={<Orders />} />
+          <Route path={'/editslider/:id?'} element={<SliderAdd />} />
           <Route path={'/slider/add'} element={<SliderAdd />} />
           <Route path={'/slider/view'} element={<SliderView />} />
           <Route path={'/editcountry/:id?'} element={<CountryAdd />} />
           <Route path={'/country/add'} element={<CountryAdd />} />
           <Route path={'/country/view'} element={<CountryView />} />
+          <Route path={'/edittestimonial/:id?'} element={<TestimonialAdd />} />
           <Route path={'/testimonial/add'} element={<TestimonialAdd />} />
           <Route path={'/testimonial/view'} element={<TestimonialView />} />
           <Route path={'/editfaq/:id?'} element={<FaqAdd />} />

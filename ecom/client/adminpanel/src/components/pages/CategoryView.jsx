@@ -15,9 +15,7 @@ export default function CategoryView() {
   let [limit, setLimit] = React.useState(5);
   let [totalPage, setTotalPage] = React.useState(0);
   let [staticPath, setStaticPath] = React.useState([]);
-  let [ids, setids] = React.useState([]
-
-  );
+  let [ids, setids] = React.useState([]);
 
   let getCategoryData = async () => {
     axios.get(`${apiBaseurl}category/view`,
