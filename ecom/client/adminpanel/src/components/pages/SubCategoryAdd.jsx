@@ -72,9 +72,7 @@ export default function SubCategoryAdd() {
             <label htmlFor="CategoryName" className='block font-bold mb-2'>Parent Category Name</label>
             <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' name="ParentCategoryName" id="CategoryName">
               <option value="">Select Category</option>
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="sale">Sale</option>
+
             </select>
             <label htmlFor="SubCategoryName" className='block font-bold mb-2'>Category Name</label>
             <input

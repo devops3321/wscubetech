@@ -4,6 +4,7 @@ const { materialRoutes } = require("./materialRoutes");
 const { countryRoutes } = require("./countryRoutes");
 const { faqRoutes } = require("./faqRoutes");
 const { categoryRoutes } = require("./categoryRoutes");
+const { subcategoryRoutes } = require("./subcategoryRoutes");
 const { whychooseusRoutes } = require("./whychooseusRoutes");
 
 let adminRoutes = express.Router();
@@ -12,6 +13,7 @@ adminRoutes.use("/material", materialRoutes);
 adminRoutes.use("/country", countryRoutes);
 adminRoutes.use("/faq", faqRoutes);
 adminRoutes.use("/category", categoryRoutes);
+adminRoutes.use("/subcategory", subcategoryRoutes);
 adminRoutes.use("/whychooseus", whychooseusRoutes);
 
 //  admin login url : http://localhost:<port>/admin/login
