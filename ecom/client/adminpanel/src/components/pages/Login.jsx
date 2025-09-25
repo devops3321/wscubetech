@@ -1,45 +1,83 @@
-import React from 'react'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+    const navigate = useNavigate();
+    const [formValue, setFormValue] = useState({ email: '', password: '' });
+
+    const handleInputChange = (e) => {
+        setFormValue({ ...formValue, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // TODO: Add authentication logic here
+        navigate('/dashboard');
+    };
+
     return (
-        <section className="bg-white-50 dark:bg-white-900">
-            <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 bg-gray-900">
-                <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-blue-900">
-                    <img className="w-50 h-18 mr-2 text-blue-900" src="https://www.wscubetech.com/images/ws-cube-white-logo.svg" alt="logo" />
-                </a>
-                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-white-800 dark:border-white-700 border-[solid] shadow-lg">
-                    <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                        <h1 className="text-xl font-bold leading-tight tracking-tight text-blue-900 md:text-2xl dark:text-black">
-                            Sign in to your account
-                        </h1>
-                        <form className="space-y-4 md:space-y-6" action="#">
-                            <div>
-                                <label for="email" className="block mb-2 text-sm font-medium text-blue-900 dark:text-black">Email</label>
-                                <input type="email" name="email" id="email" className="bg-white-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-white-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="" />
+        <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8 flex items-center justify-center">
+            <div className="w-full max-w-md mx-auto px-4">
+                <div className="flex flex-col items-center mb-2">
+                    <img
+                        className="w-40 h-24 object-contain"
+                        src="https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/company-profile/logo/cccfbdab-3bec-439f-88b9-5694698cd302-1670132652.png"
+                        alt="logo"
+                    />
+                </div>
+                <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
+                    <h2 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Sign in to your account</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                value={formValue.email}
+                                onChange={handleInputChange}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                placeholder="name@company.com"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                value={formValue.password}
+                                onChange={handleInputChange}
+                                placeholder="••••••••"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                required
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <input
+                                    id="remember"
+                                    type="checkbox"
+                                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
+                                />
+                                <label htmlFor="remember" className="ml-2 text-sm text-gray-700">Remember me</label>
                             </div>
-                            <div>
-                                <label for="password" className="block mb-2 text-sm font-medium text-blue-900 dark:text-black">Password</label>
-                                <input type="password" name="password" id="password" placeholder="••••••••" className="bg-white-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-white-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-start">
-                                    <div className="flex items-center h-5">
-                                        <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
-                                    </div>
-                                    <div className="ml-3 text-sm">
-                                        <label for="remember" className="text-blue-900 dark:text-blue-900">Remember me</label>
-                                    </div>
-                                </div>
-                                <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500 text-black-900">Forgot password?</a>
-                            </div>
-                            <button type="submit" className="w-full text-white font-bold bg-blue-700 hover:bg-gray-700 focus:ring-3 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-gray-700 dark:focus:ring-primary-800">Sign in</button>
-                            <p className="text-sm font-light text-black-500 dark:text-white-400">
-                                Don’t have an account yet? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
-                            </p>
-                        </form>
-                    </div>
+                            <a href="#" className="text-sm font-medium text-blue-600 hover:underline">Forgot password?</a>
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full text-white font-bold bg-blue-700 hover:bg-blue-800 focus:ring-3 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-md px-5 py-2.5 text-center shadow transition-all duration-150"
+                        >
+                            Sign in
+                        </button>
+                        <p className="text-sm font-light text-gray-500 text-center">
+                            Don’t have an account yet?{' '}
+                            <a href="#" className="font-medium text-blue-600 hover:underline">Sign up</a>
+                        </p>
+                    </form>
                 </div>
             </div>
         </section>
     );
-};
+}
