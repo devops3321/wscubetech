@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Link } from "react-router-dom";
 
@@ -11,6 +11,11 @@ export default function ProductAdd() {
     const [backImagePreview, setBackImagePreview] = useState(null);
     const [galleryImageFile, setGalleryImageFile] = useState(null);
     const [galleryImagePreview, setGalleryImagePreview] = useState(null);
+
+    // Refs for file inputs
+    const productImageInputRef = useRef(null);
+    const backImageInputRef = useRef(null);
+    const galleryImageInputRef = useRef(null);
 
     // Drag and drop handlers for each image
     const handleDragOver = (e) => {
@@ -99,17 +104,17 @@ export default function ProductAdd() {
                 <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
                     <h2 className="text-3xl font-semibold text-gray-800 mb-6">Add Product</h2>
                     <form className="p-0">
-                        <div className="flex flex-col md:flex-row gap-12">
+                        <div className="flex flex-col md:flex-row gap-6">
                             {/* Product Images */}
-                            <div className="flex-1 flex flex-col gap-10">
+                            <div className="flex flex-col gap-8 min-w-[11rem] max-w-[18.5rem]"> {/* w-44 to w-74 */}
                                 {/* Product Image */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Product Image</label>
                                     <div
-                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center h-48 mb-4 cursor-pointer relative hover:border-blue-400 transition-all"
+                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
                                         onDragOver={handleDragOver}
                                         onDrop={handleProductDrop}
-                                        onClick={() => document.getElementById('productImageInput').click()}
+                                        onClick={() => productImageInputRef.current && productImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
                                     >
                                         {productImagePreview ? (
@@ -126,11 +131,11 @@ export default function ProductAdd() {
                                                 <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400">Drag & drop or click to upload</span>
+                                            <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
                                         )}
                                         <input
                                             type="file"
-                                            id="productImageInput"
+                                            ref={productImageInputRef}
                                             name="productImage"
                                             accept="image/*"
                                             style={{ display: 'none' }}
@@ -142,10 +147,10 @@ export default function ProductAdd() {
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Back Image</label>
                                     <div
-                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center h-48 mb-4 cursor-pointer relative hover:border-blue-400 transition-all"
+                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
                                         onDragOver={handleDragOver}
                                         onDrop={handleBackDrop}
-                                        onClick={() => document.getElementById('backImageInput').click()}
+                                        onClick={() => backImageInputRef.current && backImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
                                     >
                                         {backImagePreview ? (
@@ -162,11 +167,11 @@ export default function ProductAdd() {
                                                 <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400">Drag & drop or click to upload</span>
+                                            <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
                                         )}
                                         <input
                                             type="file"
-                                            id="backImageInput"
+                                            ref={backImageInputRef}
                                             name="backImage"
                                             accept="image/*"
                                             style={{ display: 'none' }}
@@ -178,10 +183,10 @@ export default function ProductAdd() {
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Gallery Image</label>
                                     <div
-                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center h-48 mb-4 cursor-pointer relative hover:border-blue-400 transition-all"
+                                        className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
                                         onDragOver={handleDragOver}
                                         onDrop={handleGalleryDrop}
-                                        onClick={() => document.getElementById('galleryImageInput').click()}
+                                        onClick={() => galleryImageInputRef.current && galleryImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
                                     >
                                         {galleryImagePreview ? (
@@ -198,11 +203,11 @@ export default function ProductAdd() {
                                                 <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400">Drag & drop or click to upload</span>
+                                            <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
                                         )}
                                         <input
                                             type="file"
-                                            id="galleryImageInput"
+                                            ref={galleryImageInputRef}
                                             name="galleryImage"
                                             accept="image/*"
                                             style={{ display: 'none' }}
@@ -212,17 +217,17 @@ export default function ProductAdd() {
                                 </div>
                             </div>
                             {/* Product Details */}
-                            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8"> {/* wider gap-x for more width */}
                                 {/* ...existing code for all form fields... */}
                                 {/* Product Name */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Product Name</label>
-                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' placeholder="Product Name" />
+                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2' placeholder="Product Name" />
                                 </div>
                                 {/* Parent Category */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Parent Category</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Mobile Phones</option>
                                         <option>Laptops</option>
@@ -234,7 +239,7 @@ export default function ProductAdd() {
                                 {/* Sub Category */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Sub Category</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Select Category</option>
                                         <option>Mobile Phones</option>
                                         <option>Laptops</option>
@@ -245,7 +250,7 @@ export default function ProductAdd() {
                                 {/* Sub Sub Category */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Sub Sub Category</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Mobile Phones</option>
                                         <option>Laptops</option>
@@ -257,7 +262,7 @@ export default function ProductAdd() {
                                 {/* Material */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Material</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Cotton</option>
                                         <option>Polyester</option>
@@ -270,7 +275,7 @@ export default function ProductAdd() {
                                 {/* Color */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Color</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Red</option>
                                         <option>Blue</option>
@@ -284,7 +289,7 @@ export default function ProductAdd() {
                                 {/* Product Type */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Select Product Type</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Featured</option>
                                         <option>New Arrivals</option>
@@ -295,7 +300,7 @@ export default function ProductAdd() {
                                 {/* Is Best Selling */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Is Best Selling</label>
-                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6'>
+                                    <select className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'>
                                         <option>Nothing Selected</option>
                                         <option>Yes</option>
                                         <option>No</option>
@@ -325,25 +330,25 @@ export default function ProductAdd() {
                                 {/* Actual Price */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Actual Price</label>
-                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' placeholder="Actual Price" />
+                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2' placeholder="Actual Price" />
                                 </div>
                                 {/* ...existing code for all other fields... */}
                                 {/* Sale Price */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Sale Price</label>
-                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' placeholder="Sale Price" />
+                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2' placeholder="Sale Price" />
                                 </div>
                                 {/* ...existing code for all other fields... */}
                                 {/* Total In Stocks */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Total In Stocks</label>
-                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' placeholder="Total In Stocks" />
+                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2' placeholder="Total In Stocks" />
                                 </div>
                                 {/* ...existing code for all other fields... */}
                                 {/* Order */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Order</label>
-                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-6' placeholder="Order" />
+                                    <input type="text" className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2' placeholder="Order" />
                                 </div>
                             </div>
                         </div>

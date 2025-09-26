@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -36,10 +36,13 @@ export default function SubCategoryAdd() {
         .then((response) => response.data)
         .then((finResponse) => {
           if (finResponse.status === "success") {
+            let parentCat = finResponse.subcategoryData.parentCategory;
+            // If parentCategory is an object, extract its _id
+            let parentCategoryId = parentCat && typeof parentCat === 'object' && parentCat._id ? parentCat._id : (parentCat || '');
             setFormValue({
               subcategoryName: finResponse.subcategoryData.subcategoryName || '',
               subcategoryOrder: finResponse.subcategoryData.subcategoryOrder || '',
-              parentCategory: finResponse.subcategoryData.parentCategory || ''
+              parentCategory: parentCategoryId
             });
             setStaticPath(finResponse.staticPath || "");
             if (finResponse.subcategoryData.subcategoryImage) {
@@ -66,11 +69,11 @@ export default function SubCategoryAdd() {
     formData.append("subcategoryName", formValue.subcategoryName);
     formData.append("subcategoryOrder", formValue.subcategoryOrder);
     formData.append("parentCategory", formValue.parentCategory);
+    formData.append("parentCategory", formValue.parentCategory);
     if (subcategoryImageFile) {
       formData.append("subcategoryImage", subcategoryImageFile);
     }
     if (id) {
-      // If id is present, update the existing subcategory
       axios.put(`${apiBaseurl}subcategory/update/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -85,13 +88,16 @@ export default function SubCategoryAdd() {
             });
             setSubcategoryImageFile(null);
             setImagePreview(null);
-            setTimeout(() => navigate('/subcategory/view'), 1000);
+            // Force reload to ensure view page updates
+            setTimeout(() => {
+              navigate('/subcategory/view', { replace: true });
+              window.location.reload();
+            }, 1000);
           } else {
             toast.error(finResponse.message);
           }
         });
     } else {
-      // If no id, create a new subcategory
       axios.post(`${apiBaseurl}subcategory/create`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -160,7 +166,7 @@ export default function SubCategoryAdd() {
     <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
       <ToastContainer />
       <div className="max-w-3xl mx-auto px-4">
-        
+
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
             <Link to="/dashboard" className="hover:text-blue-700 transition-colors">Home</Link>
@@ -219,18 +225,18 @@ export default function SubCategoryAdd() {
                     className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
                     name="parentCategory"
                     id="parentCategory"
-                    value={formValue.parentCategory}
+                    value={formValue.parentCategory || ''}
                     onChange={handleInputChange}
                     required
                   >
                     <option value="">Select Category</option>
-                      {Array.isArray(parentData)
-                        ? parentData.map((item, index) => (
-                            <option key={item._id} value={item._id}>
-                              {item.categoryName}
-                            </option>
-                          ))
-                        : null}
+                    {Array.isArray(parentData)
+                      ? parentData.map((item, index) => (
+                        <option key={item._id} value={item._id}>
+                          {item.categoryName}
+                        </option>
+                      ))
+                      : null}
                   </select>
                 </div>
                 <div>

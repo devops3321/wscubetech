@@ -197,9 +197,7 @@ export default function SubCategoryView() {
                         <td className="px-4 py-2 align-middle text-center w-1/6">
                           <div className="flex items-center justify-center h-full">
                             <Link to={`/editsubcategory/${row._id}`} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition-colors duration-200 cursor-pointer" title="Edit Subcategory">
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition-colors duration-200 cursor-pointer" title="Edit Subcategory">
                               <FaPen />
-                            </button>
                             </Link>
                           </div>
                         </td>

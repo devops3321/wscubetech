@@ -15,7 +15,7 @@ let subcategoryCreate = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "subcategory created successfully",
+            message: "Subcategory created successfully",
             staticPath: process.env.SUBCATEGORY_IMAGE_PATH,
             subcategoryResult
         }
@@ -26,7 +26,7 @@ let subcategoryCreate = async (req, res) => {
         let errorMessage;
         console.log(err);
         if (err.code == 11000) {
-            errorMessage = "subcategory Name Already Exists...";
+            errorMessage = "Subcategory name already exists.";
         }
         if (err.errors) {
             errorMessage = err.errors.subcategoryName?.message || "Validation error";
@@ -59,7 +59,7 @@ let subcategoryViewAll = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "Categories retrieved successfully",
+            message: "Subcategories retrieved successfully",
             subcategoryData,
             length: subcategoryDataLength.length,
             staticPath: process.env.SUBCATEGORY_IMAGE_PATH,
@@ -72,7 +72,7 @@ let subcategoryViewAll = async (req, res) => {
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "subcategory not found",
+            message: "Subcategories not found",
             error: err
         }
         res.send(resObj);
@@ -89,7 +89,7 @@ let subcategoryViewById = async (req, res) => {
 
         let resObj = {
             status: "success",
-            message: "Categories retrieved successfully",
+            message: "Subcategory retrieved successfully",
             subcategoryData,
             staticPath: process.env.SUBCATEGORY_IMAGE_PATH
         }
@@ -100,7 +100,7 @@ let subcategoryViewById = async (req, res) => {
     catch (err) {
         let resObj = {
             status: "failed",
-            message: "subcategory not found",
+            message: "Subcategory not found",
             error: err
         }
         res.send(resObj);
@@ -111,7 +111,7 @@ let subcategoryViewByParentCategory = async (req, res) => {
     let categoryData = await categoryModel.find({categoryStatus:true}).select("categoryName");
     let resObj = {
         status: "success",
-        message: "Subcategories retrieved successfully",
+        message: "Parent categories retrieved successfully",
         categoryData,
         staticPath: process.env.SUBCATEGORY_IMAGE_PATH
     }
@@ -126,7 +126,7 @@ let subcategoryDeleteAll = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "All Categories deleted successfully",
+                message: "All subcategories deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -134,7 +134,7 @@ let subcategoryDeleteAll = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "Error deleting Categories",
+                message: "Error deleting subcategories",
                 error: err
             }
             res.send(deleteObj);
@@ -150,7 +150,7 @@ let subcategoryMultiDeleteById = async (req, res) => {
         .then((delResp) => {
             deleteObj = {
                 status: "success",
-                message: "Categories deleted successfully",
+                message: "Subcategories deleted successfully",
                 delResp
             }
             res.send(deleteObj);
@@ -158,7 +158,7 @@ let subcategoryMultiDeleteById = async (req, res) => {
         .catch((err) => {
             deleteObj = {
                 status: "failed",
-                message: "Categories not Deleted",
+                message: "Subcategories not deleted",
                 error: err
             }
 
@@ -181,14 +181,14 @@ let subcategoryStatusUpdate = async (req, res) => {
         );
         let resObj = {
             status: "success",
-            message: "subcategory status updated successfully",
+            message: "Subcategory status updated successfully",
             subcategoryUpdate
         };
         res.send(resObj);
     } catch (err) {
         let resObj = {
             status: "failed",
-            message: "subcategory not found",
+            message: "Subcategory not found",
             error: err
         };
         res.send(resObj);
@@ -215,20 +215,24 @@ let subcategoryUpdate = async (req, res) => {
         if (typeof req.body.subcategoryCode !== 'undefined') {
             updateObj.subcategoryCode = req.body.subcategoryCode;
         }
+        // Optionally update parentCategory if provided
+        if (req.body.parentCategory) {
+            updateObj.parentCategory = req.body.parentCategory;
+        }
         let subcategoryUpdate = await subcategoryModel.updateOne(
             { _id: id },
             { $set: updateObj }
         );
         let resObj = {
             status: "success",
-            message: "subcategory updated successfully",
+            message: "Subcategory updated successfully",
             subcategoryUpdate
         };
         res.send(resObj);
     } catch (err) {
         let resObj = {
             status: "failed",
-            message: "subcategory not found",
+            message: "Subcategory not found",
             error: err
         };
         res.send(resObj);
