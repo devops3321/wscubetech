@@ -51,6 +51,7 @@ createRoot(document.getElementById('root')).render(
           <Route path={'/editcategory/:id?'} element={<CategoryAdd />} />
           <Route path={'/category/add'} element={<CategoryAdd />} />
           <Route path={'/category/view'} element={<CategoryView />} />
+          <Route path={'/editsubcategory/:id?'} element={<SubCategoryAdd />} />
           <Route path={'/subcategory/add'} element={<SubCategoryAdd />} />
           <Route path={'/subcategory/view'} element={<SubCategoryView />} />
           <Route path={'/subsubcategory/add'} element={<SubSubCategoryAdd />} />

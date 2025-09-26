@@ -1,8 +1,12 @@
+
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function SubCategoryAdd() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [parentData, setParentData] = useState([]);
   const [subcategoryImageFile, setSubcategoryImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -11,6 +15,7 @@ export default function SubCategoryAdd() {
     subcategoryOrder: '',
     parentCategory: ''
   });
+  const [staticPath, setStaticPath] = useState("");
 
   let apiBaseurl = import.meta.env.VITE_APIBASEURL;
 
@@ -24,33 +29,96 @@ export default function SubCategoryAdd() {
       });
   }
 
-  let saveSubCategory = (e) => {
-    e.preventDefault();
-    let formValue = new FormData();
-    axios.post(`${apiBaseurl}subcategory/create`, formValue, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-      .then((response) => response.data)
-      .then((finResponse) => {
-        if (finResponse.status === "success") {
-          // Reset form and image preview
-          setFormValue({
-            subcategoryName: '',
-            subcategoryOrder: '',
-            parentCategory: ''
-          });
-          setSubcategoryImageFile(null);
-          setImagePreview(null);
-        }
-      })
+  let getSubCategory = () => {
+    if (id) {
+      // If id is present, fetch the subcategory data for editing
+      axios.get(`${apiBaseurl}subcategory/view/${id}`)
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success") {
+            setFormValue({
+              subcategoryName: finResponse.subcategoryData.subcategoryName || '',
+              subcategoryOrder: finResponse.subcategoryData.subcategoryOrder || '',
+              parentCategory: finResponse.subcategoryData.parentCategory || ''
+            });
+            setStaticPath(finResponse.staticPath || "");
+            if (finResponse.subcategoryData.subcategoryImage) {
+              setImagePreview(`${finResponse.staticPath || ""}${finResponse.subcategoryData.subcategoryImage}`);
+            } else {
+              setImagePreview(null);
+            }
+          }
+        });
+    } else {
+      // If no id, reset form for adding new subcategory
+      setFormValue({
+        subcategoryName: '',
+        subcategoryOrder: '',
+        parentCategory: ''
+      });
+      setImagePreview(null);
+    }
   }
 
+  let saveSubCategory = (e) => {
+    e.preventDefault();
+    let formData = new FormData();
+    formData.append("subcategoryName", formValue.subcategoryName);
+    formData.append("subcategoryOrder", formValue.subcategoryOrder);
+    formData.append("parentCategory", formValue.parentCategory);
+    if (subcategoryImageFile) {
+      formData.append("subcategoryImage", subcategoryImageFile);
+    }
+    if (id) {
+      // If id is present, update the existing subcategory
+      axios.put(`${apiBaseurl}subcategory/update/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success") {
+            toast.success(finResponse.message);
+            setFormValue({
+              subcategoryName: '',
+              subcategoryOrder: '',
+              parentCategory: ''
+            });
+            setSubcategoryImageFile(null);
+            setImagePreview(null);
+            setTimeout(() => navigate('/subcategory/view'), 1000);
+          } else {
+            toast.error(finResponse.message);
+          }
+        });
+    } else {
+      // If no id, create a new subcategory
+      axios.post(`${apiBaseurl}subcategory/create`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success") {
+            toast.success(finResponse.message);
+            setFormValue({
+              subcategoryName: '',
+              subcategoryOrder: '',
+              parentCategory: ''
+            });
+            setSubcategoryImageFile(null);
+            setImagePreview(null);
+            setTimeout(() => navigate('/subcategory/view'), 1000);
+          } else {
+            toast.error(finResponse.message);
+          }
+        });
+    }
+  }
 
   useEffect(() => {
     getParentCategory();
-  }, []);
+    getSubCategory();
+    // eslint-disable-next-line
+  }, [id]);
 
   // Custom drag and drop handlers
   const handleDragOver = (e) => {
@@ -82,36 +150,29 @@ export default function SubCategoryAdd() {
     setImagePreview(null);
   };
 
-  // Placeholder for parent categories (should be fetched from API)
-  const parentCategories = [
-    { _id: '1', categoryName: 'Shoe' },
-    { _id: '2', categoryName: 'Bag' },
-  ];
-
   const handleInputChange = (e) => {
     setFormValue({ ...formValue, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: Implement API call for subcategory creation
-    // Use formValue and subcategoryImageFile
-  };
+  let funObj = id ? "Edit Sub Category" : "Add Sub Category";
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
+      <ToastContainer />
       <div className="max-w-3xl mx-auto px-4">
+        
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
             <Link to="/dashboard" className="hover:text-blue-700 transition-colors">Home</Link>
             <span className="text-gray-400">/</span>
-            <Link to="/subcategory/add" className="hover:text-blue-700 transition-colors">Sub Category</Link>
+            <Link to={id ? `/subcategory/add/${id}` : "/subcategory/add"} className="hover:text-blue-700 transition-colors">Sub Category</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-blue-700">Add Sub Category</span>
+            <span className="text-blue-700">{funObj}</span>
           </h1>
         </div>
+
         <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-6">Add Sub Category</h2>
+          <h2 className="text-3xl font-semibold text-gray-800 mb-6">{funObj}</h2>
           <form onSubmit={saveSubCategory}>
             <div className="flex flex-col md:flex-row gap-8">
               {/* Subcategory Image */}
@@ -163,9 +224,13 @@ export default function SubCategoryAdd() {
                     required
                   >
                     <option value="">Select Category</option>
-                    {parentCategories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
-                    ))}
+                      {Array.isArray(parentData)
+                        ? parentData.map((item, index) => (
+                            <option key={item._id} value={item._id}>
+                              {item.categoryName}
+                            </option>
+                          ))
+                        : null}
                   </select>
                 </div>
                 <div>
@@ -196,7 +261,7 @@ export default function SubCategoryAdd() {
                 </div>
               </div>
             </div>
-            <button type="submit" className="mt-8 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">Add Sub Category</button>
+            <button type="submit" className="mt-8 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">{funObj}</button>
           </form>
         </div>
       </div>
