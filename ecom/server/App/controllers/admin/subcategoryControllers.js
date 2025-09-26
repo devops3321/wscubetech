@@ -1,4 +1,5 @@
 const { subcategoryModel } = require("../../models/subcategoryModel");
+const { categoryModel } = require("../../models/categoryModel");
 
 let subcategoryCreate = async (req, res) => {
     console.log(req.body);
@@ -80,6 +81,7 @@ let subcategoryViewAll = async (req, res) => {
 
 let subcategoryViewById = async (req, res) => {
 
+
     let subcategoryId = req.params.id;
 
     try {
@@ -103,6 +105,17 @@ let subcategoryViewById = async (req, res) => {
         }
         res.send(resObj);
     }
+}
+
+let subcategoryViewByParentCategory = async (req, res) => { 
+    let categoryData = await categoryModel.find({categoryStatus:true}).select("categoryName");
+    let resObj = {
+        status: "success",
+        message: "Subcategories retrieved successfully",
+        categoryData,
+        staticPath: process.env.SUBCATEGORY_IMAGE_PATH
+    }
+    res.send(resObj);
 }
 
 let subcategoryDeleteAll = async (req, res) => {
@@ -223,4 +236,4 @@ let subcategoryUpdate = async (req, res) => {
 
 }
 
-module.exports = { subcategoryCreate, subcategoryViewAll, subcategoryViewById, subcategoryDeleteAll, subcategoryMultiDeleteById, subcategoryStatusUpdate, subcategoryUpdate };
+module.exports = { subcategoryCreate, subcategoryViewAll, subcategoryViewById, subcategoryViewByParentCategory, subcategoryDeleteAll, subcategoryMultiDeleteById, subcategoryStatusUpdate, subcategoryUpdate };

@@ -1,7 +1,7 @@
 let express = require("express");
 const multer  = require('multer');
 
-const { subcategoryCreate, subcategoryViewAll, subcategoryViewById, subcategoryDeleteAll, subcategoryMultiDeleteById, subcategoryStatusUpdate, subcategoryUpdate } = require("../../controllers/admin/subcategoryControllers");
+const { subcategoryCreate, subcategoryViewAll, subcategoryViewById, subcategoryViewByParentCategory, subcategoryDeleteAll, subcategoryMultiDeleteById, subcategoryStatusUpdate, subcategoryUpdate } = require("../../controllers/admin/subcategoryControllers");
 let subcategoryRoutes = express.Router();
 
 const storage = multer.diskStorage({
@@ -21,6 +21,8 @@ subcategoryRoutes.post("/create", upload.single('subcategoryImage'), subcategory
 subcategoryRoutes.get("/view", subcategoryViewAll)
 
 subcategoryRoutes.get("/view/:id", subcategoryViewById)
+
+subcategoryRoutes.get("/parent-category/view", subcategoryViewByParentCategory)
 
 subcategoryRoutes.delete("/delete", subcategoryDeleteAll)
 

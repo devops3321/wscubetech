@@ -1,7 +1,9 @@
-import React, { useRef, useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function SubCategoryAdd() {
+  const [parentData, setParentData] = useState([]);
   const [subcategoryImageFile, setSubcategoryImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [formValue, setFormValue] = useState({
@@ -9,6 +11,46 @@ export default function SubCategoryAdd() {
     subcategoryOrder: '',
     parentCategory: ''
   });
+
+  let apiBaseurl = import.meta.env.VITE_APIBASEURL;
+
+  let getParentCategory = () => {
+    axios.get(`${apiBaseurl}subcategory/parent-category/view`)
+      .then((response) => response.data)
+      .then((finResponse) => {
+        if (finResponse.status === "success") {
+          setParentData(finResponse.categoryData);
+        }
+      });
+  }
+
+  let saveSubCategory = (e) => {
+    e.preventDefault();
+    let formValue = new FormData();
+    axios.post(`${apiBaseurl}subcategory/create`, formValue, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+      .then((response) => response.data)
+      .then((finResponse) => {
+        if (finResponse.status === "success") {
+          // Reset form and image preview
+          setFormValue({
+            subcategoryName: '',
+            subcategoryOrder: '',
+            parentCategory: ''
+          });
+          setSubcategoryImageFile(null);
+          setImagePreview(null);
+        }
+      })
+  }
+
+
+  useEffect(() => {
+    getParentCategory();
+  }, []);
 
   // Custom drag and drop handlers
   const handleDragOver = (e) => {
@@ -70,7 +112,7 @@ export default function SubCategoryAdd() {
         </div>
         <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
           <h2 className="text-3xl font-semibold text-gray-800 mb-6">Add Sub Category</h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={saveSubCategory}>
             <div className="flex flex-col md:flex-row gap-8">
               {/* Subcategory Image */}
               <div className="flex-1">
