@@ -24,7 +24,7 @@ export default function SubSubCategoryView() {
     })
       .then((response) => response.data)
       .then((finResponse) => {
-        setSubsubcategoryData(Array.isArray(finResponse.subsubcategoryData) ? finResponse.subsubcategoryData : []);
+        setSubsubcategoryData(Array.isArray(finResponse.data) ? finResponse.data : []);
         setTotalPage(finResponse.totalPage || 0);
         setStaticPath(finResponse.staticPath || "");
       })

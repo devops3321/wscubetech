@@ -46,8 +46,8 @@ export default function SubSubCategoryAdd() {
       axios.get(`${apiBaseurl}subsubcategory/view/${id}`)
         .then((response) => response.data)
         .then((finResponse) => {
-          if (finResponse.status === "success" && finResponse.subsubcategoryData) {
-            const data = finResponse.subsubcategoryData;
+          if (finResponse.status === "success" && finResponse.data) {
+            const data = finResponse.data;
             setFormValue({
               subsubcategoryName: data.subsubcategoryName || '',
               subsubcategoryOrder: data.subsubcategoryOrder || '',

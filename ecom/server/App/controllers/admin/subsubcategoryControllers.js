@@ -3,8 +3,6 @@ const { subcategoryModel } = require("../../models/subcategoryModel");
 const { categoryModel } = require("../../models/categoryModel");
 
 let subsubcategoryCreate = async (req, res) => {
-    console.log(req.body);
-
     let insertObj = {
         subsubcategoryName: req.body.subsubcategoryName,
         parentCategory: req.body.parentCategory,
@@ -18,30 +16,26 @@ let subsubcategoryCreate = async (req, res) => {
     try {
         let subsubcategoryCollection = new subsubcategoryModel(insertObj);
         let subsubcategoryResult = await subsubcategoryCollection.save();
-        let resObj = {
+        res.status(201).json({
             status: "success",
-            message: "subsubcategory created successfully",
-            staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH,
-            subsubcategoryResult
-        };
-        console.log(resObj);
-        res.send(resObj);
+            message: "Sub Sub Category created successfully.",
+            data: subsubcategoryResult,
+            staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH
+        });
     }
     catch (err) {
-        let errorMessage;
-        console.log(err);
+        let errorMessage = "An error occurred while creating Sub Sub Category.";
         if (err.code == 11000) {
-            errorMessage = "subsubcategory name already exists.";
+            errorMessage = "Sub Sub Category name already exists.";
         }
         if (err.errors) {
-            errorMessage = err.errors.subsubcategoryName?.message || "Validation error";
+            errorMessage = err.errors.subsubcategoryName?.message || "Validation error.";
         }
-        let resObj = {
+        res.status(400).json({
             status: "failed",
             message: errorMessage,
             error: err
-        };
-        res.send(resObj);
+        });
     }
 }
 
@@ -53,37 +47,29 @@ let subsubcategoryViewAll = async (req, res) => {
         if (req.query.limit) {
             limit = parseInt(req.query.limit);
         }
-        
         if (req.query.page) {
             skip = (req.query.page - 1) * limit;
         }
-
         let subsubcategoryData = await subsubcategoryModel.find()
             .populate("parentCategory", "categoryName")
             .populate("subcategory", "subcategoryName")
             .skip(skip).limit(limit);
-
         let subsubcategoryDataLength = await subsubcategoryModel.countDocuments();
-
-        let resObj = {
+        res.status(200).json({
             status: "success",
-            message: "Subcategories retrieved successfully",
-            subsubcategoryData,
-            length: subsubcategoryDataLength,
+            message: "Sub Sub Categories retrieved successfully.",
+            data: subsubcategoryData,
+            totalCount: subsubcategoryDataLength,
             staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH,
             totalPage: Math.ceil(subsubcategoryDataLength / limit)
-        };
-
-        res.send(resObj);
+        });
     }
-
     catch (err) {
-        let resObj = {
+        res.status(404).json({
             status: "failed",
-            message: "Subcategories not found",
+            message: "Sub Sub Categories not found.",
             error: err
-        }
-        res.send(resObj);
+        });
     }
 }
 
@@ -91,29 +77,29 @@ let subsubcategoryViewById = async (req, res) => {
 
 
     let subsubcategoryId = req.params.id;
-
     try {
         let subsubcategoryData = await subsubcategoryModel.findById(subsubcategoryId)
             .populate("parentCategory", "categoryName")
             .populate("subcategory", "subcategoryName");
-
-        let resObj = {
+        if (!subsubcategoryData) {
+            return res.status(404).json({
+                status: "failed",
+                message: "Sub Sub Category not found.",
+            });
+        }
+        res.status(200).json({
             status: "success",
-            message: "subsubcategory retrieved successfully",
-            subsubcategoryData,
+            message: "Sub Sub Category retrieved successfully.",
+            data: subsubcategoryData,
             staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH
-        };
-
-        res.send(resObj);
-
+        });
     }
     catch (err) {
-        let resObj = {
+        res.status(500).json({
             status: "failed",
-            message: "subsubcategory not found",
+            message: "Error retrieving Sub Sub Category.",
             error: err
-        }
-        res.send(resObj);
+        });
     }
 }
 
@@ -121,30 +107,28 @@ let subsubcategoryViewById = async (req, res) => {
 let subsubcategoryViewParentCategories = async (req, res) => {
     try {
         let categoryData = await categoryModel.find({ categoryStatus: true }).select("categoryName");
-        let resObj = {
+        res.status(200).json({
             status: "success",
-            message: "Parent categories retrieved successfully",
+            message: "Parent categories retrieved successfully.",
             categoryData,
             staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH
-        };
-        res.send(resObj);
+        });
     } catch (err) {
-        res.send({ status: "failed", message: "Error fetching parent categories", error: err });
+        res.status(500).json({ status: "failed", message: "Error fetching parent categories.", error: err });
     }
 };
 
 let subsubcategoryViewSubCategories = async (req, res) => {
     try {
         let subcategoryData = await subcategoryModel.find({ subcategoryStatus: true }).select("subcategoryName parentCategory");
-        let resObj = {
+        res.status(200).json({
             status: "success",
-            message: "Subcategories retrieved successfully",
+            message: "Subcategories retrieved successfully.",
             subcategoryData,
             staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH
-        };
-        res.send(resObj);
+        });
     } catch (err) {
-        res.send({ status: "failed", message: "Error fetching subcategories", error: err });
+        res.status(500).json({ status: "failed", message: "Error fetching subcategories.", error: err });
     }
 };
 
@@ -154,49 +138,39 @@ let subsubcategoryViewBysubCategory = async (req, res) => {
 
 let subsubcategoryDeleteAll = async (req, res) => {
 
-    let deleteObj;
-
     subsubcategoryModel.deleteMany({})
         .then((delResp) => {
-            deleteObj = {
+            res.status(200).json({
                 status: "success",
-                message: "All subcategories deleted successfully",
-                delResp
-            }
-            res.send(deleteObj);
+                message: "All Sub Sub Categories deleted successfully.",
+                deleted: delResp
+            });
         })
         .catch((err) => {
-            deleteObj = {
+            res.status(500).json({
                 status: "failed",
-                message: "Error deleting subcategories",
+                message: "Error deleting Sub Sub Categories.",
                 error: err
-            }
-            res.send(deleteObj);
+            });
         });
 }
 
 let subsubcategoryMultiDeleteById = async (req, res) => {
     let subsubcategoryIds = req.body.ids;
-
-    let deleteObj;
-
     subsubcategoryModel.deleteMany({ _id: subsubcategoryIds })
         .then((delResp) => {
-            deleteObj = {
+            res.status(200).json({
                 status: "success",
-                message: "Subcategories deleted successfully",
-                delResp
-            }
-            res.send(deleteObj);
+                message: "Selected Sub Sub Categories deleted successfully.",
+                deleted: delResp
+            });
         })
         .catch((err) => {
-            deleteObj = {
+            res.status(500).json({
                 status: "failed",
-                message: "Subcategories not deleted",
+                message: "Selected Sub Sub Categories not deleted.",
                 error: err
-            }
-
-            res.send(deleteObj);
+            });
         });
 }
 
@@ -213,19 +187,17 @@ let subsubcategoryStatusUpdate = async (req, res) => {
                 }
             ]
         );
-        let resObj = {
+        res.status(200).json({
             status: "success",
-            message: "subsubcategory status updated successfully",
-            subsubcategoryUpdate
-        };
-        res.send(resObj);
+            message: "Sub Sub Category status updated successfully.",
+            updated: subsubcategoryUpdate
+        });
     } catch (err) {
-        let resObj = {
+        res.status(404).json({
             status: "failed",
-            message: "subsubcategory not found",
+            message: "Sub Sub Category not found.",
             error: err
-        };
-        res.send(resObj);
+        });
     }
 }
 
@@ -261,19 +233,23 @@ let subsubcategoryUpdate = async (req, res) => {
             { _id: id },
             { $set: updateObj }
         );
-        let resObj = {
+        if (subsubcategoryUpdate.nModified === 0 && subsubcategoryUpdate.modifiedCount === 0) {
+            return res.status(404).json({
+                status: "failed",
+                message: "Sub Sub Category not found or no changes made."
+            });
+        }
+        res.status(200).json({
             status: "success",
-            message: "subsubcategory updated successfully",
-            subsubcategoryUpdate
-        };
-        res.send(resObj);
+            message: "Sub Sub Category updated successfully.",
+            updated: subsubcategoryUpdate
+        });
     } catch (err) {
-        let resObj = {
+        res.status(500).json({
             status: "failed",
-            message: "subsubcategory not found",
+            message: "Error updating Sub Sub Category.",
             error: err
-        };
-        res.send(resObj);
+        });
     }
 
 }

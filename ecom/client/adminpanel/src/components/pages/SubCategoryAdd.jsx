@@ -34,18 +34,18 @@ export default function SubCategoryAdd() {
       axios.get(`${apiBaseurl}subcategory/view/${id}`)
         .then((response) => response.data)
         .then((finResponse) => {
-          if (finResponse.status === "success") {
-            let parentCat = finResponse.subcategoryData.parentCategory;
+          if (finResponse.status === "success" && finResponse.data) {
+            let parentCat = finResponse.data.parentCategory;
             // If parentCategory is an object, extract its _id
             let parentCategoryId = parentCat && typeof parentCat === 'object' && parentCat._id ? parentCat._id : (parentCat || '');
             setFormValue({
-              subcategoryName: finResponse.subcategoryData.subcategoryName || '',
-              subcategoryOrder: finResponse.subcategoryData.subcategoryOrder || '',
+              subcategoryName: finResponse.data.subcategoryName || '',
+              subcategoryOrder: finResponse.data.subcategoryOrder || '',
               parentCategory: parentCategoryId
             });
             setStaticPath(finResponse.staticPath || "");
-            if (finResponse.subcategoryData.subcategoryImage) {
-              setImagePreview(`${finResponse.staticPath || ""}${finResponse.subcategoryData.subcategoryImage}`);
+            if (finResponse.data.subcategoryImage) {
+              setImagePreview(`${finResponse.staticPath || ""}${finResponse.data.subcategoryImage}`);
             } else {
               setImagePreview(null);
             }
