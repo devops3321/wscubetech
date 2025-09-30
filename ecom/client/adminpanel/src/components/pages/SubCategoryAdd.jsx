@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -68,7 +67,6 @@ export default function SubCategoryAdd() {
     let formData = new FormData();
     formData.append("subcategoryName", formValue.subcategoryName);
     formData.append("subcategoryOrder", formValue.subcategoryOrder);
-    formData.append("parentCategory", formValue.parentCategory);
     formData.append("parentCategory", formValue.parentCategory);
     if (subcategoryImageFile) {
       formData.append("subcategoryImage", subcategoryImageFile);

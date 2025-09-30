@@ -14,6 +14,8 @@ const { whychooseusRoutes } = require("./App/routes/admin/whychooseusRoutes");
 const { sliderRoutes } = require("./App/routes/admin/sliderRoutes");
 const { testimonialRoutes } = require("./App/routes/admin/testimonialRoutes");
 const { subcategoryRoutes } = require("./App/routes/admin/subcategoryRoutes");
+const { subsubcategoryRoutes } = require("./App/routes/admin/subsubcategoryRoutes");
+
 App.use(cors());
 App.use(express.json());
 
@@ -23,6 +25,7 @@ App.use("/uploads/whychooseus", express.static("uploads/whychooseus"));
 App.use("/uploads/slider", express.static("uploads/slider"));
 App.use("/uploads/testimonial", express.static("uploads/testimonial"));
 App.use("/uploads/subcategory", express.static("uploads/subcategory"));
+App.use("/uploads/subsubcategory", express.static("uploads/subsubcategory"));
 
 // http://localhost:<port>/admin/login
 App.use("/admin", adminRoutes);
@@ -35,6 +38,7 @@ App.use("/whychooseus", whychooseusRoutes);
 App.use("/slider", sliderRoutes);
 App.use("/testimonial", testimonialRoutes);
 App.use("/subcategory", subcategoryRoutes);
+App.use("/subsubcategory", subsubcategoryRoutes);
 
 // http://localhost:<port>/
 mongoose.connect(process.env.MONGO_URL)

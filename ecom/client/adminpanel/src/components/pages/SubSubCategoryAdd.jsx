@@ -1,25 +1,68 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SubSubCategoryAdd() {
+
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [subSubCategoryImageFile, setSubSubCategoryImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [formValue, setFormValue] = useState({
-    subSubCategoryName: '',
-    subSubCategoryOrder: '',
+    subsubcategoryName: '',
+    subsubcategoryOrder: '',
     parentCategory: '',
-    subCategory: ''
+    subcategory: ''
   });
+  const [parentCategories, setParentCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [staticPath, setStaticPath] = useState("");
+  let apiBaseurl = import.meta.env.VITE_APIBASEURL;
 
-  // Placeholder for parent and subcategories (should be fetched from API)
-  const parentCategories = [
-    { _id: '1', categoryName: 'Shoe' },
-    { _id: '2', categoryName: 'Bag' },
-  ];
-  const subCategories = [
-    { _id: '1', subcategoryName: 'Men' },
-    { _id: '2', subcategoryName: 'Women' },
-  ];
+  // Fetch parent categories and subcategories
+  useEffect(() => {
+    axios.get(`${apiBaseurl}subsubcategory/parent-category/view`)
+      .then((response) => response.data)
+      .then((finResponse) => {
+        if (finResponse.status === "success") {
+          setParentCategories(finResponse.categoryData || []);
+          setStaticPath(finResponse.staticPath || "");
+        }
+      });
+    axios.get(`${apiBaseurl}subsubcategory/subcategory/view`)
+      .then((response) => response.data)
+      .then((finResponse) => {
+        if (finResponse.status === "success") {
+          setSubCategories(finResponse.subcategoryData || []);
+        }
+      });
+  }, [apiBaseurl]);
+
+  // Fetch subsubcategory data for edit mode
+  useEffect(() => {
+    if (id) {
+      axios.get(`${apiBaseurl}subsubcategory/view/${id}`)
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success" && finResponse.subsubcategoryData) {
+            const data = finResponse.subsubcategoryData;
+            setFormValue({
+              subsubcategoryName: data.subsubcategoryName || '',
+              subsubcategoryOrder: data.subsubcategoryOrder || '',
+              parentCategory: data.parentCategory?._id || data.parentCategory || '',
+              subcategory: data.subcategory?._id || data.subcategory || ''
+            });
+            if (data.subsubcategoryImage && finResponse.staticPath) {
+              setImagePreview(finResponse.staticPath + data.subsubcategoryImage);
+            } else {
+              setImagePreview(null);
+            }
+          }
+        });
+    }
+  }, [id, apiBaseurl]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -56,12 +99,59 @@ export default function SubSubCategoryAdd() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement API call for subsubcategory creation
-    // Use formValue and subSubCategoryImageFile
+    let formData = new FormData();
+    formData.append("subsubcategoryName", formValue.subsubcategoryName);
+    formData.append("subsubcategoryOrder", formValue.subsubcategoryOrder);
+    formData.append("parentCategory", formValue.parentCategory);
+    formData.append("subcategory", formValue.subcategory);
+    // Only append image if a new one is selected
+    if (subSubCategoryImageFile) {
+      formData.append("subsubcategoryImage", subSubCategoryImageFile);
+    }
+    if (id) {
+      // Edit mode: PUT request
+      axios.put(`${apiBaseurl}subsubcategory/update/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success") {
+            toast.success(finResponse.message);
+            setTimeout(() => navigate('/subsubcategory/view'), 1000);
+          } else {
+            toast.error(finResponse.message);
+          }
+        });
+    } else {
+      // Add mode: POST request
+      axios.post(`${apiBaseurl}subsubcategory/create`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then((response) => response.data)
+        .then((finResponse) => {
+          if (finResponse.status === "success") {
+            toast.success(finResponse.message);
+            setFormValue({
+              subsubcategoryName: '',
+              subsubcategoryOrder: '',
+              parentCategory: '',
+              subcategory: ''
+            });
+            setSubSubCategoryImageFile(null);
+            setImagePreview(null);
+            setTimeout(() => navigate('/subsubcategory/view'), 1000);
+          } else {
+            toast.error(finResponse.message);
+          }
+        });
+    }
   };
+
+  let funObj = id ? "Edit Sub Sub Category" : "Add Sub Sub Category";
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
+      <ToastContainer />
       <div className="max-w-3xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
@@ -69,11 +159,11 @@ export default function SubSubCategoryAdd() {
             <span className="text-gray-400">/</span>
             <Link to="/subsubcategory/add" className="hover:text-blue-700 transition-colors">Sub Sub Category</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-blue-700">Add Sub Sub Category</span>
+            <span className="text-blue-700">{funObj}</span>
           </h1>
         </div>
         <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-6">Add Sub Sub Category</h2>
+          <h2 className="text-3xl font-semibold text-gray-800 mb-6">{funObj}</h2>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col md:flex-row gap-8">
               {/* SubSubCategory Image */}
@@ -131,28 +221,30 @@ export default function SubSubCategoryAdd() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="subCategory" className="block font-medium mb-2 text-gray-700">Sub Category Name</label>
+                  <label htmlFor="subcategory" className="block font-medium mb-2 text-gray-700">Sub Category Name</label>
                   <select
                     className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
-                    name="subCategory"
-                    id="subCategory"
-                    value={formValue.subCategory}
+                    name="subcategory"
+                    id="subcategory"
+                    value={formValue.subcategory}
                     onChange={handleInputChange}
                     required
                   >
                     <option value="">Select Sub Category</option>
-                    {subCategories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.subcategoryName}</option>
-                    ))}
+                    {subCategories
+                      .filter((cat) => !formValue.parentCategory || cat.parentCategory === formValue.parentCategory || (cat.parentCategory?._id === formValue.parentCategory))
+                      .map((cat) => (
+                        <option key={cat._id} value={cat._id}>{cat.subcategoryName}</option>
+                      ))}
                   </select>
                 </div>
                 <div>
                   <label htmlFor="subSubCategoryName" className="block font-medium mb-2 text-gray-700">Sub Sub Category Name</label>
                   <input
                     type="text"
-                    id="subSubCategoryName"
-                    name="subSubCategoryName"
-                    value={formValue.subSubCategoryName}
+                    id="subsubcategoryName"
+                    name="subsubcategoryName"
+                    value={formValue.subsubcategoryName}
                     onChange={handleInputChange}
                     className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
                     placeholder="Sub Sub Category Name"
@@ -163,9 +255,9 @@ export default function SubSubCategoryAdd() {
                   <label htmlFor="subSubCategoryOrder" className="block font-medium mb-2 text-gray-700">Order</label>
                   <input
                     type="text"
-                    id="subSubCategoryOrder"
-                    name="subSubCategoryOrder"
-                    value={formValue.subSubCategoryOrder}
+                    id="subsubcategoryOrder"
+                    name="subsubcategoryOrder"
+                    value={formValue.subsubcategoryOrder}
                     onChange={handleInputChange}
                     className="rounded-lg border border-gray-300 w-full h-12 p-3 font-medium focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-all duration-200"
                     placeholder="Order"
@@ -174,7 +266,7 @@ export default function SubSubCategoryAdd() {
                 </div>
               </div>
             </div>
-            <button type="submit" className="mt-8 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">Add Sub Sub Category</button>
+            <button type="submit" className="mt-8 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">{funObj}</button>
           </form>
         </div>
       </div>
