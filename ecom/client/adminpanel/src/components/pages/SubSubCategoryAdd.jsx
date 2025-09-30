@@ -21,8 +21,8 @@ export default function SubSubCategoryAdd() {
   const [staticPath, setStaticPath] = useState("");
   let apiBaseurl = import.meta.env.VITE_APIBASEURL;
 
-  // Fetch parent categories and subcategories
-  useEffect(() => {
+  // Fetch parent categories
+  const fetchParentCategories = () => {
     axios.get(`${apiBaseurl}subsubcategory/parent-category/view`)
       .then((response) => response.data)
       .then((finResponse) => {
@@ -31,6 +31,10 @@ export default function SubSubCategoryAdd() {
           setStaticPath(finResponse.staticPath || "");
         }
       });
+  };
+
+  // Fetch subcategories
+  const fetchSubCategories = () => {
     axios.get(`${apiBaseurl}subsubcategory/subcategory/view`)
       .then((response) => response.data)
       .then((finResponse) => {
@@ -38,6 +42,11 @@ export default function SubSubCategoryAdd() {
           setSubCategories(finResponse.subcategoryData || []);
         }
       });
+  };
+
+  useEffect(() => {
+    fetchParentCategories();
+    fetchSubCategories();
   }, [apiBaseurl]);
 
   // Fetch subsubcategory data for edit mode
@@ -46,6 +55,7 @@ export default function SubSubCategoryAdd() {
       axios.get(`${apiBaseurl}subsubcategory/view/${id}`)
         .then((response) => response.data)
         .then((finResponse) => {
+          // Fix: use correct response key and handle missing data
           if (finResponse.status === "success" && finResponse.data) {
             const data = finResponse.data;
             setFormValue({
@@ -54,11 +64,19 @@ export default function SubSubCategoryAdd() {
               parentCategory: data.parentCategory?._id || data.parentCategory || '',
               subcategory: data.subcategory?._id || data.subcategory || ''
             });
-            if (data.subsubcategoryImage && finResponse.staticPath) {
-              setImagePreview(finResponse.staticPath + data.subsubcategoryImage);
+            if (data.subsubcategoryImage && (finResponse.staticPath || staticPath)) {
+              setImagePreview((finResponse.staticPath || staticPath) + data.subsubcategoryImage);
             } else {
               setImagePreview(null);
             }
+          } else {
+            setFormValue({
+              subsubcategoryName: '',
+              subsubcategoryOrder: '',
+              parentCategory: '',
+              subcategory: ''
+            });
+            setImagePreview(null);
           }
         });
     }
