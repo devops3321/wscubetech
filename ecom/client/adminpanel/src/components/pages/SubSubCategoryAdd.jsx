@@ -233,9 +233,11 @@ export default function SubSubCategoryAdd() {
                     required
                   >
                     <option value="">Select Category</option>
-                    {parentCategories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
-                    ))}
+                    {
+                      parentCategories.map((cat) => (
+                        <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
+                      ))
+                    }
                   </select>
                 </div>
                 <div>
