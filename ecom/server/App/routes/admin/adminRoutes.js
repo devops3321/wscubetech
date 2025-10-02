@@ -1,17 +1,21 @@
 let express = require("express");
+const { adminauthRoutes } = require("./adminauthRoutes");
 const { colorRoutes } = require("./colorRoutes");
 const { materialRoutes } = require("./materialRoutes");
 const { countryRoutes } = require("./countryRoutes");
 const { faqRoutes } = require("./faqRoutes");
 const { categoryRoutes } = require("./categoryRoutes");
-const {subcategoryRoutes} = require("./subcategoryRoutes");
-const {subsubcategoryRoutes} = require("./subsubcategoryRoutes");
+const { subcategoryRoutes } = require("./subcategoryRoutes");
+const { subsubcategoryRoutes } = require("./subsubcategoryRoutes");
 const { whychooseusRoutes } = require("./whychooseusRoutes");
 const { testimonialRoutes } = require("./testimonialRoutes");
 const { sliderRoutes } = require("./sliderRoutes");
 const { productRoutes } = require("./productRoutes");
 
 let adminRoutes = express.Router();
+
+adminRoutes.use("/auth", adminauthRoutes);
+
 adminRoutes.use("/color", colorRoutes);
 adminRoutes.use("/material", materialRoutes);
 adminRoutes.use("/country", countryRoutes);

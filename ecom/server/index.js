@@ -1,4 +1,4 @@
-let express=require("express");
+let express = require("express");
 let cors = require("cors");
 let mongoose = require("mongoose");
 require("dotenv").config();
@@ -15,6 +15,7 @@ const { sliderRoutes } = require("./App/routes/admin/sliderRoutes");
 const { testimonialRoutes } = require("./App/routes/admin/testimonialRoutes");
 const { subcategoryRoutes } = require("./App/routes/admin/subcategoryRoutes");
 const { subsubcategoryRoutes } = require("./App/routes/admin/subsubcategoryRoutes");
+const { adminModel } = require("./App/models/adminModel");
 
 App.use(cors());
 App.use(express.json());
@@ -42,8 +43,21 @@ App.use("/subsubcategory", subsubcategoryRoutes);
 
 // http://localhost:<port>/
 mongoose.connect(process.env.MONGO_URL)
-.then(()=>{
-    App.listen(process.env.PORT,()=>{
-        console.log(`server is running at port ${process.env.PORT}`);
-    })
-});
+    .then(async (res) => {
+
+        let checkAdmin = await adminModel.find() // returns array
+
+        if (checkAdmin.length == 0) {
+            await adminModel.insertOne(
+                {
+                    adminEmail: process.env.ADMIN_EMAIL,
+                    adminPassword: process.env.ADMIN_PASSWORD
+                }
+
+            )
+        }
+
+        App.listen(process.env.PORT, () => {
+            console.log(`server is running at port ${process.env.PORT}`);
+        })
+    });

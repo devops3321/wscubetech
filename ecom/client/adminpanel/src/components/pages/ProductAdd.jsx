@@ -31,7 +31,7 @@ export default function ProductAdd() {
         actualPrice: "",
         salePrice: "",
         totalInStocks: "",
-        order: ""
+        productOrder: ""
     });
 
     // Image states
@@ -185,7 +185,6 @@ export default function ProductAdd() {
         e.preventDefault();
         const formData = new FormData();
         formData.append("productName", formValue.productName);
-        formData.append("productPrice", formValue.productPrice);
         formData.append("productDescription", formValue.productDescription);
         formData.append("parentCategory", formValue.parentCategory);
         formData.append("subCategory", formValue.subCategory);
@@ -197,13 +196,13 @@ export default function ProductAdd() {
             formValue.color.forEach((c) => formData.append("color", c));
         }
         formData.append("productType", formValue.productType);
-        formData.append("isBestSelling", formValue.isBestSelling === "Yes");
-        formData.append("isTopRated", formValue.isTopRated === "Yes");
-        formData.append("isUpsell", formValue.isUpsell === "Yes");
+        formData.append("isBestSelling", formValue.isBestSelling === "true" || formValue.isBestSelling === true);
+        formData.append("isTopRated", formValue.isTopRated === "true" || formValue.isTopRated === true);
+        formData.append("isUpsell", formValue.isUpsell === "true" || formValue.isUpsell === true);
         formData.append("actualPrice", formValue.actualPrice);
         formData.append("salePrice", formValue.salePrice);
         formData.append("totalInStocks", formValue.totalInStocks);
-        formData.append("order", formValue.order);
+        formData.append("productOrder", formValue.productOrder);
         if (productImageFile) formData.append("productImage", productImageFile);
         if (backImageFile) formData.append("productBackImage", backImageFile);
         if (galleryImageFiles && galleryImageFiles.length > 0) {
@@ -231,7 +230,7 @@ export default function ProductAdd() {
                         actualPrice: "",
                         salePrice: "",
                         totalInStocks: "",
-                        order: ""
+                        productOrder: ""
                     });
                     setProductImageFile(null);
                     setProductImagePreview(null);
@@ -239,7 +238,7 @@ export default function ProductAdd() {
                     setBackImagePreview(null);
                     setGalleryImageFiles([]);
                     setGalleryImagePreviews([]);
-                }, 500); // Give toast time to show
+                }, 500);
             } else {
                 toast.error(response.data.message || "Failed to create product");
             }
@@ -502,8 +501,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value={true}>Yes</option>
-                                        <option value={false}>No</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
                                     </select>
                                 </div>
                                 {/* Is Top Rated */}
@@ -516,8 +515,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value={true}>Yes</option>
-                                        <option value={false}>No</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
                                     </select>
                                 </div>
                                 {/* Is Upsell */}
@@ -530,8 +529,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value={true}>Yes</option>
-                                        <option value={false}>No</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
                                     </select>
                                 </div>
                                 {/* Actual Price */}
@@ -545,7 +544,7 @@ export default function ProductAdd() {
                                         value={formValue.actualPrice}
                                         onChange={handleInputChange}
                                     />
-                                </div>                                
+                                </div>
                                 {/* Sale Price */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Sale Price</label>
@@ -557,7 +556,7 @@ export default function ProductAdd() {
                                         value={formValue.salePrice}
                                         onChange={handleInputChange}
                                     />
-                                </div>                                
+                                </div>
                                 {/* Total In Stocks */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Total In Stocks</label>
@@ -569,7 +568,7 @@ export default function ProductAdd() {
                                         value={formValue.totalInStocks}
                                         onChange={handleInputChange}
                                     />
-                                </div>                                
+                                </div>
                                 {/* Order */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Order</label>

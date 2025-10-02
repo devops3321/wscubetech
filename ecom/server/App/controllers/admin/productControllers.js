@@ -111,7 +111,7 @@ const createProduct = async (req, res) => {
             actualPrice: req.body.actualPrice,
             salePrice: req.body.salePrice,
             totalInStocks: req.body.totalInStocks,
-            order: req.body.order,
+            productOrder: req.body.productOrder,
             productImage: productImage,
             productBackImage: productBackImage,
             galleryImage: galleryImages,
