@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
+    productImage: { type: String, default: "" },
+    productBackImage: { type: String, default: "" },
+    galleryImage: [{ type: String }],
     productName: {
         type: String,
         required: [true, "Product name is required"],
@@ -12,31 +15,15 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    productPrice: {
-        type: Number,
-        required: [true, "Product price is required"]
+    parentCategory: { type: mongoose.Schema.Types.ObjectId, ref: "categoryModel" },
+    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subcategoryModel" },
+    subSubCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subsubcategoryModel" },
+    material: [{ type: mongoose.Schema.Types.ObjectId, ref: "materialModel" }],
+    color: [{ type: mongoose.Schema.Types.ObjectId, ref: "colorModel" }],
+    productType: {
+        type: String,
+        enum: ['Featured', 'New Arrivals', 'On Sale'],
     },
-    parentCategory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "category",
-        required: true
-    },
-    subCategory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "subcategory",
-        required: true
-    },
-    subSubCategory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "subsubcategory",
-        required: false
-    },
-    productImage: String,
-    backImage: String,
-    galleryImage: String,
-    material: String,
-    color: String,
-    productType: String,
     isBestSelling: {
         type: Boolean,
         default: false
@@ -52,8 +39,9 @@ const productSchema = new mongoose.Schema({
     actualPrice: Number,
     salePrice: Number,
     totalInStocks: Number,
-    order: Number,
-    status: {
+    productOrder: Number,
+    productDescription: String,
+    productStatus: {
         type: Boolean,
         default: true
     },

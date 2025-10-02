@@ -36,16 +36,16 @@ productRoutes.get("/get-material", getMaterial);
 // Product CRUD routes
 productRoutes.post("/", upload.fields([
 	{ name: 'productImage', maxCount: 1 },
-	{ name: 'backImage', maxCount: 1 },
-	{ name: 'galleryImage', maxCount: 20 }
+	{ name: 'productBackImage', maxCount: 1 },
+	{ name: 'galleryImage', maxCount: 10 }
 ]), createProduct);
 
 productRoutes.get("/", getAllProducts);
 productRoutes.get("/:id", getProductById);
 productRoutes.put("/:id", upload.fields([
 	{ name: 'productImage', maxCount: 1 },
-	{ name: 'backImage', maxCount: 1 },
-	{ name: 'galleryImage', maxCount: 20 }
+	{ name: 'productBackImage', maxCount: 1 },
+	{ name: 'galleryImage', maxCount: 10 }
 ]), updateProduct);
 productRoutes.delete("/:id", deleteProduct);
 

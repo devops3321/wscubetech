@@ -87,20 +87,45 @@ const getMaterial = async (req, res) => {
 // Create a new product
 const createProduct = async (req, res) => {
     try {
-        const productData = req.body;
-        if (req.files) {
-            if (req.files.productImage && req.files.productImage[0]) {
-                productData.productImage = req.files.productImage[0].filename;
-            }
-            if (req.files.backImage && req.files.backImage[0]) {
-                productData.backImage = req.files.backImage[0].filename;
-            }
-            if (req.files.galleryImage && req.files.galleryImage[0]) {
-                productData.galleryImage = req.files.galleryImage[0].filename;
-            }
-        }
-        const product = await productModel.create(productData);
-        res.status(201).json({ status: true, message: "Product created successfully", data: product });
+        let productImage = req.files?.productImage?.[0]?.filename || "";
+        let productBackImage = req.files?.productBackImage?.[0]?.filename || "";
+        let galleryImages = req.files?.galleryImage ? req.files.galleryImage.map(f => f.filename) : [];
+
+        let color = req.body.color;
+        let material = req.body.material;
+        if (typeof color === "string") color = [color];
+        if (typeof material === "string") material = [material];
+
+        const newProduct = new productModel({
+            productName: req.body.productName,
+            productDescription: req.body.productDescription,
+            parentCategory: req.body.parentCategory,
+            subCategory: req.body.subCategory,
+            subSubCategory: req.body.subSubCategory,
+            material: material,
+            color: color,
+            productType: req.body.productType,
+            isBestSelling: req.body.isBestSelling,
+            isTopRated: req.body.isTopRated,
+            isUpsell: req.body.isUpsell,
+            actualPrice: req.body.actualPrice,
+            salePrice: req.body.salePrice,
+            totalInStocks: req.body.totalInStocks,
+            order: req.body.order,
+            productImage: productImage,
+            productBackImage: productBackImage,
+            galleryImage: galleryImages,
+
+        });
+
+        const product = await productModel.create(newProduct);
+        res.status(201).json({
+            status: "success",
+            message: "Product created successfully",
+            data: newProduct,
+            productStaticPath: process.env.PRODUCT_IMAGE_PATH
+        });
+        console.log("Product created:", product);
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
@@ -139,22 +164,21 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const productData = req.body;
-        if (req.files) {
-            if (req.files.productImage && req.files.productImage[0]) {
-                productData.productImage = req.files.productImage[0].filename;
-            }
-            if (req.files.backImage && req.files.backImage[0]) {
-                productData.backImage = req.files.backImage[0].filename;
-            }
-            if (req.files.galleryImage && req.files.galleryImage[0]) {
-                productData.galleryImage = req.files.galleryImage[0].filename;
-            }
-        }
-        const product = await productModel.findByIdAndUpdate(req.params.id, productData, { new: true });
+        let updateData = {};
+        if (req.files?.productImage?.[0]) updateData.productImage = req.files.productImage[0].filename;
+        if (req.files?.productBackImage?.[0]) updateData.productBackImage = req.files.productBackImage[0].filename;
+        if (req.files?.galleryImage) updateData.galleryImage = req.files.galleryImage.map(f => f.filename);
+
+        const product = await productModel.findByIdAndUpdate(req.params.id, { ...productData, ...updateData }, { new: true });
         if (!product) {
             return res.status(404).json({ status: false, message: "Product not found" });
         }
-        res.status(200).json({ status: true, message: "Product updated successfully", data: product });
+        res.json({
+            status: "success",
+            message: "Product updated successfully",
+            data: updatedProduct,
+            productStaticPath: process.env.PRODUCT_IMAGE_PATH
+        });
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }

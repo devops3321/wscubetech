@@ -1,17 +1,15 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
 
 export default function ProductAdd() {
-
     let apiBaseurl = import.meta.env.VITE_APIBASEURL;
 
+    // State
     const [parentCategories, setParentCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [subSubCategories, setSubSubCategories] = useState([]);
@@ -20,13 +18,12 @@ export default function ProductAdd() {
     const [staticPath, setStaticPath] = useState("");
     const [formValue, setFormValue] = useState({
         productName: "",
-        productPrice: "",
         productDescription: "",
         parentCategory: "",
         subCategory: "",
         subSubCategory: "",
-        material: [], // now array for react-select multi
-        color: [], // now array for react-select multi
+        material: [],
+        color: [],
         productType: "",
         isBestSelling: "",
         isTopRated: "",
@@ -36,210 +33,88 @@ export default function ProductAdd() {
         totalInStocks: "",
         order: ""
     });
-    const [description, setDescription] = useState("");
-    // State for image previews and files
+
+    // Image states
     const [productImageFile, setProductImageFile] = useState(null);
     const [productImagePreview, setProductImagePreview] = useState(null);
     const [backImageFile, setBackImageFile] = useState(null);
     const [backImagePreview, setBackImagePreview] = useState(null);
-    const [galleryImageFile, setGalleryImageFile] = useState(null);
-    const [galleryImagePreview, setGalleryImagePreview] = useState(null);
+    const [galleryImageFiles, setGalleryImageFiles] = useState([]);
+    const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
 
+    // Refs
+    const productImageInputRef = useRef(null);
+    const backImageInputRef = useRef(null);
+    const galleryImageInputRef = useRef(null);
 
-    // Fetch parent categories
-    const fetchParentCategories = () => {
+    // Fetch functions
+    useEffect(() => {
         axios.get(`${apiBaseurl}product/get-parent-category`)
-            .then((response) => response.data)
-            .then((finResponse) => {
+            .then(res => res.data)
+            .then(finResponse => {
                 if (finResponse.status === "success") {
                     setParentCategories(finResponse.categoryData || []);
                     setStaticPath(finResponse.staticPath || "");
                 }
             });
-    };
-
-    // Fetch subcategories for selected parent
-    const fetchSubCategories = (parentId) => {
-        console.log('Fetching subcategories for parentId:', parentId);
-        if (!parentId) {
-            setSubCategories([]);
-            return;
-        }
-        axios.get(`${apiBaseurl}product/get-sub-category/${parentId}`)
-            .then((response) => response.data)
-            .then((finResponse) => {
-                console.log('Subcategory API response:', finResponse);
-                if (finResponse.status === "success") {
-                    setSubCategories(finResponse.categoryData || []);
-                } else {
-                    setSubCategories([]);
-                }
-            });
-    };
-
-    // Fetch subsubcategories for selected subcategory
-    const fetchSubSubCategories = (subId) => {
-        console.log('Fetching subsubcategories for subId:', subId);
-        if (!subId) {
-            setSubSubCategories([]);
-            return;
-        }
-        axios.get(`${apiBaseurl}product/get-sub-sub-category/${subId}`)
-            .then((response) => response.data)
-            .then((finResponse) => {
-                console.log('SubSubcategory API response:', finResponse);
-                if (finResponse.status === "success") {
-                    setSubSubCategories(finResponse.categoryData || []);
-                } else {
-                    setSubSubCategories([]);
-                }
-            });
-    };
-
-    // Fetch colors
-    const fetchColors = () => {
         axios.get(`${apiBaseurl}product/get-colors`)
-            .then((response) => response.data)
-            .then((finResponse) => {
-                if (finResponse.status === "success") {
-                    setColors(finResponse.categoryData || []);
-                }
+            .then(res => res.data)
+            .then(finResponse => {
+                if (finResponse.status === "success") setColors(finResponse.categoryData || []);
             });
-    };
-
-    // Fetch materials
-    const fetchMaterials = () => {
         axios.get(`${apiBaseurl}product/get-material`)
-            .then((response) => response.data)
-            .then((finResponse) => {
-                if (finResponse.status === "success") {
-                    setMaterials(finResponse.categoryData || []);
-                }
+            .then(res => res.data)
+            .then(finResponse => {
+                if (finResponse.status === "success") setMaterials(finResponse.categoryData || []);
             });
-    };
-
-    useEffect(() => {
-        fetchParentCategories();
-        fetchColors();
-        fetchMaterials();
     }, [apiBaseurl]);
 
-    // When parentCategory changes, fetch subcategories
     useEffect(() => {
-        console.log('Parent category changed:', formValue.parentCategory);
         if (formValue.parentCategory) {
-            fetchSubCategories(formValue.parentCategory);
+            axios.get(`${apiBaseurl}product/get-sub-category/${formValue.parentCategory}`)
+                .then(res => res.data)
+                .then(finResponse => {
+                    if (finResponse.status === "success") setSubCategories(finResponse.categoryData || []);
+                    else setSubCategories([]);
+                });
         } else {
             setSubCategories([]);
         }
-        setFormValue((prev) => ({ ...prev, subCategory: "", subSubCategory: "" }));
+        setFormValue(prev => ({ ...prev, subCategory: "", subSubCategory: "" }));
         setSubSubCategories([]);
     }, [formValue.parentCategory]);
 
-    // When subCategory changes, fetch subsubcategories
     useEffect(() => {
-        console.log('Subcategory changed:', formValue.subCategory);
         if (formValue.subCategory) {
-            fetchSubSubCategories(formValue.subCategory);
+            axios.get(`${apiBaseurl}product/get-sub-sub-category/${formValue.subCategory}`)
+                .then(res => res.data)
+                .then(finResponse => {
+                    if (finResponse.status === "success") setSubSubCategories(finResponse.categoryData || []);
+                    else setSubSubCategories([]);
+                });
         } else {
             setSubSubCategories([]);
         }
-        setFormValue((prev) => ({ ...prev, subSubCategory: "" }));
+        setFormValue(prev => ({ ...prev, subSubCategory: "" }));
     }, [formValue.subCategory]);
 
-
-
-    // Refs for file inputs
-    const productImageInputRef = useRef(null);
-    const backImageInputRef = useRef(null);
-    const galleryImageInputRef = useRef(null);
-
-
-    // Handle input changes (including for react-select)
+    // Input handlers
     const handleInputChange = (e) => {
-        const { name, value, type, multiple, options } = e.target;
-        setFormValue((prev) => ({ ...prev, [name]: value }));
+        const { name, value } = e.target;
+        setFormValue(prev => ({ ...prev, [name]: value }));
     };
-
-    // For react-select multi (color, material)
     const handleMultiSelectChange = (selected, { name }) => {
-        setFormValue((prev) => ({ ...prev, [name]: selected ? selected.map((opt) => opt.value) : [] }));
-    };
-    // Handle form submit
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("productName", formValue.productName);
-        formData.append("productPrice", formValue.productPrice);
-        formData.append("productDescription", description);
-        formData.append("parentCategory", formValue.parentCategory);
-        formData.append("subCategory", formValue.subCategory);
-        formData.append("subSubCategory", formValue.subSubCategory);
-        // Multi-select material
-        if (formValue.material && formValue.material.length > 0) {
-            formValue.material.forEach((m) => formData.append("material", m));
-        }
-        formData.append("productType", formValue.productType);
-        formData.append("isBestSelling", formValue.isBestSelling === "Yes");
-        formData.append("isTopRated", formValue.isTopRated === "Yes");
-        formData.append("isUpsell", formValue.isUpsell === "Yes");
-        formData.append("actualPrice", formValue.actualPrice);
-        formData.append("salePrice", formValue.salePrice);
-        formData.append("totalInStocks", formValue.totalInStocks);
-        formData.append("order", formValue.order);
-        // Multi-select color
-        if (formValue.color && formValue.color.length > 0) {
-            formValue.color.forEach((c) => formData.append("color", c));
-        }
-        if (productImageFile) formData.append("productImage", productImageFile);
-        if (backImageFile) formData.append("backImage", backImageFile);
-        if (galleryImageFile) formData.append("galleryImage", galleryImageFile);
-        try {
-            const response = await axios.post(`${apiBaseurl}product/`, formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            if (response.data.status) {
-                toast.success("Product created successfully!");
-                // Optionally reset form
-                setFormValue({
-                    productName: "",
-                    productPrice: "",
-                    productDescription: "",
-                    parentCategory: "",
-                    subCategory: "",
-                    subSubCategory: "",
-                    material: "",
-                    color: [],
-                    productType: "",
-                    isBestSelling: "",
-                    isTopRated: "",
-                    isUpsell: "",
-                    actualPrice: "",
-                    salePrice: "",
-                    totalInStocks: "",
-                    order: ""
-                });
-                setDescription("");
-                setProductImageFile(null);
-                setProductImagePreview(null);
-                setBackImageFile(null);
-                setBackImagePreview(null);
-                setGalleryImageFile(null);
-                setGalleryImagePreview(null);
-            } else {
-                toast.error(response.data.message || "Failed to create product");
-            }
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Error creating product");
-        }
+        setFormValue(prev => ({ ...prev, [name]: selected ? selected.map(opt => opt.value) : [] }));
     };
 
-    // Drag and drop handlers for each image
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    // Product Image handlers
+    const handleProductFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setProductImageFile(file);
+            setProductImagePreview(URL.createObjectURL(file));
+        }
     };
-    // Product Image
     const handleProductDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -249,19 +124,20 @@ export default function ProductAdd() {
             setProductImagePreview(URL.createObjectURL(file));
         }
     };
-    const handleProductFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setProductImageFile(file);
-            setProductImagePreview(URL.createObjectURL(file));
-        }
-    };
     const handleRemoveProductImage = (e) => {
         e.stopPropagation();
         setProductImageFile(null);
         setProductImagePreview(null);
     };
-    // Back Image
+
+    // Back Image handlers
+    const handleProductBackImageChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setBackImageFile(file);
+            setBackImagePreview(URL.createObjectURL(file));
+        }
+    };
     const handleBackDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -271,39 +147,105 @@ export default function ProductAdd() {
             setBackImagePreview(URL.createObjectURL(file));
         }
     };
-    const handleBackFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setBackImageFile(file);
-            setBackImagePreview(URL.createObjectURL(file));
-        }
-    };
     const handleRemoveBackImage = (e) => {
         e.stopPropagation();
         setBackImageFile(null);
         setBackImagePreview(null);
     };
-    // Gallery Image
+
+    // Gallery Image handlers
+    const handleGalleryImageChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const files = Array.from(e.target.files);
+            setGalleryImageFiles(files);
+            setGalleryImagePreviews(files.map(file => URL.createObjectURL(file)));
+        }
+    };
     const handleGalleryDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const file = e.dataTransfer.files[0];
-            setGalleryImageFile(file);
-            setGalleryImagePreview(URL.createObjectURL(file));
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const files = Array.from(e.dataTransfer.files);
+            setGalleryImageFiles(files);
+            setGalleryImagePreviews(files.map(file => URL.createObjectURL(file)));
         }
     };
-    const handleGalleryFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setGalleryImageFile(file);
-            setGalleryImagePreview(URL.createObjectURL(file));
-        }
+    const handleRemoveGalleryImage = (index) => {
+        setGalleryImageFiles(prev => prev.filter((_, i) => i !== index));
+        setGalleryImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
-    const handleRemoveGalleryImage = (e) => {
-        e.stopPropagation();
-        setGalleryImageFile(null);
-        setGalleryImagePreview(null);
+
+    // Description handler
+    const setProductDescription = (value) => {
+        setFormValue(prev => ({ ...prev, productDescription: value }));
+    };
+
+    // Submit handler
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("productName", formValue.productName);
+        formData.append("productPrice", formValue.productPrice);
+        formData.append("productDescription", formValue.productDescription);
+        formData.append("parentCategory", formValue.parentCategory);
+        formData.append("subCategory", formValue.subCategory);
+        formData.append("subSubCategory", formValue.subSubCategory);
+        if (formValue.material && formValue.material.length > 0) {
+            formValue.material.forEach((m) => formData.append("material", m));
+        }
+        if (formValue.color && formValue.color.length > 0) {
+            formValue.color.forEach((c) => formData.append("color", c));
+        }
+        formData.append("productType", formValue.productType);
+        formData.append("isBestSelling", formValue.isBestSelling === "Yes");
+        formData.append("isTopRated", formValue.isTopRated === "Yes");
+        formData.append("isUpsell", formValue.isUpsell === "Yes");
+        formData.append("actualPrice", formValue.actualPrice);
+        formData.append("salePrice", formValue.salePrice);
+        formData.append("totalInStocks", formValue.totalInStocks);
+        formData.append("order", formValue.order);
+        if (productImageFile) formData.append("productImage", productImageFile);
+        if (backImageFile) formData.append("productBackImage", backImageFile);
+        if (galleryImageFiles && galleryImageFiles.length > 0) {
+            galleryImageFiles.forEach((file) => formData.append("galleryImage", file));
+        }
+        try {
+            const response = await axios.post(`${apiBaseurl}product/`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            if (response.data.status === "success") {
+                toast.success("Product created successfully!");
+                setTimeout(() => {
+                    setFormValue({
+                        productName: "",
+                        productDescription: "",
+                        parentCategory: "",
+                        subCategory: "",
+                        subSubCategory: "",
+                        material: [],
+                        color: [],
+                        productType: "",
+                        isBestSelling: "",
+                        isTopRated: "",
+                        isUpsell: "",
+                        actualPrice: "",
+                        salePrice: "",
+                        totalInStocks: "",
+                        order: ""
+                    });
+                    setProductImageFile(null);
+                    setProductImagePreview(null);
+                    setBackImageFile(null);
+                    setBackImagePreview(null);
+                    setGalleryImageFiles([]);
+                    setGalleryImagePreviews([]);
+                }, 500); // Give toast time to show
+            } else {
+                toast.error(response.data.message || "Failed to create product");
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Error creating product");
+        }
     };
 
     return (
@@ -324,44 +266,39 @@ export default function ProductAdd() {
                     <form className="p-0" onSubmit={handleSubmit} encType="multipart/form-data">
                         <div className="flex flex-col md:flex-row gap-6">
                             {/* Product Images */}
-                            <div className="flex flex-col gap-8 min-w-[11rem] max-w-[18.5rem]"> {/* w-44 to w-74 */}
+                            <div className="flex flex-col gap-8 min-w-[11rem] max-w-[18.5rem]">
                                 {/* Product Image */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Product Image</label>
                                     <div
                                         className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
-                                        onDragOver={handleDragOver}
+                                        onDragOver={e => e.preventDefault()}
                                         onDrop={handleProductDrop}
                                         onClick={() => productImageInputRef.current && productImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
                                     >
-                                        {
-                                            productImagePreview ?
-                                                (
-                                                    <div className="relative w-full h-full flex flex-col items-center justify-center">
-                                                        <img src={productImagePreview} alt="Preview" className="h-full object-contain rounded-lg border border-gray-200 shadow-sm" />
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleRemoveProductImage}
-                                                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 text-xs hover:bg-red-800 shadow z-10"
-                                                            style={{ zIndex: 2 }}
-                                                        >
-                                                            Remove/Change
-                                                        </button>
-                                                        <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
-                                                    </div>
-                                                )
-                                                :
-                                                (
-                                                    <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
-                                                )
-                                        }
+                                        {productImagePreview ? (
+                                            <div className="relative w-full h-full flex flex-col items-center justify-center">
+                                                <img src={productImagePreview} alt="Preview" className="h-full object-contain rounded-lg border border-gray-200 shadow-sm" />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveProductImage}
+                                                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 text-xs hover:bg-red-800 shadow z-10"
+                                                    style={{ zIndex: 2 }}
+                                                >
+                                                    Remove/Change
+                                                </button>
+                                                <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
+                                        )}
                                         <input
                                             type="file"
-                                            ref={productImageInputRef}
                                             name="productImage"
                                             accept="image/*"
-                                            style={{ display: 'none' }}
+                                            ref={productImageInputRef}
+                                            style={{ display: "none" }}
                                             onChange={handleProductFileChange}
                                         />
                                     </div>
@@ -371,7 +308,7 @@ export default function ProductAdd() {
                                     <label className="block font-medium mb-3 text-gray-700">Back Image</label>
                                     <div
                                         className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
-                                        onDragOver={handleDragOver}
+                                        onDragOver={e => e.preventDefault()}
                                         onDrop={handleBackDrop}
                                         onClick={() => backImageInputRef.current && backImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
@@ -394,53 +331,57 @@ export default function ProductAdd() {
                                         )}
                                         <input
                                             type="file"
-                                            ref={backImageInputRef}
-                                            name="backImage"
+                                            name="productBackImage"
                                             accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={handleBackFileChange}
+                                            ref={backImageInputRef}
+                                            style={{ display: "none" }}
+                                            onChange={handleProductBackImageChange}
                                         />
                                     </div>
                                 </div>
-                                {/* Gallery Image */}
+                                {/* Gallery Images */}
                                 <div>
-                                    <label className="block font-medium mb-3 text-gray-700">Gallery Image</label>
+                                    <label className="block font-medium mb-3 text-gray-700">Gallery Images</label>
                                     <div
                                         className="border-2 border-dashed border-gray-300 rounded-xl bg-white flex flex-col items-center justify-center h-48 w-60 mb-4 cursor-pointer relative hover:border-blue-400 shadow-md transition-all p-3"
-                                        onDragOver={handleDragOver}
+                                        onDragOver={e => e.preventDefault()}
                                         onDrop={handleGalleryDrop}
                                         onClick={() => galleryImageInputRef.current && galleryImageInputRef.current.click()}
                                         style={{ position: 'relative' }}
                                     >
-                                        {galleryImagePreview ? (
-                                            <div className="relative w-full h-full flex flex-col items-center justify-center">
-                                                <img src={galleryImagePreview} alt="Preview" className="h-full object-contain rounded-lg border border-gray-200 shadow-sm" />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleRemoveGalleryImage}
-                                                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 text-xs hover:bg-red-800 shadow z-10"
-                                                    style={{ zIndex: 2 }}
-                                                >
-                                                    Remove/Change
-                                                </button>
-                                                <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Current image will be replaced</span>
+                                        {galleryImagePreviews && galleryImagePreviews.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2 w-full h-full items-center justify-center">
+                                                {galleryImagePreviews.map((preview, idx) => (
+                                                    <div key={idx} className="relative">
+                                                        <img src={preview} alt={`Preview ${idx + 1}`} className="h-16 w-16 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={e => { e.stopPropagation(); handleRemoveGalleryImage(idx); }}
+                                                            className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 py-0 text-xs hover:bg-red-800 shadow z-10"
+                                                            style={{ zIndex: 2 }}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
                                         ) : (
                                             <span className="text-gray-400 flex items-center justify-center h-full w-full text-center">Drag & drop or click to upload</span>
                                         )}
                                         <input
+                                            multiple
                                             type="file"
-                                            ref={galleryImageInputRef}
                                             name="galleryImage"
                                             accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={handleGalleryFileChange}
+                                            ref={galleryImageInputRef}
+                                            style={{ display: "none" }}
+                                            onChange={handleGalleryImageChange}
                                         />
                                     </div>
                                 </div>
                             </div>
                             {/* Product Details */}
-                            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-8"> {/* wider gap-x for more width */}
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-8">
                                 {/* Product Name */}
                                 <div>
                                     <label className="block font-medium mb-3 text-gray-700">Product Name</label>
@@ -561,8 +502,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
                                 </div>
                                 {/* Is Top Rated */}
@@ -575,8 +516,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
                                 </div>
                                 {/* Is Upsell */}
@@ -589,8 +530,8 @@ export default function ProductAdd() {
                                         onChange={handleInputChange}
                                     >
                                         <option value="">Nothing Selected</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
+                                        <option value={true}>Yes</option>
+                                        <option value={false}>No</option>
                                     </select>
                                 </div>
                                 {/* Actual Price */}
@@ -636,8 +577,8 @@ export default function ProductAdd() {
                                         type="text"
                                         className='rounded-lg border border-gray-300 w-full h-12 p-3 font-medium mb-3 md:col-span-2'
                                         placeholder="Order"
-                                        name="order"
-                                        value={formValue.order}
+                                        name="productOrder"
+                                        value={formValue.productOrder}
                                         onChange={handleInputChange}
                                     />
                                 </div>
@@ -648,24 +589,15 @@ export default function ProductAdd() {
                             <label className="block font-semibold text-xl mb-3">Description</label>
                             <div data-color-mode="light">
                                 <MDEditor
-                                    value={description}
-                                    onChange={setDescription}
+                                    name="productDescription"
+                                    value={formValue.productDescription}
+                                    onChange={setProductDescription}
                                     height={200}
                                     style={{ background: "#fff" }}
                                     textareaProps={{ style: { background: "#fff" } }}
                                 />
                             </div>
-                            <style>
-                                {`
-                            /* Make MDEditor toolbar icons bigger */
-                            .w-md-editor-toolbar button svg {
-                                width: 1.7em !important;
-                                height: 1.7em !important;
-                            }
-                            `}
-                            </style>
                         </div>
-                        {/* Submit Button */}
                         <button type="submit" className="mt-10 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">
                             Create Product
                         </button>
