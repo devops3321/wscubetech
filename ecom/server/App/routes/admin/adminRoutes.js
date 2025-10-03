@@ -37,4 +37,4 @@ adminRoutes.post("/login", (req,res)=> {
     res.send(obj);
 });
 
-module.exports = adminRoutes;
+module.exports = {adminRoutes};

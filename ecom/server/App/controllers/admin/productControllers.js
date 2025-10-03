@@ -4,7 +4,6 @@ const { subsubcategoryModel } = require("../../models/subsubcategoryModel");
 const { colorModel } = require("../../models/colorModel");
 const { materialModel } = require("../../models/materialModel");
 const { productModel } = require("../../models/productModel");
-const { get } = require("mongoose");
 
 // Fetch all categories (for dropdowns)
 const getParentCategory = async (req, res) => {
@@ -138,7 +137,12 @@ const getAllProducts = async (req, res) => {
             .populate('parentCategory')
             .populate('subCategory')
             .populate('subSubCategory');
-        res.status(200).json({ status: true, message: "Products fetched successfully", data: products });
+        res.status(200).json({
+            status: true,
+            message: "Products fetched successfully",
+            data: products,
+            productStaticPath: process.env.PRODUCT_IMAGE_PATH
+        });
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
@@ -147,14 +151,16 @@ const getAllProducts = async (req, res) => {
 // Get a single product by ID
 const getProductById = async (req, res) => {
     try {
-        const product = await productModel.findById(req.params.id)
-            .populate('parentCategory')
-            .populate('subCategory')
-            .populate('subSubCategory');
+        const product = await productModel.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ status: false, message: "Product not found" });
         }
-        res.status(200).json({ status: true, message: "Product fetched successfully", data: product });
+        res.status(200).json({
+            status: true,
+            message: "Product fetched successfully",
+            data: product,
+            productStaticPath: process.env.PRODUCT_IMAGE_PATH
+        });
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
@@ -163,20 +169,29 @@ const getProductById = async (req, res) => {
 // Update a product by ID
 const updateProduct = async (req, res) => {
     try {
-        const productData = req.body;
-        let updateData = {};
-        if (req.files?.productImage?.[0]) updateData.productImage = req.files.productImage[0].filename;
-        if (req.files?.productBackImage?.[0]) updateData.productBackImage = req.files.productBackImage[0].filename;
-        if (req.files?.galleryImage) updateData.galleryImage = req.files.galleryImage.map(f => f.filename);
+        let updateFields = { ...req.body };
+        // Handle file uploads if any (similar to createProduct)
+        if (req.files?.productImage?.[0]) {
+            updateFields.productImage = req.files.productImage[0].filename;
+        }
+        if (req.files?.productBackImage?.[0]) {
+            updateFields.productBackImage = req.files.productBackImage[0].filename;
+        }
+        if (req.files?.galleryImage) {
+            updateFields.galleryImage = req.files.galleryImage.map(f => f.filename);
+        }
+        // Convert material and color to arrays if needed
+        if (typeof updateFields.color === "string") updateFields.color = [updateFields.color];
+        if (typeof updateFields.material === "string") updateFields.material = [updateFields.material];
 
-        const product = await productModel.findByIdAndUpdate(req.params.id, { ...productData, ...updateData }, { new: true });
-        if (!product) {
+        const updated = await productModel.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+        if (!updated) {
             return res.status(404).json({ status: false, message: "Product not found" });
         }
-        res.json({
-            status: "success",
+        res.status(200).json({
+            status: true,
             message: "Product updated successfully",
-            data: updatedProduct,
+            data: updated,
             productStaticPath: process.env.PRODUCT_IMAGE_PATH
         });
     } catch (error) {
@@ -197,6 +212,44 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+
+// Bulk delete
+const deleteMultipleProducts = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ status: false, message: "No product IDs provided" });
+        }
+        await productModel.deleteMany({ _id: { $in: ids } });
+        res.json({ status: true, message: "Products deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
+    }
+};
+
+// Bulk status update
+const updateProductStatus = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ status: false, message: "No product IDs provided" });
+        }
+        // Toggle status for each product
+        const products = await productModel.find({ _id: { $in: ids } });
+        if (!products.length) {
+            return res.status(404).json({ status: false, message: "Products not found" });
+        }
+        // Toggle status for each product
+        for (let product of products) {
+            product.productStatus = !product.productStatus;
+            await product.save();
+        }
+        res.json({ status: true, message: "Product status updated successfully" });
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
+    }
+};
+
 module.exports = {
     getParentCategory,
     getSubCategory,
@@ -207,5 +260,7 @@ module.exports = {
     getAllProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStatus,
+    deleteMultipleProducts
 };

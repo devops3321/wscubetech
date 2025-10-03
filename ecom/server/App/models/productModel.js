@@ -15,10 +15,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    parentCategory: { type: mongoose.Schema.Types.ObjectId, ref: "categoryModel" },
-    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subcategoryModel" },
-    subSubCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subsubcategoryModel" },
-    material: [{ type: mongoose.Schema.Types.ObjectId, ref: "materialModel" }],
+    parentCategory: { type: mongoose.Schema.Types.ObjectId, ref: "category" },
+    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subcategory" },
+    subSubCategory: { type: mongoose.Schema.Types.ObjectId, ref: "subsubcategory" },
+    material: [{ type: mongoose.Schema.Types.ObjectId, ref: "materials" }],
     color: [{ type: mongoose.Schema.Types.ObjectId, ref: "colorModel" }],
     productType: {
         type: String,

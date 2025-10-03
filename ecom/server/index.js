@@ -4,7 +4,7 @@ let mongoose = require("mongoose");
 require("dotenv").config();
 let App = express();
 
-const adminRoutes = require("./App/routes/admin/adminRoutes");
+const { adminRoutes } = require("./App/routes/admin/adminRoutes");
 const { colorRoutes } = require("./App/routes/admin/colorRoutes");
 const { materialRoutes } = require("./App/routes/admin/materialRoutes");
 const { countryRoutes } = require("./App/routes/admin/countryRoutes");
@@ -15,6 +15,7 @@ const { sliderRoutes } = require("./App/routes/admin/sliderRoutes");
 const { testimonialRoutes } = require("./App/routes/admin/testimonialRoutes");
 const { subcategoryRoutes } = require("./App/routes/admin/subcategoryRoutes");
 const { subsubcategoryRoutes } = require("./App/routes/admin/subsubcategoryRoutes");
+const { productRoutes } = require("./App/routes/admin/productRoutes");
 const { adminModel } = require("./App/models/adminModel");
 
 App.use(cors());
@@ -27,6 +28,7 @@ App.use("/uploads/slider", express.static("uploads/slider"));
 App.use("/uploads/testimonial", express.static("uploads/testimonial"));
 App.use("/uploads/subcategory", express.static("uploads/subcategory"));
 App.use("/uploads/subsubcategory", express.static("uploads/subsubcategory"));
+App.use("/uploads/product", express.static("uploads/product"));
 
 // http://localhost:<port>/admin/login
 App.use("/admin", adminRoutes);
@@ -40,6 +42,7 @@ App.use("/slider", sliderRoutes);
 App.use("/testimonial", testimonialRoutes);
 App.use("/subcategory", subcategoryRoutes);
 App.use("/subsubcategory", subsubcategoryRoutes);
+App.use("/product", productRoutes);
 
 // http://localhost:<port>/
 mongoose.connect(process.env.MONGO_URL)

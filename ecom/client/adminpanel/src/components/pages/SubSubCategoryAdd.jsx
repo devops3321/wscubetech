@@ -82,6 +82,19 @@ export default function SubSubCategoryAdd() {
     }
   }, [id, apiBaseurl]);
 
+  useEffect(() => {
+    if (!id) {
+      setFormValue({
+        subsubcategoryName: '',
+        subsubcategoryOrder: '',
+        parentCategory: '',
+        subcategory: ''
+      });
+      setSubSubCategoryImageFile(null);
+      setImagePreview(null);
+    }
+  }, [id]);
+
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();

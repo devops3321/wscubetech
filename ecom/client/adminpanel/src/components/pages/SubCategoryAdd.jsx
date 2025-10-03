@@ -124,6 +124,18 @@ export default function SubCategoryAdd() {
     // eslint-disable-next-line
   }, [id]);
 
+  useEffect(() => {
+    if (!id) {
+      setFormValue({
+        subcategoryName: '',
+        subcategoryOrder: '',
+        parentCategory: ''
+      });
+      setSubcategoryImageFile(null);
+      setImagePreview(null);
+    }
+  }, [id]);
+
   // Custom drag and drop handlers
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -169,7 +181,7 @@ export default function SubCategoryAdd() {
           <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
             <Link to="/dashboard" className="hover:text-blue-700 transition-colors">Home</Link>
             <span className="text-gray-400">/</span>
-            <Link to={id ? `/subcategory/add/${id}` : "/subcategory/add"} className="hover:text-blue-700 transition-colors">Sub Category</Link>
+            <Link to={"/subcategory/add"} className="hover:text-blue-700 transition-colors">Sub Category</Link>
             <span className="text-gray-400">/</span>
             <span className="text-blue-700">{funObj}</span>
           </h1>

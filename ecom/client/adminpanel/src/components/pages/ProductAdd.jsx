@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import MDEditor from "@uiw/react-md-editor";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,6 +8,8 @@ import Select from "react-select";
 
 export default function ProductAdd() {
     let apiBaseurl = import.meta.env.VITE_APIBASEURL;
+    const { id } = useParams();
+    const navigate = useNavigate();
 
     // State
     const [parentCategories, setParentCategories] = useState([]);
@@ -95,8 +97,94 @@ export default function ProductAdd() {
         } else {
             setSubSubCategories([]);
         }
-        setFormValue(prev => ({ ...prev, subSubCategory: "" }));
-    }, [formValue.subCategory]);
+        // Only reset subSubCategory if not editing or if subCategory was changed by user
+        if (!id) {
+            setFormValue(prev => ({ ...prev, subSubCategory: "" }));
+        }
+    }, [formValue.subCategory, id]);
+
+    // Fetch product details if editing
+    useEffect(() => {
+        if (id) {
+            axios.get(`${apiBaseurl}product/${id}`)
+                .then(res => {
+                    const data = res.data.data;
+                    // Set all simple fields first
+                    setFormValue(prev => ({
+                        ...prev,
+                        productName: data.productName || "",
+                        productDescription: data.productDescription || "",
+                        parentCategory: data.parentCategory || "",
+                        material: data.material || [],
+                        color: data.color || [],
+                        productType: data.productType || "",
+                        isBestSelling: data.isBestSelling === true ? "true" : data.isBestSelling === false ? "false" : "",
+                        isTopRated: data.isTopRated === true ? "true" : data.isTopRated === false ? "false" : "",
+                        isUpsell: data.isUpsell === true ? "true" : data.isUpsell === false ? "false" : "",
+                        actualPrice: data.actualPrice || "",
+                        salePrice: data.salePrice || "",
+                        totalInStocks: data.totalInStocks || "",
+                        productOrder: data.productOrder || ""
+                    }));
+                    setProductImagePreview(data.productImage ? `${res.data.productStaticPath}${data.productImage}` : null);
+                    setBackImagePreview(data.productBackImage ? `${res.data.productStaticPath}${data.productBackImage}` : null);
+
+                    // Fetch subcategories and subsubcategories in sequence
+                    if (data.parentCategory) {
+                        axios.get(`${apiBaseurl}product/get-sub-category/${data.parentCategory}`)
+                            .then(res2 => res2.data)
+                            .then(finResponse2 => {
+                                setSubCategories(finResponse2.categoryData || []);
+                                setFormValue(prev => ({ ...prev, subCategory: data.subCategory || "" }));
+
+                                if (data.subCategory) {
+                                    axios.get(`${apiBaseurl}product/get-sub-sub-category/${data.subCategory}`)
+                                        .then(res3 => res3.data)
+                                        .then(finResponse3 => {
+                                            setSubSubCategories(finResponse3.categoryData || []);
+                                            // Set subSubCategory only after options are loaded
+                                            setFormValue(prev => ({ ...prev, subSubCategory: data.subSubCategory || "" }));
+                                        });
+                                }
+                            });
+                    }
+                    // Gallery images
+                    if (data.galleryImage && Array.isArray(data.galleryImage)) {
+                        setGalleryImagePreviews(data.galleryImage.map(img => `${res.data.productStaticPath}${img}`));
+                    }
+                });
+        }
+    }, [id, apiBaseurl]);
+
+    useEffect(() => {
+        if (!id) {
+            setFormValue({
+                productName: "",
+                productDescription: "",
+                parentCategory: "",
+                subCategory: "",
+                subSubCategory: "",
+                material: [],
+                color: [],
+                productType: "",
+                isBestSelling: "",
+                isTopRated: "",
+                isUpsell: "",
+                actualPrice: "",
+                salePrice: "",
+                totalInStocks: "",
+                productOrder: ""
+            });
+            setProductImageFile(null);
+            setProductImagePreview(null);
+            setBackImageFile(null);
+            setBackImagePreview(null);
+            setGalleryImageFiles([]);
+            setGalleryImagePreviews([]);
+            setSubCategories([]);
+            setSubSubCategories([]);
+        }
+    }, [id]);
 
     // Input handlers
     const handleInputChange = (e) => {
@@ -209,43 +297,30 @@ export default function ProductAdd() {
             galleryImageFiles.forEach((file) => formData.append("galleryImage", file));
         }
         try {
-            const response = await axios.post(`${apiBaseurl}product/`, formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            if (response.data.status === "success") {
-                toast.success("Product created successfully!");
-                setTimeout(() => {
-                    setFormValue({
-                        productName: "",
-                        productDescription: "",
-                        parentCategory: "",
-                        subCategory: "",
-                        subSubCategory: "",
-                        material: [],
-                        color: [],
-                        productType: "",
-                        isBestSelling: "",
-                        isTopRated: "",
-                        isUpsell: "",
-                        actualPrice: "",
-                        salePrice: "",
-                        totalInStocks: "",
-                        productOrder: ""
-                    });
-                    setProductImageFile(null);
-                    setProductImagePreview(null);
-                    setBackImageFile(null);
-                    setBackImagePreview(null);
-                    setGalleryImageFiles([]);
-                    setGalleryImagePreviews([]);
-                }, 500);
+            if (id) {
+                // Edit mode
+                await axios.put(`${apiBaseurl}product/${id}`, formData);
+                toast.success("Product updated successfully!");
             } else {
-                toast.error(response.data.message || "Failed to create product");
+                // Add mode
+                const response = await axios.post(`${apiBaseurl}product/add`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                });
+                if (response.data.status === "success") {
+                    toast.success("Product created successfully!");
+                } else {
+                    toast.error(response.data.message || "Failed to create product");
+                }
             }
+            setTimeout(() => {
+                navigate("/product/product-items");
+            }, 500);
         } catch (err) {
-            toast.error(err.response?.data?.message || "Error creating product");
+            toast.error(err.response?.data?.message || "Error saving product");
         }
     };
+
+    let funObj = id ? "Edit Product" : "Add Product";
 
     return (
         <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
@@ -257,11 +332,11 @@ export default function ProductAdd() {
                         <span className="text-gray-400">/</span>
                         <Link to="/product/add" className="hover:text-blue-700 transition-colors">Product</Link>
                         <span className="text-gray-400">/</span>
-                        <span className="text-blue-700">Add Product</span>
+                        <span className="text-blue-700">{funObj}</span>
                     </h1>
                 </div>
                 <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-                    <h2 className="text-3xl font-semibold text-gray-800 mb-6">Add Product</h2>
+                    <h2 className="text-3xl font-semibold text-gray-800 mb-6">{funObj}</h2>
                     <form className="p-0" onSubmit={handleSubmit} encType="multipart/form-data">
                         <div className="flex flex-col md:flex-row gap-6">
                             {/* Product Images */}
@@ -598,7 +673,7 @@ export default function ProductAdd() {
                             </div>
                         </div>
                         <button type="submit" className="mt-10 text-white bg-blue-700 hover:bg-blue-800 font-semibold rounded-lg text-md px-8 py-3 shadow transition-all duration-150">
-                            Create Product
+                            {funObj}
                         </button>
                     </form>
                 </div>
