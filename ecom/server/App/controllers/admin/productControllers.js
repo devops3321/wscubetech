@@ -95,6 +95,17 @@ const createProduct = async (req, res) => {
         if (typeof color === "string") color = [color];
         if (typeof material === "string") material = [material];
 
+        // Validate and convert fields
+        const totalInStocks = Number(req.body.totalInStocks);
+        const productOrder = Number(req.body.productOrder);
+
+        if (isNaN(totalInStocks) || isNaN(productOrder)) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Invalid input: totalInStocks and productOrder must be numbers."
+            });
+        }
+
         const newProduct = new productModel({
             productName: req.body.productName,
             productDescription: req.body.productDescription,
@@ -109,12 +120,11 @@ const createProduct = async (req, res) => {
             isUpsell: req.body.isUpsell,
             actualPrice: req.body.actualPrice,
             salePrice: req.body.salePrice,
-            totalInStocks: req.body.totalInStocks,
-            productOrder: req.body.productOrder,
+            totalInStocks: totalInStocks,
+            productOrder: productOrder,
             productImage: productImage,
             productBackImage: productBackImage,
             galleryImage: galleryImages,
-
         });
 
         const product = await productModel.create(newProduct);
@@ -170,6 +180,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         let updateFields = { ...req.body };
+
         // Handle file uploads if any (similar to createProduct)
         if (req.files?.productImage?.[0]) {
             updateFields.productImage = req.files.productImage[0].filename;
@@ -180,9 +191,31 @@ const updateProduct = async (req, res) => {
         if (req.files?.galleryImage) {
             updateFields.galleryImage = req.files.galleryImage.map(f => f.filename);
         }
+
         // Convert material and color to arrays if needed
         if (typeof updateFields.color === "string") updateFields.color = [updateFields.color];
         if (typeof updateFields.material === "string") updateFields.material = [updateFields.material];
+
+        // Validate and convert fields
+        if (updateFields.totalInStocks) {
+            updateFields.totalInStocks = Number(updateFields.totalInStocks);
+            if (isNaN(updateFields.totalInStocks)) {
+                return res.status(400).json({
+                    status: "failed",
+                    message: "Invalid input: totalInStocks must be a number."
+                });
+            }
+        }
+
+        if (updateFields.productOrder) {
+            updateFields.productOrder = Number(updateFields.productOrder);
+            if (isNaN(updateFields.productOrder)) {
+                return res.status(400).json({
+                    status: "failed",
+                    message: "Invalid input: productOrder must be a number."
+                });
+            }
+        }
 
         const updated = await productModel.findByIdAndUpdate(req.params.id, updateFields, { new: true });
         if (!updated) {
