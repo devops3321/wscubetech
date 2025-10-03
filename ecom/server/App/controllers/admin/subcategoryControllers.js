@@ -177,24 +177,32 @@ let subcategoryStatusUpdate = async (req, res) => {
 let subcategoryUpdate = async (req, res) => {
     let { id } = req.params;
     try {
+        // Check for duplicate name (excluding current)
+        const existing = await subcategoryModel.findOne({
+            subcategoryName: req.body.subcategoryName,
+            _id: { $ne: id }
+        });
+        if (existing) {
+            return res.status(400).json({
+                status: "failed",
+                message: "Sub Category name already exists."
+            });
+        }
+
         // Build update object
         let updateObj = {
             subcategoryName: req.body.subcategoryName,
             subcategoryOrder: req.body.subcategoryOrder,
         };
-        // Only update subcategoryImage if a new file is uploaded
         if (req.file && req.file.filename) {
             updateObj.subcategoryImage = req.file.filename;
         }
-        // Optionally update status if provided
         if (typeof req.body.subcategoryStatus !== 'undefined') {
             updateObj.subcategoryStatus = req.body.subcategoryStatus;
         }
-        // Optionally update code if provided
         if (typeof req.body.subcategoryCode !== 'undefined') {
             updateObj.subcategoryCode = req.body.subcategoryCode;
         }
-        // Optionally update parentCategory if provided
         if (req.body.parentCategory) {
             updateObj.parentCategory = req.body.parentCategory;
         }

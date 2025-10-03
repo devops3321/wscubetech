@@ -86,14 +86,18 @@ export default function SubCategoryAdd() {
             });
             setSubcategoryImageFile(null);
             setImagePreview(null);
-            // Force reload to ensure view page updates
             setTimeout(() => {
               navigate('/subcategory/view', { replace: true });
               window.location.reload();
             }, 1000);
           } else {
-            toast.error(finResponse.message);
+            toast.error(finResponse.message || "An error occurred while updating.");
           }
+        })
+        .catch((err) => {
+          // Show backend error message if available
+          const msg = err.response?.data?.message || "An error occurred while updating.";
+          toast.error(msg);
         });
     } else {
       axios.post(`${apiBaseurl}subcategory/create`, formData, {
@@ -112,8 +116,12 @@ export default function SubCategoryAdd() {
             setImagePreview(null);
             setTimeout(() => navigate('/subcategory/view'), 1000);
           } else {
-            toast.error(finResponse.message);
+            toast.error(finResponse.message || "An error occurred while creating.");
           }
+        })
+        .catch((err) => {
+          const msg = err.response?.data?.message || "An error occurred while creating.";
+          toast.error(msg);
         });
     }
   }

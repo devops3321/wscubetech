@@ -135,7 +135,6 @@ export default function SubSubCategoryAdd() {
     formData.append("subsubcategoryOrder", formValue.subsubcategoryOrder);
     formData.append("parentCategory", formValue.parentCategory);
     formData.append("subcategory", formValue.subcategory);
-    // Only append image if a new one is selected
     if (subSubCategoryImageFile) {
       formData.append("subsubcategoryImage", subSubCategoryImageFile);
     }
@@ -150,8 +149,12 @@ export default function SubSubCategoryAdd() {
             toast.success(finResponse.message);
             setTimeout(() => navigate('/subsubcategory/view'), 1000);
           } else {
-            toast.error(finResponse.message);
+            toast.error(finResponse.message || "An error occurred while updating.");
           }
+        })
+        .catch((err) => {
+          const msg = err.response?.data?.message || "An error occurred while updating.";
+          toast.error(msg);
         });
     } else {
       // Add mode: POST request
@@ -172,8 +175,12 @@ export default function SubSubCategoryAdd() {
             setImagePreview(null);
             setTimeout(() => navigate('/subsubcategory/view'), 1000);
           } else {
-            toast.error(finResponse.message);
+            toast.error(finResponse.message || "An error occurred while creating.");
           }
+        })
+        .catch((err) => {
+          const msg = err.response?.data?.message || "An error occurred while creating.";
+          toast.error(msg);
         });
     }
   };
