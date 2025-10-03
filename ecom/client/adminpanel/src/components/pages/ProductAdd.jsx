@@ -49,23 +49,51 @@ export default function ProductAdd() {
     const backImageInputRef = useRef(null);
     const galleryImageInputRef = useRef(null);
 
+    // API call functions
+    const fetchParentCategories = async (apiBaseurl) => {
+        const res = await axios.get(`${apiBaseurl}product/get-parent-category`);
+        return res.data;
+    };
+
+    const fetchColors = async (apiBaseurl) => {
+        const res = await axios.get(`${apiBaseurl}product/get-colors`);
+        return res.data;
+    };
+
+    const fetchMaterials = async (apiBaseurl) => {
+        const res = await axios.get(`${apiBaseurl}product/get-material`);
+        return res.data;
+    };
+
+    const fetchSubCategories = async (apiBaseurl, parentCategory) => {
+        const res = await axios.get(`${apiBaseurl}product/get-sub-category/${parentCategory}`);
+        return res.data;
+    };
+
+    const fetchSubSubCategories = async (apiBaseurl, subCategory) => {
+        const res = await axios.get(`${apiBaseurl}product/get-sub-sub-category/${subCategory}`);
+        return res.data;
+    };
+
+    const fetchProductDetails = async (apiBaseurl, id) => {
+        const res = await axios.get(`${apiBaseurl}product/${id}`);
+        return res.data;
+    };
+
     // Fetch functions
     useEffect(() => {
-        axios.get(`${apiBaseurl}product/get-parent-category`)
-            .then(res => res.data)
+        fetchParentCategories(apiBaseurl)
             .then(finResponse => {
                 if (finResponse.status === "success") {
                     setParentCategories(finResponse.categoryData || []);
                     setStaticPath(finResponse.staticPath || "");
                 }
             });
-        axios.get(`${apiBaseurl}product/get-colors`)
-            .then(res => res.data)
+        fetchColors(apiBaseurl)
             .then(finResponse => {
                 if (finResponse.status === "success") setColors(finResponse.categoryData || []);
             });
-        axios.get(`${apiBaseurl}product/get-material`)
-            .then(res => res.data)
+        fetchMaterials(apiBaseurl)
             .then(finResponse => {
                 if (finResponse.status === "success") setMaterials(finResponse.categoryData || []);
             });
@@ -73,8 +101,7 @@ export default function ProductAdd() {
 
     useEffect(() => {
         if (formValue.parentCategory) {
-            axios.get(`${apiBaseurl}product/get-sub-category/${formValue.parentCategory}`)
-                .then(res => res.data)
+            fetchSubCategories(apiBaseurl, formValue.parentCategory)
                 .then(finResponse => {
                     if (finResponse.status === "success") setSubCategories(finResponse.categoryData || []);
                     else setSubCategories([]);
@@ -88,8 +115,7 @@ export default function ProductAdd() {
 
     useEffect(() => {
         if (formValue.subCategory) {
-            axios.get(`${apiBaseurl}product/get-sub-sub-category/${formValue.subCategory}`)
-                .then(res => res.data)
+            fetchSubSubCategories(apiBaseurl, formValue.subCategory)
                 .then(finResponse => {
                     if (finResponse.status === "success") setSubSubCategories(finResponse.categoryData || []);
                     else setSubSubCategories([]);
@@ -106,9 +132,9 @@ export default function ProductAdd() {
     // Fetch product details if editing
     useEffect(() => {
         if (id) {
-            axios.get(`${apiBaseurl}product/${id}`)
+            fetchProductDetails(apiBaseurl, id)
                 .then(res => {
-                    const data = res.data.data;
+                    const data = res.data;
                     // Set all simple fields first
                     setFormValue(prev => ({
                         ...prev,
@@ -126,20 +152,18 @@ export default function ProductAdd() {
                         totalInStocks: data.totalInStocks || "",
                         productOrder: data.productOrder || ""
                     }));
-                    setProductImagePreview(data.productImage ? `${res.data.productStaticPath}${data.productImage}` : null);
-                    setBackImagePreview(data.productBackImage ? `${res.data.productStaticPath}${data.productBackImage}` : null);
+                    setProductImagePreview(data.productImage ? `${res.productStaticPath}${data.productImage}` : null);
+                    setBackImagePreview(data.productBackImage ? `${res.productStaticPath}${data.productBackImage}` : null);
 
                     // Fetch subcategories and subsubcategories in sequence
                     if (data.parentCategory) {
-                        axios.get(`${apiBaseurl}product/get-sub-category/${data.parentCategory}`)
-                            .then(res2 => res2.data)
+                        fetchSubCategories(apiBaseurl, data.parentCategory)
                             .then(finResponse2 => {
                                 setSubCategories(finResponse2.categoryData || []);
                                 setFormValue(prev => ({ ...prev, subCategory: data.subCategory || "" }));
 
                                 if (data.subCategory) {
-                                    axios.get(`${apiBaseurl}product/get-sub-sub-category/${data.subCategory}`)
-                                        .then(res3 => res3.data)
+                                    fetchSubSubCategories(apiBaseurl, data.subCategory)
                                         .then(finResponse3 => {
                                             setSubSubCategories(finResponse3.categoryData || []);
                                             // Set subSubCategory only after options are loaded
@@ -150,7 +174,7 @@ export default function ProductAdd() {
                     }
                     // Gallery images
                     if (data.galleryImage && Array.isArray(data.galleryImage)) {
-                        setGalleryImagePreviews(data.galleryImage.map(img => `${res.data.productStaticPath}${img}`));
+                        setGalleryImagePreviews(data.galleryImage.map(img => `${res.productStaticPath}${img}`));
                     }
                 });
         }
