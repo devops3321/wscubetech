@@ -3,9 +3,9 @@ const { categoryModel } = require("../../models/categoryModel");
 let categoryCreate = async (req, res) => {
     console.log(req.body);
 
-    let insertObj = {...req.body};
+    let insertObj = { ...req.body };
 
-    if(req.file && req.file.filename){
+    if (req.file && req.file.filename) {
         insertObj["categoryImage"] = req.file.filename
     }
     try {
@@ -47,7 +47,7 @@ let categoryViewAll = async (req, res) => {
         if (req.query.limit) {
             limit = parseInt(req.query.limit);
         }
-        
+
         if (req.query.page) {
             skip = (req.query.page - 1) * limit;
         }

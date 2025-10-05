@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { LoginContext } from '../context/MainContext.jsx';
+import { useEffect } from 'react';
 
 export default function Login() {
+    let { id, setId } = useContext(LoginContext);
+
     let apiBaseurl = import.meta.env.VITE_APIBASEURL;
     const navigate = useNavigate();
 
@@ -24,12 +28,11 @@ export default function Login() {
             .then((response) => response.data)
             .then((finRespone) => {
                 if (finRespone.status === "success") {
-                    setButtonState('success');
+                    setButtonState('success');                   
+                    setId(finRespone.adminData._id);
                     setFormValue({ adminEmail: "", adminPassword: "" });
-                    setTimeout(() => {
-                        navigate('/dashboard');
-                    }, 1000);
-                } else {
+                }
+                 else {
                     setError(finRespone.message);
                     setButtonState('error');
                     setTimeout(() => {
@@ -45,6 +48,14 @@ export default function Login() {
                 }, 1000);
             });
     };
+
+    useEffect(() => {
+        if (id) {
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1000);
+        }
+    }, [id]);
 
     let buttonClass = "w-full text-white font-bold font-medium rounded-lg text-md px-5 py-2.5 text-center shadow transition-all duration-150";
     let buttonText = "Sign in";

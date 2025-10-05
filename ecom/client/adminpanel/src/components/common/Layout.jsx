@@ -1,10 +1,23 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Header from './Header.jsx'
 import Footer from './Footer.jsx'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
+import { LoginContext } from '../context/MainContext.jsx';
+import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react'
 
 export default function Layout() {
+
+    let { id, setId } = useContext(LoginContext);
+
+    let navigate = useNavigate();
+
+    useEffect(() => {
+        if (id == '' || id == null || id == undefined) {
+            navigate('/login');
+        }
+    }, [id]);
     return (
         <section className="min-h-screen grid grid-cols-1 md:grid-cols-[250px_1fr] lg:grid-cols-[220px_1fr] xl:grid-cols-[15%_auto]">
             {/* Sidebar always visible, logo always at top. Never overlaps content. */}

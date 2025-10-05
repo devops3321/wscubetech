@@ -32,53 +32,56 @@ import TestimonialAdd from './components/pages/TestimonialAdd.jsx'
 import TestimonialView from './components/pages/TestimonialView.jsx'
 import FaqAdd from './components/pages/FaqAdd.jsx'
 import FaqView from './components/pages/FaqView.jsx'
+import { LoginProvider } from './components/context/MainContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path={'/'} element={<Layout />}>
-          <Route path={'/dashboard'} element={<Dashboard />} />
-          <Route path={'/viewuser'} element={<ViewUser />} />
-          <Route path={'/contactenquirymgmt'} element={<ContactEnquiryMgmt />} />
-          <Route path={'/newsletter'} element={<NewsLetters />} />
-          <Route path={'/editcolor/:id?'} element={<ColorAdd />} />
-          <Route path={'/color/add'} element={<ColorAdd />} />
-          <Route path={'/color/view'} element={<ColorView />} />
-          <Route path={'/editmaterial/:id?'} element={<MaterialAdd />} />
-          <Route path={'/material/add'} element={<MaterialAdd />} />
-          <Route path={'/material/view'} element={<ViewMaterial />} />
-          <Route path={'/editcategory/:id?'} element={<CategoryAdd />} />
-          <Route path={'/category/add'} element={<CategoryAdd />} />
-          <Route path={'/category/view'} element={<CategoryView />} />
-          <Route path={'/editsubcategory/:id?'} element={<SubCategoryAdd />} />
-          <Route path={'/subcategory/add'} element={<SubCategoryAdd />} />
-          <Route path={'/subcategory/view'} element={<SubCategoryView />} />
-          <Route path={'/editsubsubcategory/:id?'} element={<SubSubCategoryAdd />} />
-          <Route path={'/subsubcategory/add'} element={<SubSubCategoryAdd />} />
-          <Route path={'/subsubcategory/view'} element={<SubSubCategoryView />} />
-          <Route path={'/editproduct/:id?'} element={<ProductAdd />} />
-          <Route path={'/product/add'} element={<ProductAdd />} />
-          <Route path={'/product/product-items'} element={<ProductItems />} />
-          <Route path={'/editwhychooseus/:id?'} element={<WhyChooseUsAdd />} />
-          <Route path={'/whychooseus/add'} element={<WhyChooseUsAdd />} />
-          <Route path={'/whychooseus/view'} element={<WhyChooseUsView />} />
-          <Route path={'/orders'} element={<Orders />} />
-          <Route path={'/editslider/:id?'} element={<SliderAdd />} />
-          <Route path={'/slider/add'} element={<SliderAdd />} />
-          <Route path={'/slider/view'} element={<SliderView />} />
-          <Route path={'/editcountry/:id?'} element={<CountryAdd />} />
-          <Route path={'/country/add'} element={<CountryAdd />} />
-          <Route path={'/country/view'} element={<CountryView />} />
-          <Route path={'/edittestimonial/:id?'} element={<TestimonialAdd />} />
-          <Route path={'/testimonial/add'} element={<TestimonialAdd />} />
-          <Route path={'/testimonial/view'} element={<TestimonialView />} />
-          <Route path={'/editfaq/:id?'} element={<FaqAdd />} />
-          <Route path={'/faq/add'} element={<FaqAdd />} />
-          <Route path={'/faq/view'} element={<FaqView />} />
-        </Route>
-        <Route path={'/login'} element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+    <LoginProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path={'/'} element={<Layout />}>
+            <Route path={'/dashboard'} element={<Dashboard />} />
+            <Route path={'/viewuser'} element={<ViewUser />} />
+            <Route path={'/contactenquirymgmt'} element={<ContactEnquiryMgmt />} />
+            <Route path={'/newsletter'} element={<NewsLetters />} />
+            <Route path={'/editcolor/:id?'} element={<ColorAdd />} />
+            <Route path={'/color/add'} element={<ColorAdd />} />
+            <Route path={'/color/view'} element={<ColorView />} />
+            <Route path={'/editmaterial/:id?'} element={<MaterialAdd />} />
+            <Route path={'/material/add'} element={<MaterialAdd />} />
+            <Route path={'/material/view'} element={<ViewMaterial />} />
+            <Route path={'/editcategory/:id?'} element={<CategoryAdd />} />
+            <Route path={'/category/add'} element={<CategoryAdd />} />
+            <Route path={'/category/view'} element={<CategoryView />} />
+            <Route path={'/editsubcategory/:id?'} element={<SubCategoryAdd />} />
+            <Route path={'/subcategory/add'} element={<SubCategoryAdd />} />
+            <Route path={'/subcategory/view'} element={<SubCategoryView />} />
+            <Route path={'/editsubsubcategory/:id?'} element={<SubSubCategoryAdd />} />
+            <Route path={'/subsubcategory/add'} element={<SubSubCategoryAdd />} />
+            <Route path={'/subsubcategory/view'} element={<SubSubCategoryView />} />
+            <Route path={'/editproduct/:id?'} element={<ProductAdd />} />
+            <Route path={'/product/add'} element={<ProductAdd />} />
+            <Route path={'/product/product-items'} element={<ProductItems />} />
+            <Route path={'/editwhychooseus/:id?'} element={<WhyChooseUsAdd />} />
+            <Route path={'/whychooseus/add'} element={<WhyChooseUsAdd />} />
+            <Route path={'/whychooseus/view'} element={<WhyChooseUsView />} />
+            <Route path={'/orders'} element={<Orders />} />
+            <Route path={'/editslider/:id?'} element={<SliderAdd />} />
+            <Route path={'/slider/add'} element={<SliderAdd />} />
+            <Route path={'/slider/view'} element={<SliderView />} />
+            <Route path={'/editcountry/:id?'} element={<CountryAdd />} />
+            <Route path={'/country/add'} element={<CountryAdd />} />
+            <Route path={'/country/view'} element={<CountryView />} />
+            <Route path={'/edittestimonial/:id?'} element={<TestimonialAdd />} />
+            <Route path={'/testimonial/add'} element={<TestimonialAdd />} />
+            <Route path={'/testimonial/view'} element={<TestimonialView />} />
+            <Route path={'/editfaq/:id?'} element={<FaqAdd />} />
+            <Route path={'/faq/add'} element={<FaqAdd />} />
+            <Route path={'/faq/view'} element={<FaqView />} />
+          </Route>
+          <Route path={'/login'} element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </LoginProvider>
   </StrictMode>,
 )

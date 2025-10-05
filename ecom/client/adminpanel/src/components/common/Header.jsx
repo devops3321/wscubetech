@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaLock } from "react-icons/fa";
 import { HiMiniUserCircle } from "react-icons/hi2";
 import { RiIdCardLine } from "react-icons/ri";
+import { LoginContext } from '../context/MainContext.jsx';
+
+
 export default function Header() {
+    const { id, setId } = useContext(LoginContext);
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     // Open dropdown on user photo hover, close on mouse leave from photo or dropdown
@@ -45,10 +50,10 @@ export default function Header() {
                                     <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><HiMiniUserCircle /></span>Profile</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><RiIdCardLine /></span>Company Profile</a>
+                                    <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-`200"><span><RiIdCardLine /></span>Company Profile</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><FaLock /></span>Logout</a>
+                                    <a href="#" onClick= {()=> setId('')} className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><FaLock /></span>Logout</a>
                                 </li>
                             </ul>
                         </div>
