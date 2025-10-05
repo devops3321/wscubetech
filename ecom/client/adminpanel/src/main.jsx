@@ -32,6 +32,8 @@ import TestimonialAdd from './components/pages/TestimonialAdd.jsx'
 import TestimonialView from './components/pages/TestimonialView.jsx'
 import FaqAdd from './components/pages/FaqAdd.jsx'
 import FaqView from './components/pages/FaqView.jsx'
+import AdminProfile from './components/pages/AdminProfile.jsx'
+import CompanyProfile from './components/pages/CompanyProfile.jsx'
 import { LoginProvider } from './components/context/MainContext.jsx';
 
 createRoot(document.getElementById('root')).render(
@@ -78,6 +80,8 @@ createRoot(document.getElementById('root')).render(
             <Route path={'/editfaq/:id?'} element={<FaqAdd />} />
             <Route path={'/faq/add'} element={<FaqAdd />} />
             <Route path={'/faq/view'} element={<FaqView />} />
+            <Route path={'/adminprofile'} element={<AdminProfile />} />
+            <Route path={'/companyprofile'} element={<CompanyProfile />} />
           </Route>
           <Route path={'/login'} element={<Login />} />
         </Routes>

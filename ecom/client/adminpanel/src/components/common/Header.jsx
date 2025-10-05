@@ -4,6 +4,7 @@ import { FaLock } from "react-icons/fa";
 import { HiMiniUserCircle } from "react-icons/hi2";
 import { RiIdCardLine } from "react-icons/ri";
 import { LoginContext } from '../context/MainContext.jsx';
+import { Link } from 'react-router-dom';
 
 
 export default function Header() {
@@ -47,13 +48,13 @@ export default function Header() {
                         >
                             <ul className="py-2 w-44" aria-labelledby="user-menu-button">
                                 <li>
-                                    <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><HiMiniUserCircle /></span>Profile</a>
+                                    <Link to={'/adminprofile'} className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><HiMiniUserCircle /></span>Profile</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-`200"><span><RiIdCardLine /></span>Company Profile</a>
+                                    <Link to={'/companyprofile'} className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><RiIdCardLine /></span>Company Profile</Link>
                                 </li>
                                 <li>
-                                    <a href="#" onClick= {()=> setId('')} className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><FaLock /></span>Logout</a>
+                                    <Link onClick= {()=> setId('')} className="block flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:text-gray-200 dark:hover:text-white rounded-lg transition-all duration-200"><span><FaLock /></span>Logout</Link>
                                 </li>
                             </ul>
                         </div>
