@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { LoginContext } from '../context/MainContext';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AdminProfile() {
+  const apiBaseurl = import.meta.env.VITE_APIBASEURL;
   const [activeTab, setActiveTab] = useState('edit');
   const [profile, setProfile] = useState({
     name: '',
@@ -8,6 +13,9 @@ export default function AdminProfile() {
     mobile: '',
     avatar: null,
   });
+  const [formValue, setFormValue] = useState();
+
+  const { id, setId } = React.useContext(LoginContext);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,8 +28,34 @@ export default function AdminProfile() {
     }
   };
 
+  const changePassword = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const oldPassword = formData.get('oldPassword');
+    const newPassword = formData.get('newPassword');
+    const confirmPassword = formData.get('confirmPassword');
+
+    try {
+      const response = await axios.put(
+        `${apiBaseurl}auth/changepassword`,
+        { id, oldPassword, newPassword, confirmPassword }
+      );
+      const finResponse = response.data;
+
+      if (finResponse.status === "success") {
+        toast.success(finResponse.message);
+        e.target.reset();
+      } else {
+        toast.error(finResponse.message || "Password change failed");
+      }
+    } catch (error) {
+      toast.error("Server error. Please try again.");
+    }
+  }
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 border border-gray-200 mt-8">
+      <ToastContainer />
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left: Profile Card */}
         <div className="md:w-1/3 flex flex-col items-center">
@@ -134,7 +168,7 @@ export default function AdminProfile() {
               </div>
             </form>
           ) : (
-            <form className="space-y-6" onSubmit={e => e.preventDefault()}>
+            <form className="space-y-6" onSubmit={changePassword}>
               <div>
                 <label htmlFor="oldPassword" className="block mb-2 text-sm font-medium text-gray-700">Old Password</label>
                 <input

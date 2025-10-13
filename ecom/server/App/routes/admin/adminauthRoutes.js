@@ -1,11 +1,13 @@
 let express = require("express");   
 let adminauthRoutes = express.Router();
-const { adminLogin } = require("../../controllers/admin/adminAuthController");
+const { adminLogin, changePassword  } = require("../../controllers/admin/adminAuthController");
 
 let multer = require("multer");
 
 const upload = multer();
 
 adminauthRoutes.post("/login", upload.none(), adminLogin);
+
+adminauthRoutes.put("/changepassword", upload.none(), changePassword);
 
 module.exports = { adminauthRoutes };
