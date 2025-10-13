@@ -9,7 +9,7 @@ export default function AdminProfile() {
   const [activeTab, setActiveTab] = useState('edit');
   const [profile, setProfile] = useState({
     name: '',
-    email: 'xyz@gmail.com',
+    email: 'admin@monsta.com',
     mobile: '',
     avatar: null,
   });
@@ -76,11 +76,11 @@ export default function AdminProfile() {
             <div className="font-semibold mb-2">Contact Information</div>
             <div className="flex items-center justify-center gap-2 text-gray-700 mb-1">
               <span>📞</span>
-              <span>1234567890</span>
+              <span>+91 1234567890</span>
             </div>
             <div className="flex items-center justify-center gap-2 text-gray-700">
               <span>✉️</span>
-              <span>xyz@gmail.com</span>
+              <span>admin@monsta.com</span>
             </div>
           </div>
         </div>
