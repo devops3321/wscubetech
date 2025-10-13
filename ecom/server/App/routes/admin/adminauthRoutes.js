@@ -8,6 +8,6 @@ const upload = multer();
 
 adminauthRoutes.post("/login", upload.none(), adminLogin);
 
-adminauthRoutes.put("/changepassword", upload.none(), changePassword);
+adminauthRoutes.put("/changepassword/:id", upload.none(), changePassword);
 
 module.exports = { adminauthRoutes };

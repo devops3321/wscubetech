@@ -38,8 +38,8 @@ export default function AdminProfile() {
 
     try {
       const response = await axios.put(
-        `${apiBaseurl}auth/changepassword`,
-        { id, oldPassword, newPassword, confirmPassword }
+        `${apiBaseurl}auth/changepassword/${id}`,
+        { oldPassword, newPassword, confirmPassword }
       );
       const finResponse = response.data;
 

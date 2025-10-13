@@ -27,7 +27,9 @@ let adminLogin = async (req, res) => {
 }
 
 let changePassword = async (req, res) => {
-    let { id, oldPassword, newPassword, confirmPassword } = req.body;
+    let { id } = req.params;
+
+    let { oldPassword, newPassword, confirmPassword } = req.body;
 
     // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
@@ -54,7 +56,7 @@ let changePassword = async (req, res) => {
     if (oldPassword === newPassword) {
         return res.send({
             status: "failed",
-            message: "New password must be different from old password",
+            message: "New password must be different from existing password",
         });
     }
 
