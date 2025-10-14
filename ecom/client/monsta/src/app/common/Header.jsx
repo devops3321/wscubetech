@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 
 export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
@@ -14,6 +15,7 @@ export default function Header() {
     };
 
     // Handles mouse leave with timeout
+    
     const handleMenuClose = () => {
         closeTimeout.current = setTimeout(() => setOpenMenu(null), 250);
     };
@@ -29,6 +31,14 @@ export default function Header() {
         setMobileNavOpen((prev) => !prev);
         setOpenMenu(null);
     };
+
+    let cart = useSelector((mystore) => {
+        // console.log("mystore.cart", mystore);  // access the store
+        // console.log("mystore.mycart", mystore.mycart); // access the cart state
+        // console.log("cart items", mystore.mycart.cartItem); // log the number of items in the cart
+
+        return mystore.mycart.cartItem;
+});
 
     return (
         <div>
@@ -83,7 +93,7 @@ export default function Header() {
                                 <circle cx="20" cy="21" r="1" />
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                             </svg>
-                            <span className="absolute -top-3 -right-4 bg-[#C09578] text-white text-xs rounded-full px-2 py-0.5">0</span>
+                            <span className="absolute -top-3 -right-4 bg-[#C09578] text-white text-xs rounded-full px-2 py-0.5">{cart.length}</span>
                         </span>
                         {/* Separator line */}
                         <span className="h-6 w-px bg-gray-300 mx-2"></span>

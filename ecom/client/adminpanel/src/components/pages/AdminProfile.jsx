@@ -13,7 +13,7 @@ export default function AdminProfile() {
     mobile: '',
     avatar: null,
   });
-  const [formValue, setFormValue] = useState();
+  const [formValue, setFormValue] = React. useState();
 
   const { id, setId } = React.useContext(LoginContext);
 
@@ -31,10 +31,10 @@ export default function AdminProfile() {
   const changePassword = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
-    const oldPassword = formData.get('oldPassword');
-    const newPassword = formData.get('newPassword');
-    const confirmPassword = formData.get('confirmPassword');
+    const formValue = new FormData(e.target);
+    const oldPassword = formValue.get('oldPassword');
+    const newPassword = formValue.get('newPassword');
+    const confirmPassword = formValue.get('confirmPassword');
 
     try {
       const response = await axios.put(
