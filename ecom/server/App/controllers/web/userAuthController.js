@@ -69,6 +69,17 @@ let sendOtp = async (req, res) => {
 let createuser = async (req, res) => {
     let { userName, userEmail, userPhone, userPassword, otp } = req.body;
 
+    // Check if user already exists
+    let existingUser = await userModel.findOne({ userEmail: userEmail });
+
+    if (existingUser) {
+        let resObj = {
+            status: "failed",
+            message: "User already exists with this email",
+        }
+        res.send(resObj);
+        return;
+    }
     // Verify OTP
     let backendotp = userOTP.get("userotp");
 
