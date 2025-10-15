@@ -74,67 +74,67 @@ export default function LoginRegister() {
                 </div>
                 <div>
                     <h2 className="text-3xl font-playfair mb-6 text-black">Register</h2>
-                    {!showOtp ? (
-                        <form className="bg-white border-1 border-gray-300 rounded-lg p-6" onSubmit={handleRegisterSubmit}>
-                            <div className="mb-4">
-                                <label className="block font-semibold mb-2 text-black" htmlFor="name">Name *</label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    placeholder="Name"
-                                    className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                    value={registerData.name}
-                                    onChange={handleRegisterChange}
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block font-semibold mb-2 text-black" htmlFor="register-email">Email address *</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    placeholder="Email Address"
-                                    className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                    value={registerData.email}
-                                    onChange={handleRegisterChange}
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block font-semibold mb-2 text-black" htmlFor="phone">Phone *</label>
-                                <input
-                                    type="text"
-                                    id="phone"
-                                    placeholder="Phone"
-                                    className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                    value={registerData.phone}
-                                    onChange={handleRegisterChange}
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block font-semibold mb-2 text-black" htmlFor="register-password">Password *</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    placeholder="Password"
-                                    className="w-full border px-4 py-3 mb-2 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                    value={registerData.password}
-                                    onChange={handleRegisterChange}
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    className="bg-[#C09578] text-white font-bold px-5 py-2 rounded-full cursor-pointer "
-                                >
-                                    REGISTER
-                                </button>
-                            </div>
-                        </form>
-                    ) : (
-                        <form className="bg-white border-1 border-gray-300 rounded-lg p-6" onSubmit={handleOtpSubmit}>
+                    <form className="bg-white border-1 border-gray-300 rounded-lg p-6" onSubmit={handleRegisterSubmit}>
+                        <div className="mb-4">
+                            <label className="block font-semibold mb-2 text-black" htmlFor="name">Name *</label>
+                            <input
+                                type="text"
+                                id="name"
+                                placeholder="Name"
+                                className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
+                                value={registerData.name}
+                                onChange={handleRegisterChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block font-semibold mb-2 text-black" htmlFor="register-email">Email address *</label>
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Email Address"
+                                className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
+                                value={registerData.email}
+                                onChange={handleRegisterChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block font-semibold mb-2 text-black" htmlFor="phone">Phone *</label>
+                            <input
+                                type="text"
+                                id="phone"
+                                placeholder="Phone"
+                                className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
+                                value={registerData.phone}
+                                onChange={handleRegisterChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block font-semibold mb-2 text-black" htmlFor="register-password">Password *</label>
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Password"
+                                className="w-full border px-4 py-3 mb-2 rounded focus:outline-none text-black placeholder:text-gray-400"
+                                value={registerData.password}
+                                onChange={handleRegisterChange}
+                                required
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                className="bg-[#C09578] text-white font-bold px-5 py-2 rounded-full cursor-pointer "
+                            >
+                                REGISTER
+                            </button>
+                        </div>
+                    </form>
+                    {/* OTP Step below Register Form */}
+                    {showOtp && (
+                        <form className="bg-white border-1 border-gray-300 rounded-lg p-6 mt-6" onSubmit={handleOtpSubmit}>
                             <div className="mb-4">
                                 <label className="block font-semibold mb-2 text-black" htmlFor="otp">Enter OTP *</label>
                                 <input
