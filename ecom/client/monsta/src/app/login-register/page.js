@@ -1,16 +1,19 @@
 "use client"
 import React, { useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
+import axios from 'axios';
 
 export default function LoginRegister() {
+    const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
+
     const [showOtp, setShowOtp] = useState(false);
     const [registerData, setRegisterData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
+        userName: '',
+        userEmail: '',
+        userPhone: '',
+        userPassword: '',
+        otp: ''
     });
-    const [otp, setOtp] = useState('');
 
     const handleRegisterChange = (e) => {
         setRegisterData({ ...registerData, [e.target.id]: e.target.value });
@@ -20,6 +23,13 @@ export default function LoginRegister() {
         e.preventDefault();
         // Send registration data to backend, which should trigger OTP send
         // Example: await axios.post('/api/register', registerData);
+        console.log('Registration data submitted:', registerData);
+        axios.post(`${apiBaseurl}user/send-otp`, registerData)
+        .then((res)=> res.data)
+        .then((finResponse) => {
+            console.log(finResponse);
+        })
+
         setShowOtp(true);
     };
 
@@ -30,10 +40,11 @@ export default function LoginRegister() {
         // On success, redirect or show success message
         alert('OTP Verified! Registration complete.');
         setShowOtp(false);
-        setRegisterData({ name: '', email: '', phone: '', password: '' });
+        setRegisterData({ userName: '', userEmail: '', userPhone: '', userPassword: '' });
         setOtp('');
     };
 
+        
     return (
         <div>
             <Breadcrumb pageName={"My Account"} />
@@ -72,6 +83,7 @@ export default function LoginRegister() {
                         </div>
                     </form>
                 </div>
+                {/* Register */}
                 <div>
                     <h2 className="text-3xl font-playfair mb-6 text-black">Register</h2>
                     <form className="bg-white border-1 border-gray-300 rounded-lg p-6" onSubmit={handleRegisterSubmit}>
@@ -79,10 +91,11 @@ export default function LoginRegister() {
                             <label className="block font-semibold mb-2 text-black" htmlFor="name">Name *</label>
                             <input
                                 type="text"
-                                id="name"
+                                name="userName"
+                                id="userName"
                                 placeholder="Name"
                                 className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                value={registerData.name}
+                                value={registerData.userName}
                                 onChange={handleRegisterChange}
                                 required
                             />
@@ -91,10 +104,11 @@ export default function LoginRegister() {
                             <label className="block font-semibold mb-2 text-black" htmlFor="register-email">Email address *</label>
                             <input
                                 type="email"
-                                id="email"
+                                name='userEmail'
+                                id="userEmail"
                                 placeholder="Email Address"
                                 className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                value={registerData.email}
+                                value={registerData.userEmail}
                                 onChange={handleRegisterChange}
                                 required
                             />
@@ -103,10 +117,11 @@ export default function LoginRegister() {
                             <label className="block font-semibold mb-2 text-black" htmlFor="phone">Phone *</label>
                             <input
                                 type="text"
-                                id="phone"
+                                name='userPhone'
+                                id="userPhone"
                                 placeholder="Phone"
                                 className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                value={registerData.phone}
+                                value={registerData.userPhone}
                                 onChange={handleRegisterChange}
                                 required
                             />
@@ -115,10 +130,11 @@ export default function LoginRegister() {
                             <label className="block font-semibold mb-2 text-black" htmlFor="register-password">Password *</label>
                             <input
                                 type="password"
-                                id="password"
+                                name='userPassword'
+                                id="userPassword"
                                 placeholder="Password"
                                 className="w-full border px-4 py-3 mb-2 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                value={registerData.password}
+                                value={registerData.userPassword}
                                 onChange={handleRegisterChange}
                                 required
                             />
@@ -142,8 +158,8 @@ export default function LoginRegister() {
                                     id="otp"
                                     placeholder="Enter OTP"
                                     className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
-                                    value={otp}
-                                    onChange={e => setOtp(e.target.value)}
+                                    value={registerData.otp}
+                                    onChange={e => setRegisterData({ ...registerData, otp: e.target.value })}
                                     required
                                 />
                             </div>
