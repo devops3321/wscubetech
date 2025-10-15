@@ -16,16 +16,16 @@ let userSchema = new mongoose.Schema(
             required:[true,"User Email is required"]    
         },
         userPhone:{
-            type:Number,
+            type:String, 
             minLength:10,
-            maxLength:10,
+            maxLength:20, 
             unique:true,
             required:[true,"User Phone is required"]    
         },        
         userPassword: {
             type: String,
             minLength: 2,
-            maxLength: 30,
+            maxLength: 100, 
             required:[true,"User Password is required"]
         }
     }

@@ -100,7 +100,7 @@ export default function Footer() {
         </div>
         {/* Copyright & Payment */}
         <div className="text-center text-gray-500 text-base md:text-lg mb-6">
-          All Rights Reserved By Furniture | © 2025
+          All Rights Reserved By Monsta | © 2025
         </div>
         <div className="flex justify-center gap-2 md:gap-4 mb-5 flex-wrap">
           <img 

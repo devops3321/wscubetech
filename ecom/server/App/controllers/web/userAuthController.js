@@ -1,4 +1,7 @@
 const { transporter } = require("../../config/mailConfig");
+const { userModel } = require("../../models/userModel");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 let userOTP = new Map();
 
@@ -7,7 +10,7 @@ let sendOtp = async (req, res) => {
     let { userEmail } = req.body;
     let otp = (Math.random() * 9999999).toString().split(".")[0].slice(0, 4);
 
-    console.log(otp);
+    // console.log(otp);
 
     // Email OTP 
     const info = await transporter.sendMail({
@@ -43,12 +46,56 @@ let sendOtp = async (req, res) => {
 
     // Store OTP against user email in Backend
 
-    userOTP.set(userEmail, { otp, expiry: Date.now() + 10 * 60 * 1000 });
+    userOTP.set("userotp", otp);
 
-    console.log("Message sent: %s", info.messageId);
+    // console.log("Message sent: %s", info.messageId);
 
-    res.send("OTP sent successfully");
+    // Get local time for OTP expiry
+    const otpExpiryDate = new Date(Date.now() + 10 * 60 * 1000);
+    const otpExpiryLocal = otpExpiryDate.toLocaleString();
+
+    let resObj = {
+        status: "success",
+        message: "OTP sent successfully",
+        // otp: otp,
+        otpExpiry: otpExpiryLocal,
+        // messageId: info.messageId
+    }
+
+    res.send(resObj);
 
 }
 
-module.exports = { sendOtp };
+let createuser = async (req, res) => {
+    let { userName, userEmail, userPhone, userPassword, otp } = req.body;
+
+    // Verify OTP
+    let backendotp = userOTP.get("userotp");
+
+    if (otp == backendotp) {
+        const hash = await bcrypt.hash(userPassword, saltRounds);
+        let userObj = {
+            userName,
+            userEmail,
+            userPhone,
+            userPassword: hash
+        }
+        let user = new userModel(userObj);
+        let userRes = await user.save();
+
+        let resObj = {
+            status: "success",
+            message: "OTP verified successfully. User registered.",
+            userRes
+        }
+        res.send(resObj);
+    }
+    else {
+        let resObj = {
+            status: "failed",
+            message: "Invalid OTP. Please try again.",
+        }
+        res.send(resObj);
+    }
+}
+module.exports = { sendOtp, createuser };

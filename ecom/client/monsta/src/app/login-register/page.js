@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from 'next/navigation'; 
 
 export default function LoginRegister() {
     const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
@@ -15,6 +17,8 @@ export default function LoginRegister() {
         otp: ''
     });
 
+    const router = useRouter();
+
     const handleRegisterChange = (e) => {
         setRegisterData({ ...registerData, [e.target.id]: e.target.value });
     };
@@ -23,7 +27,7 @@ export default function LoginRegister() {
         e.preventDefault();
         // Send registration data to backend, which should trigger OTP send
         // Example: await axios.post('/api/register', registerData);
-        console.log('Registration data submitted:', registerData);
+        // console.log('Registration data submitted:', registerData);
         axios.post(`${apiBaseurl}user/send-otp`, registerData)
         .then((res)=> res.data)
         .then((finResponse) => {
@@ -38,16 +42,27 @@ export default function LoginRegister() {
         // Send OTP and registration data to backend for verification
         // Example: await axios.post('/api/verify-otp', { ...registerData, otp });
         // On success, redirect or show success message
-        alert('OTP Verified! Registration complete.');
+        axios.post(`${apiBaseurl}user/create-user`, registerData)
+        .then((res)=> res.data)
+        .then((finResponse) => {
+            if(finResponse.status === "success") {
+                toast.success(finResponse.message);
+                router.push('/thankyou'); 
+            }
+            else{
+                toast.error(finResponse.message);
+            }
+        })
+
         setShowOtp(false);
         setRegisterData({ userName: '', userEmail: '', userPhone: '', userPassword: '' });
-        setOtp('');
     };
 
         
     return (
         <div>
             <Breadcrumb pageName={"My Account"} />
+            <ToastContainer />
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-15">
                 {/* Login */}
                 <div>
