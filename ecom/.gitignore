@@ -43,3 +43,4 @@ out
 build
 
 # dotenv environment variables file
+.env*
