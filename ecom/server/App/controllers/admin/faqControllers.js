@@ -41,31 +41,47 @@ let faqCreate = async (req,res)=>{
 }
 
 let faqViewAll = async (req,res)=>{
-   
-    let skip = 0;
-    let limit = 5;
-
     try {
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
-        }
-        
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
+        const { search = "", status, page = 1, limit = 5 } = req.query;
+
+        const filter = {};
+
+        // normalize status (accept active/inactive/true/false/1/0)
+        if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+            const s = String(status).toLowerCase().trim();
+            if (s === "active" || s === "true" || s === "1") filter.faqStatus = true;
+            else if (s === "inactive" || s === "false" || s === "0") filter.faqStatus = false;
         }
 
-        let faqData = await faqModel.find().skip(skip).limit(limit);
+        // search by question/answer (case-insensitive)
+        if (search && String(search).trim() !== "") {
+            const q = String(search).trim();
+            const regex = new RegExp(q, "i");
+            filter.$or = [
+                { question: regex },
+                { answer: regex }
+            ];
+        }
 
-        let faqDataLength = await faqModel.find();
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const lim = Math.max(1, parseInt(limit, 10) || 5);
+        const skip = (pageNum - 1) * lim;
+
+        const [totalCount, faqData] = await Promise.all([
+            faqModel.countDocuments(filter),
+            faqModel.find(filter).skip(skip).limit(lim).sort({ createdAt: -1 })
+        ]);
 
         let resObj = {
             status: "success",
             message: "Faq retrieved successfully",
             faqData,
-            length: faqDataLength.length,
-            totalPage: Math.ceil(faqDataLength.length / limit)
+            totalCount,
+            page: pageNum,
+            limit: lim,
+            totalPage: Math.max(1, Math.ceil(totalCount / lim))
         }
-        res.send(resObj);
+        res.status(200).json(resObj);
     }
 
     catch (err) {
@@ -74,7 +90,7 @@ let faqViewAll = async (req,res)=>{
             message: "Faq not found",
             error: err
         }
-        res.send(resObj);
+        res.status(500).json(resObj);
     }
 }
 
