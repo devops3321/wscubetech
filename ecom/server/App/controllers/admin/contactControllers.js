@@ -22,12 +22,50 @@ const contactCreate = async (req, res) => {
 };
 
 /**
- * View all contacts
+ * View all contacts (supports server-side filtering + pagination)
+ * Query params:
+ *   - search: string (searches name,email,subject,message)
+ *   - status: "active"|"inactive" (optional)
+ *   - page: number (1-based)
+ *   - limit: number
  */
 const contactViewAll = async (req, res) => {
   try {
-    const contacts = await contactModel.find().sort({ createdAt: -1 });
-    return res.status(200).send({ status: "success", count: contacts.length, data: contacts });
+    const { search = "", status, page = 1, limit = 10 } = req.query;
+
+    const filter = {};
+
+    if (status === "active") filter.contactStatus = true;
+    else if (status === "inactive") filter.contactStatus = false;
+
+    if (search && String(search).trim() !== "") {
+      const q = String(search).trim();
+      const regex = new RegExp(q, "i");
+      filter.$or = [
+        { name: regex },
+        { email: regex },
+        { subject: regex },
+        { message: regex }
+      ];
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const lim = Math.max(1, parseInt(limit, 10) || 10);
+    const skip = (pageNum - 1) * lim;
+
+    const [totalCount, contacts] = await Promise.all([
+      contactModel.countDocuments(filter),
+      contactModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(lim)
+    ]);
+
+    return res.status(200).send({
+      status: "success",
+      count: contacts.length,
+      totalCount,
+      page: pageNum,
+      limit: lim,
+      data: contacts
+    });
   } catch (error) {
     return res.status(500).send({ status: "error", message: error.message || "Server error" });
   }

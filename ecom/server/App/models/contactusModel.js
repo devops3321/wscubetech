@@ -37,7 +37,8 @@ let contactSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         }
-    }
+    },
+    { timestamps: true } // <-- added timestamps so sorting by createdAt works
 )
 
 let contactModel = mongoose.model("contact",contactSchema);
