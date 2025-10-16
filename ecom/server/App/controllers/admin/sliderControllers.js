@@ -40,40 +40,61 @@ let sliderCreate = async (req, res) => {
 }
 
 let sliderViewAll = async (req, res) => {
-
-    let skip = 0;
-    let limit = 5;
     try {
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
+        const { search = "", status, page = 1, limit = 5 } = req.query;
+
+        const filter = {};
+
+        // normalize status (accept active/inactive/true/false/1/0)
+        if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+            const s = String(status).toLowerCase().trim();
+            if (s === "active" || s === "true" || s === "1") filter.sliderStatus = true;
+            else if (s === "inactive" || s === "false" || s === "0") filter.sliderStatus = false;
         }
-        
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
+
+        // search by title/description/code (case-insensitive)
+        if (search && String(search).trim() !== "") {
+            const q = String(search).trim();
+            const regex = new RegExp(q, "i");
+            filter.$or = [
+                { sliderTitle: regex },
+                { sliderDescription: regex },
+                { sliderCode: regex }
+            ];
         }
 
-        let sliderData = await sliderModel.find().skip(skip).limit(limit);
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const lim = Math.max(1, parseInt(limit, 10) || 5);
+        const skip = (pageNum - 1) * lim;
 
-        let sliderDataLength = await sliderModel.find();
+        const [totalCount, sliderData] = await Promise.all([
+            sliderModel.countDocuments(filter),
+            sliderModel.find(filter).skip(skip).limit(lim).sort({ createdAt: -1 })
+        ]);
 
-        let resObj = {
+        const resObj = {
             status: "success",
             message: "Slider items retrieved successfully",
             sliderData,
-            length: sliderDataLength.length,
+            count: sliderData.length,
+            totalCount,
+            page: pageNum,
+            limit: lim,
             staticPath: process.env.SLIDER_IMAGE_PATH,
-            totalPage: Math.ceil(sliderDataLength.length / limit)
-        }
-        res.send(resObj);
+            totalPage: Math.max(1, Math.ceil(totalCount / lim))
+        };
+
+        res.status(200).json(resObj);
     }
 
     catch (err) {
+        console.error("sliderViewAll error:", err);
         let resObj = {
             status: "failed",
             message: "Slider not found",
             error: err
         }
-        res.send(resObj);
+        res.status(500).json(resObj);
     }
 }
 
