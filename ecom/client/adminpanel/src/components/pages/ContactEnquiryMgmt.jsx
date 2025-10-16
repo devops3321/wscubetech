@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function ContactEnquiryMgmt() {
-  const API_BASE = (import.meta.env.VITE_APIBASEURL || "http://127.0.0.1:8100/admin/").replace(/\/+$/,"");
+  const API_BASE = (import.meta.env.VITE_APIBASEURL).replace(/\/+$/,"");
   const CONTACT_BASE = `${API_BASE}/contact`;
 
   const [enquiryData, setEnquiryData] = useState([]);
