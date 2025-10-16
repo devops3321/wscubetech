@@ -40,31 +40,47 @@ let countryCreate = async (req, res) => {
 }
 
 let countryViewAll = async (req, res) => {
-    let skip = 0;
-    let limit = 5;
-
     try {
+        const { search = "", status, page = 1, limit = 5 } = req.query;
 
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
+        const filter = {};
+
+        // normalize status (accept active/inactive/true/false/1/0)
+        if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+            const s = String(status).toLowerCase().trim();
+            if (s === "active" || s === "true" || s === "1") filter.countryStatus = true;
+            else if (s === "inactive" || s === "false" || s === "0") filter.countryStatus = false;
         }
 
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
+        // search by countryName (case-insensitive)
+        if (search && String(search).trim() !== "") {
+            const q = String(search).trim();
+            const regex = new RegExp(q, "i");
+            filter.$or = [
+                { countryName: regex },
+                { countryCode: regex } // optional if code exists
+            ];
         }
 
-        let countryData = await countryModel.find().skip(skip).limit(limit);
-        
-        let countryDataLength = await countryModel.find();
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const lim = Math.max(1, parseInt(limit, 10) || 5);
+        const skip = (pageNum - 1) * lim;
+
+        const [totalCount, countryData] = await Promise.all([
+            countryModel.countDocuments(filter),
+            countryModel.find(filter).skip(skip).limit(lim).sort({ createdAt: -1 })
+        ]);
 
         let resObj = {
             status: "success",
             message: "Country retrieved successfully",
             countryData,
-            length: countryDataLength.length,
-            totalPage: Math.ceil(countryDataLength.length / limit)
+            totalCount,
+            page: pageNum,
+            limit: lim,
+            totalPage: Math.max(1, Math.ceil(totalCount / lim))
         }
-        res.send(resObj);
+        res.status(200).json(resObj);
     }
 
     catch (err) {
@@ -73,7 +89,7 @@ let countryViewAll = async (req, res) => {
             message: "Country not found",
             error: err
         }
-        res.send(resObj);
+        res.status(500).json(resObj);
     }
 }
 
