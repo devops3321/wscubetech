@@ -113,15 +113,15 @@ let createuser = async (req, res) => {
 let login = async (req, res) => {
     let { userEmail, userPassword } = req.body;
 
-    let user = await userModel.findOne({ userEmail: userEmail });
+    let checkuser = await userModel.findOne({ userEmail: userEmail });
 
-    if (user) {
-        const match = await bcrypt.compareSync(userPassword, user.userPassword);
-        if (match) {
+    if (checkuser) {
+        const checkPassword = await bcrypt.compareSync(userPassword, checkuser.userPassword);
+        if (checkPassword) {
             let resObj = {
                 status: "success",
                 message: "Login successful",
-                user
+                user: checkuser
             }
             res.send(resObj);
         }
