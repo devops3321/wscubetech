@@ -4,6 +4,7 @@ const { subsubcategoryModel } = require("../../models/subsubcategoryModel");
 const { colorModel } = require("../../models/colorModel");
 const { materialModel } = require("../../models/materialModel");
 const { productModel } = require("../../models/productModel");
+const mongoose = require("mongoose");
 
 // Fetch all categories (for dropdowns)
 const getParentCategory = async (req, res) => {
@@ -140,22 +141,128 @@ const createProduct = async (req, res) => {
     }
 };
 
-// Get all products
+// Get all products (supports server-side filtering + pagination + search by parent/sub/subsub names)
 const getAllProducts = async (req, res) => {
-    try {
-        const products = await productModel.find()
-            .populate('parentCategory')
-            .populate('subCategory')
-            .populate('subSubCategory');
-        res.status(200).json({
-            status: true,
-            message: "Products fetched successfully",
-            data: products,
-            productStaticPath: process.env.PRODUCT_IMAGE_PATH
-        });
-    } catch (error) {
-        res.status(500).json({ status: false, message: error.message });
+  try {
+    const { search = "", status, page = 1, limit = 10 } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const lim = Math.max(1, parseInt(limit, 10) || 10);
+    const skip = (pageNum - 1) * lim;
+
+    // Build match object for aggregation
+    const match = {};
+
+    // status normalization
+    if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+      const s = String(status).toLowerCase().trim();
+      if (s === "active" || s === "true" || s === "1") match.productStatus = true;
+      else if (s === "inactive" || s === "false" || s === "0") match.productStatus = false;
     }
+
+    if (search && String(search).trim() !== "") {
+      const q = String(search).trim();
+      const regex = new RegExp(q, "i");
+      match.$or = [
+        { productName: regex },
+        { productCode: regex },
+        { "parentCategory.categoryName": regex },
+        { "subCategory.subcategoryName": regex },
+        { "subSubCategory.subsubcategoryName": regex }
+      ];
+    }
+
+    const categoryCollName = categoryModel.collection.name;
+    const subcategoryCollName = subcategoryModel.collection.name;
+    const subsubcategoryCollName = subsubcategoryModel.collection.name;
+
+    const countPipeline = [
+      {
+        $lookup: {
+          from: categoryCollName,
+          localField: "parentCategory",
+          foreignField: "_id",
+          as: "parentCategory"
+        }
+      },
+      { $unwind: { path: "$parentCategory", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: subcategoryCollName,
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "subCategory"
+        }
+      },
+      { $unwind: { path: "$subCategory", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: subsubcategoryCollName,
+          localField: "subSubCategory",
+          foreignField: "_id",
+          as: "subSubCategory"
+        }
+      },
+      { $unwind: { path: "$subSubCategory", preserveNullAndEmptyArrays: true } },
+      { $match: match },
+      { $count: "totalCount" }
+    ];
+
+    const dataPipeline = [
+      {
+        $lookup: {
+          from: categoryCollName,
+          localField: "parentCategory",
+          foreignField: "_id",
+          as: "parentCategory"
+        }
+      },
+      { $unwind: { path: "$parentCategory", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: subcategoryCollName,
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "subCategory"
+        }
+      },
+      { $unwind: { path: "$subCategory", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: subsubcategoryCollName,
+          localField: "subSubCategory",
+          foreignField: "_id",
+          as: "subSubCategory"
+        }
+      },
+      { $unwind: { path: "$subSubCategory", preserveNullAndEmptyArrays: true } },
+      { $match: match },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: lim }
+    ];
+
+    const [countAggRes, dataAggRes] = await Promise.all([
+      productModel.aggregate(countPipeline),
+      productModel.aggregate(dataPipeline)
+    ]);
+
+    const totalCount = Array.isArray(countAggRes) && countAggRes.length ? countAggRes[0].totalCount : 0;
+    const products = Array.isArray(dataAggRes) ? dataAggRes : [];
+
+    return res.status(200).json({
+      status: true,
+      message: "Products fetched successfully",
+      data: products,
+      totalCount,
+      page: pageNum,
+      limit: lim,
+      totalPage: Math.max(1, Math.ceil(totalCount / lim)),
+      productStaticPath: process.env.PRODUCT_IMAGE_PATH
+    });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message || "Server error" });
+  }
 };
 
 // Get a single product by ID
@@ -283,17 +390,18 @@ const updateProductStatus = async (req, res) => {
     }
 };
 
+// export (keep other handlers unchanged)
 module.exports = {
-    getParentCategory,
-    getSubCategory,
-    getSubSubCategory,
-    getMaterial,
-    getColors,
-    createProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-    deleteProduct,
-    updateProductStatus,
-    deleteMultipleProducts
+  getParentCategory,
+  getSubCategory,
+  getSubSubCategory,
+  getMaterial,
+  getColors,
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  updateProductStatus,
+  deleteMultipleProducts
 };
