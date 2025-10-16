@@ -51,7 +51,7 @@ export default function LoginRegister() {
             .then((finResponse) => {
                 if (finResponse.status === "success") {
                     toast.success(finResponse.message);
-                    setInterval(() => {
+                    setTimeout(() => {
                         toast.info("Redirecting to Thank You Page...");
                         router.push('/thankyou');
                     }, 2000);
@@ -72,7 +72,7 @@ export default function LoginRegister() {
             .then((finResponse) => {
                 if (finResponse.status === "success") {
                     toast.success(finResponse.message);
-                    setInterval(() => {
+                    setTimeout(() => {
                         toast.info("Redirecting to Home Page...");
                         router.push('/');
                     }, 2000);

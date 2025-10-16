@@ -11,6 +11,7 @@ const { whychooseusRoutes } = require("./whychooseusRoutes");
 const { testimonialRoutes } = require("./testimonialRoutes");
 const { sliderRoutes } = require("./sliderRoutes");
 const { productRoutes } = require("./productRoutes");
+const { contactRoutes } = require("./contactRoutes");
 
 let adminRoutes = express.Router();
 
@@ -27,6 +28,7 @@ adminRoutes.use("/subcategory", subcategoryRoutes);
 adminRoutes.use("/subsubcategory", subsubcategoryRoutes);
 adminRoutes.use("/whychooseus", whychooseusRoutes);
 adminRoutes.use("/product", productRoutes);
+adminRoutes.use("/contact", contactRoutes);
 
 //  admin login url : http://localhost:<port>/admin/login
 adminRoutes.post("/login", (req,res)=> {
