@@ -41,29 +41,46 @@ let categoryCreate = async (req, res) => {
 
 let categoryViewAll = async (req, res) => {
 
-    let skip = 0;
-    let limit = 5;
     try {
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
+        // Accept query params for server-side filtering + pagination
+        const { search = "", status, page = 1, limit = 5 } = req.query;
+
+        const filter = {};
+
+        // Status filter: 'active' | 'inactive' | undefined
+        if (status === "active") filter.categoryStatus = true;
+        else if (status === "inactive") filter.categoryStatus = false;
+
+        // Search (case-insensitive) on categoryName and categoryCode
+        if (search && String(search).trim() !== "") {
+            const q = String(search).trim();
+            const regex = new RegExp(q, "i");
+            filter.$or = [
+                { categoryName: regex },
+                { categoryCode: regex }
+            ];
         }
 
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
-        }
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const lim = Math.max(1, parseInt(limit, 10) || 5);
+        const skip = (pageNum - 1) * lim;
 
-        let categoryData = await categoryModel.find().skip(skip).limit(limit);
+        const [totalCount, categoryData] = await Promise.all([
+            categoryModel.countDocuments(filter),
+            categoryModel.find(filter).skip(skip).limit(lim).sort({ createdAt: -1 })
+        ]);
 
-        let categoryDataLength = await categoryModel.find();
-
-        let resObj = {
+        const resObj = {
             status: "success",
             message: "Categories retrieved successfully",
             categoryData,
-            length: categoryDataLength.length,
+            count: categoryData.length,
+            totalCount,
+            page: pageNum,
+            limit: lim,
             staticPath: process.env.CATEGORY_IMAGE_PATH,
-            totalPage: Math.ceil(categoryDataLength.length / limit)
-        }
+            totalPage: Math.max(1, Math.ceil(totalCount / lim))
+        };
 
         res.send(resObj);
     }
