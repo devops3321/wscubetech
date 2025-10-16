@@ -40,38 +40,108 @@ let subsubcategoryCreate = async (req, res) => {
 }
 
 let subsubcategoryViewAll = async (req, res) => {
-
-    let skip = 0;
-    let limit = 5;
     try {
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
+        console.log("subsubcategoryViewAll - req.query:", req.query);
+        const { search = "", status, page = 1, limit = 5 } = req.query;
+
+        const match = {};
+
+        // normalize status values (accept "active"/"inactive", "true"/"false", "1"/"0")
+        if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+            const s = String(status).toLowerCase().trim();
+            if (s === "active" || s === "true" || s === "1") match.subsubcategoryStatus = true;
+            else if (s === "inactive" || s === "false" || s === "0") match.subsubcategoryStatus = false;
         }
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
+
+        if (search && String(search).trim() !== "") {
+            const q = String(search).trim();
+            const regex = new RegExp(q, "i");
+            match.$or = [
+                { subsubcategoryName: regex },
+                { subsubcategoryCode: regex },
+                { "parentCategory.categoryName": regex },    // matches after $lookup + $unwind
+                { "subcategory.subcategoryName": regex }    // matches after $lookup + $unwind
+            ];
         }
-        let subsubcategoryData = await subsubcategoryModel.find()
-            .populate("parentCategory", "categoryName")
-            .populate("subcategory", "subcategoryName")
-            .skip(skip).limit(limit);
-        let subsubcategoryDataLength = await subsubcategoryModel.countDocuments();
-        res.status(200).json({
+
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const lim = Math.max(1, parseInt(limit, 10) || 5);
+        const skip = (pageNum - 1) * lim;
+
+        const categoryCollName = categoryModel.collection.name;
+        const subcategoryCollName = subcategoryModel.collection.name;
+
+        const countPipeline = [
+            {
+                $lookup: {
+                    from: categoryCollName,
+                    localField: "parentCategory",
+                    foreignField: "_id",
+                    as: "parentCategory"
+                }
+            },
+            { $unwind: { path: "$parentCategory", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: subcategoryCollName,
+                    localField: "subcategory",
+                    foreignField: "_id",
+                    as: "subcategory"
+                }
+            },
+            { $unwind: { path: "$subcategory", preserveNullAndEmptyArrays: true } },
+            { $match: match },
+            { $count: "totalCount" }
+        ];
+
+        const dataPipeline = [
+            {
+                $lookup: {
+                    from: categoryCollName,
+                    localField: "parentCategory",
+                    foreignField: "_id",
+                    as: "parentCategory"
+                }
+            },
+            { $unwind: { path: "$parentCategory", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: subcategoryCollName,
+                    localField: "subcategory",
+                    foreignField: "_id",
+                    as: "subcategory"
+                }
+            },
+            { $unwind: { path: "$subcategory", preserveNullAndEmptyArrays: true } },
+            { $match: match },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: lim }
+        ];
+
+        const [countAggRes, dataAggRes] = await Promise.all([
+            subsubcategoryModel.aggregate(countPipeline),
+            subsubcategoryModel.aggregate(dataPipeline)
+        ]);
+
+        const totalCount = Array.isArray(countAggRes) && countAggRes.length ? countAggRes[0].totalCount : 0;
+        const subsubcategoryData = Array.isArray(dataAggRes) ? dataAggRes : [];
+
+        return res.status(200).json({
             status: "success",
             message: "Sub Sub Categories retrieved successfully.",
             data: subsubcategoryData,
-            totalCount: subsubcategoryDataLength,
+            totalCount,
+            page: pageNum,
+            limit: lim,
             staticPath: process.env.SUBSUBCATEGORY_IMAGE_PATH,
-            totalPage: Math.ceil(subsubcategoryDataLength / limit)
+            totalPage: Math.max(1, Math.ceil(totalCount / lim))
         });
+    } catch (err) {
+        console.error("subsubcategoryViewAll error:", err);
+        return res.status(500).json({ status: "failed", message: "Sub Sub Categories not found.", error: err });
     }
-    catch (err) {
-        res.status(404).json({
-            status: "failed",
-            message: "Sub Sub Categories not found.",
-            error: err
-        });
-    }
-}
+};
 
 let subsubcategoryViewById = async (req, res) => {
 

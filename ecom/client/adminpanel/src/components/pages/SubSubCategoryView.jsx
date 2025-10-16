@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaPen, FaFilter } from "react-icons/fa";
+import { FaPen, FaFilter, FaSearch } from "react-icons/fa";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
 
 export default function SubSubCategoryView() {
-  let apiBaseurl = import.meta.env.VITE_APIBASEURL;
+  let apiBaseurl = (import.meta.env.VITE_APIBASEURL || "").replace(/\/+$/,"") + "/";
+  const ENDPOINT = `${apiBaseurl}subsubcategory`;
+
   const [subsubcategoryData, setSubsubcategoryData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(5);
@@ -17,31 +19,49 @@ export default function SubSubCategoryView() {
   const [ids, setIds] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const getSubSubCategoryData = () => {
-    axios.get(`${apiBaseurl}subsubcategory/view`, {
-      params: { page: currentPage, limit: limit }
-    })
-      .then((response) => response.data)
-      .then((finResponse) => {
+  // filters
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all"); // all | active | inactive
+  const [showFilter, setShowFilter] = useState(false);
+
+  const getSubSubCategoryData = async (page = 1, lim = 5, searchTerm = "", statusFilter = "all") => {
+    try {
+      setLoading(true);
+      const params = { page, limit: lim };
+      if (searchTerm && String(searchTerm).trim() !== "") params.search = String(searchTerm).trim();
+      if (statusFilter === "active") params.status = "active";
+      if (statusFilter === "inactive") params.status = "inactive";
+
+      const resp = await axios.get(`${ENDPOINT}/view`, { params });
+      const finResponse = resp.data;
+      if (finResponse && finResponse.status === "success") {
         setSubsubcategoryData(Array.isArray(finResponse.data) ? finResponse.data : []);
-        setTotalPage(finResponse.totalPage || 0);
+        setTotalPage(finResponse.totalPage || Math.max(1, Math.ceil((finResponse.totalCount || 0) / lim)));
         setStaticPath(finResponse.staticPath || "");
-      })
-      .catch(() => {
-        toast.error("Failed to fetch subsubcategory data.");
+      } else {
+        toast.error(finResponse?.message || "Failed to fetch subsubcategory data.");
         setSubsubcategoryData([]);
-      });
+        setTotalPage(0);
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message || "Failed to fetch subsubcategory data.");
+      setSubsubcategoryData([]);
+      setTotalPage(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getCheckedIds = (e) => {
+    const val = e.target.value;
     if (e.target.checked) {
-      if (!ids.includes(e.target.value)) {
-        setIds([...ids, e.target.value]);
+      if (!ids.includes(val)) {
+        setIds(prev => [...prev, val]);
       }
     } else {
-      let filtered = ids.filter((v) => v !== e.target.value);
-      setIds(filtered);
+      setIds(prev => prev.filter((v) => v !== val));
     }
   };
 
@@ -54,58 +74,64 @@ export default function SubSubCategoryView() {
     }
   };
 
-  const multidelete = () => {
+  const multidelete = async () => {
     if (ids.length >= 1) {
-      axios.delete(`${apiBaseurl}subsubcategory/multidelete/`, {
-        data: { ids: ids }
-      })
-        .then((response) => response.data)
-        .then((finResponse) => {
-          toast.success(finResponse.message);
-          getSubSubCategoryData();
+      try {
+        const resp = await axios.delete(`${ENDPOINT}/multidelete/`, { data: { ids: ids } });
+        const finResponse = resp.data;
+        if (finResponse && finResponse.status === "success") {
+          toast.success(finResponse.message || "Deleted successfully");
+          getSubSubCategoryData(currentPage, limit, search, filterStatus);
           setIds([]);
-        });
+        } else {
+          toast.error(finResponse?.message || "Delete failed");
+        }
+      } catch (err) {
+        toast.error(err?.response?.data?.message || err.message || "Delete failed");
+      }
     } else {
       toast.error("Please select at least one item");
     }
   };
 
-  const statusUpdate = () => {
+  const statusUpdate = async () => {
     if (ids.length >= 1) {
-      axios.post(`${apiBaseurl}subsubcategory/statusupdate/`, { ids: ids })
-        .then((response) => response.data)
-        .then((finResponse) => {
-          toast.success(finResponse.message);
-          getSubSubCategoryData();
+      try {
+        const resp = await axios.post(`${ENDPOINT}/statusupdate/`, { ids: ids });
+        const finResponse = resp.data;
+        if (finResponse && finResponse.status === "success") {
+          toast.success(finResponse.message || "Status updated");
+          getSubSubCategoryData(currentPage, limit, search, filterStatus);
           setIds([]);
-        });
+        } else {
+          toast.error(finResponse?.message || "Status update failed");
+        }
+      } catch (err) {
+        toast.error(err?.response?.data?.message || err.message || "Status update failed");
+      }
     } else {
       toast.error("Please select at least one item");
     }
   };
 
-  // Fetch parent categories and subcategories for filtering or display (future-proofing)
+  // Fetch parent categories and subcategories for filters (optional)
   useEffect(() => {
     axios.get(`${apiBaseurl}subsubcategory/parent-category/view`)
-      .then((response) => response.data)
-      .then((finResponse) => {
-        if (finResponse.status === "success") {
-          setParentCategories(finResponse.categoryData || []);
-        }
-      });
+      .then(r => r.data)
+      .then(fin => { if (fin.status === "success") setParentCategories(fin.categoryData || []); })
+      .catch(() => { /* ignore */ });
+
     axios.get(`${apiBaseurl}subsubcategory/subcategory/view`)
-      .then((response) => response.data)
-      .then((finResponse) => {
-        if (finResponse.status === "success") {
-          setSubCategories(finResponse.subcategoryData || []);
-        }
-      });
+      .then(r => r.data)
+      .then(fin => { if (fin.status === "success") setSubCategories(fin.subcategoryData || []); })
+      .catch(() => { /* ignore */ });
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    getSubSubCategoryData();
+    getSubSubCategoryData(currentPage, limit, search, filterStatus);
     // eslint-disable-next-line
-  }, [currentPage, limit]);
+  }, [currentPage, limit, search, filterStatus]);
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
@@ -113,9 +139,9 @@ export default function SubSubCategoryView() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-700 mb-2 tracking-tight flex items-center gap-2">
-            <Link to="/dashboard" className="hover:text-blue-700 transition-colors">Home</Link>
+            <Link to="/dashboard" className="hover:text-blue-700 transition-colors cursor-pointer">Home</Link>
             <span className="text-gray-400">/</span>
-            <Link to="/subsubcategory/view" className="hover:text-blue-700 transition-colors">Sub Sub Category</Link>
+            <Link to="/subsubcategory/view" className="hover:text-blue-700 transition-colors cursor-pointer">Sub Sub Category</Link>
             <span className="text-gray-400">/</span>
             <span className="text-blue-700">View</span>
           </h1>
@@ -124,13 +150,26 @@ export default function SubSubCategoryView() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <h2 className="text-3xl font-semibold text-gray-800">View Sub Sub Category</h2>
             <div className="flex items-center gap-3">
+              <select
+                name="filterStatus"
+                id="filterStatus"
+                value={filterStatus}
+                onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg p-2 shadow-sm cursor-pointer"
+                title="Filter by status"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+
               <label htmlFor="limit" className="font-medium text-gray-700">Items per page:</label>
               <select
                 name="limit"
                 id="limit"
                 value={limit}
-                onChange={(e) => setLimit(Number(e.target.value))}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 shadow-sm"
+                onChange={(e) => { setLimit(Number(e.target.value)); setCurrentPage(1); }}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg p-2 shadow-sm cursor-pointer"
               >
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -139,11 +178,32 @@ export default function SubSubCategoryView() {
               </select>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" className="text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg text-md px-3 py-2 shadow transition-all duration-150" title="Filter"><FaFilter /></button>
-              <button type="button" onClick={statusUpdate} className="text-white bg-green-600 hover:bg-green-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150">Change Status</button>
-              <button type="button" onClick={multidelete} className="text-white bg-red-600 hover:bg-red-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150">Delete</button>
+              <button type="button" onClick={() => setShowFilter(prev => !prev)} className="text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg text-md px-3 py-2 shadow transition-all duration-150 cursor-pointer" title="Filter"><FaFilter /></button>
+              <button type="button" onClick={statusUpdate} className="text-white bg-green-600 hover:bg-green-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150 cursor-pointer">Change Status</button>
+              <button type="button" onClick={multidelete} className="text-white bg-red-600 hover:bg-red-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150 cursor-pointer">Delete</button>
             </div>
           </div>
+
+          {showFilter && (
+            <div className="mb-4 flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search by parent / subcategory / name"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                className="border px-3 py-2 rounded-md shadow-sm w-full md:w-64"
+              />
+              <button
+                type="button"
+                onClick={() => getSubSubCategoryData(1, limit, search, filterStatus)}
+                title="Search"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-md cursor-pointer"
+              >
+                <FaSearch />
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto rounded-xl border border-gray-100 bg-gray-50">
             <table className="min-w-full table-auto text-sm">
               <thead>
@@ -153,7 +213,7 @@ export default function SubSubCategoryView() {
                       type="checkbox"
                       onChange={allCheckId}
                       checked={ids.length === subsubcategoryData.length && subsubcategoryData.length > 0}
-                      className="accent-blue-600 w-5 h-5" />
+                      className="accent-blue-600 w-5 h-5 cursor-pointer" />
                   </th>
                   <th className="px-4 py-3 text-center w-2/12">SR.NO</th>
                   <th className="px-4 py-3 text-left sticky left-12 bg-blue-700/90 w-48 z-10">PARENT CATEGORY NAME</th>
@@ -166,7 +226,9 @@ export default function SubSubCategoryView() {
                 </tr>
               </thead>
               <tbody>
-                {subsubcategoryData.length >= 1 ?
+                { loading ? (
+                  <tr><td colSpan="9" className="text-center py-8">Loading...</td></tr>
+                ) : subsubcategoryData.length >= 1 ? (
                   subsubcategoryData.map((row, i) => (
                     <tr
                       key={row._id}
@@ -178,7 +240,7 @@ export default function SubSubCategoryView() {
                           onChange={getCheckedIds}
                           checked={ids.includes(row._id)}
                           value={row._id}
-                          className="accent-blue-600 w-5 h-5" />
+                          className="accent-blue-600 w-5 h-5 cursor-pointer" />
                       </td>
                       <td className="px-4 py-2 text-center font-semibold">{(currentPage - 1) * limit + i + 1}</td>
                       <td className="px-4 py-2 align-middle sticky left-12 bg-inherit w-48 font-medium">{row.parentCategory?.categoryName || '-'}</td>
@@ -192,29 +254,29 @@ export default function SubSubCategoryView() {
                       <td className="px-4 py-2 align-middle text-center w-1/8 font-semibold">{row.subsubcategoryOrder}</td>
                       <td className="px-4 py-2 align-middle text-center w-1/8">
                         {row.subsubcategoryStatus ? (
-                          <span className="px-4 py-1 rounded-full font-semibold bg-green-100 text-green-700 border border-green-300 text-xs">Active</span>
+                          <span className="px-4 py-1 rounded-full font-semibold bg-green-100 text-green-700 border border-green-300 text-xs cursor-pointer">Active</span>
                         ) : (
-                          <span className="px-4 py-1 rounded-full font-semibold bg-red-100 text-red-700 border border-red-300 text-xs">Deactivate</span>
+                          <span className="px-4 py-1 rounded-full font-semibold bg-red-100 text-red-700 border border-red-300 text-xs cursor-pointer">Deactivate</span>
                         )}
                       </td>
                       <td className="px-4 py-2 align-middle text-center w-1/6">
                         <div className="flex items-center justify-center h-full">
                           <Link to={`/editsubsubcategory/${row._id}`}>
-                          <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition-colors duration-200 cursor-pointer" title="Edit Sub Subcategory">
-                            <FaPen />
-                          </button>
+                            <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition-colors duration-200 cursor-pointer" title="Edit Sub Subcategory">
+                              <FaPen />
+                            </button>
                           </Link>
                         </div>
                       </td>
                     </tr>
                   ))
-                  : (
-                    <tr>
-                      <td colSpan="9" className="text-center py-8 text-2xl font-bold text-gray-400">
-                        No Sub Subcategory available.
-                      </td>
-                    </tr>
-                  )}
+                ) : (
+                  <tr>
+                    <td colSpan="9" className="text-center py-8 text-2xl font-bold text-gray-400">
+                      No Sub Subcategory available.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -222,7 +284,7 @@ export default function SubSubCategoryView() {
             <ResponsivePagination
               current={currentPage}
               total={totalPage}
-              onPageChange={setCurrentPage}
+              onPageChange={(p) => setCurrentPage(p)}
             />
           </div>
         </div>
