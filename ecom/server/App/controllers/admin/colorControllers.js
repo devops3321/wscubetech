@@ -66,9 +66,19 @@ let colorViewAll = async (req, res) => {
             skip = (req.query.page - 1) * limit;
         }
 
-        let colorData = await colorModel.find().skip(skip).limit(limit);
+        let searchObj = {};
+        if (req.query.searchTerm) {
 
-        let colorDataLength = await colorModel.find();
+            searchObj = {
+                $or: [
+                    { colorName: { $regex: req.query.searchTerm, $options: "i" } },
+                    { colorCode: { $regex: req.query.searchTerm, $options: "i" } }                ]
+            }
+        }
+
+        let colorData = await colorModel.find(searchObj).skip(skip).limit(limit);
+
+        let colorDataLength = await colorModel.find(searchObj);
 
         let resObj = {
             status: "success",

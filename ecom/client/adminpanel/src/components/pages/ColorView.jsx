@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
-import { FaFilter, FaPen } from "react-icons/fa";
+import { FaFilter, FaPen, FaSearch } from "react-icons/fa";
 import { Link } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import ResponsivePagination from 'react-responsive-pagination';
@@ -15,13 +15,16 @@ export default function ColorView() {
   let [currentPage, setCurrentPage] = React.useState(1);
   let [limit, setLimit] = React.useState(5);
   let [totalPage, setTotalPage] = React.useState(0);
+  let [showSearch, setShowSearch] = React.useState(false);
+  let [searchTerm, setSearchTerm] = React.useState("");
 
   let getColorData = async () => {
     axios.get(`${apiBaseurl}color/view`,
       {
         params: {
           page: currentPage,
-          limit: limit
+          limit: limit,
+          searchTerm: searchTerm   // <-- include searchTerm so backend receives it
         }
       }
     )
@@ -35,6 +38,13 @@ export default function ColorView() {
         setcolorData([]); // fallback to empty array on error
       });
   }
+
+  let handleSearch = () => {
+    // reset to first page on new search
+    setCurrentPage(1);
+    // reuse getColorData (it now sends searchTerm)
+    getColorData();
+  };
 
   let getCheckedIds = (e) => {
     if (e.target.checked) {
@@ -96,6 +106,14 @@ export default function ColorView() {
     getColorData();
   }, [currentPage, limit]);
 
+  useEffect(() => {
+    if (searchTerm) {
+      // debounce could be added if needed; keep behavior consistent
+      handleSearch();
+    } else {
+      getColorData();
+    }
+  }, [searchTerm]);
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 py-8">
@@ -129,11 +147,37 @@ export default function ColorView() {
               </select>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" className="text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg text-md px-3 py-2 shadow transition-all duration-150" title="Filter"><FaFilter /></button>
+              <button
+                type="button"
+                className="text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg text-md px-3 py-2 shadow transition-all duration-150"
+                title="Filter"
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <FaFilter />
+              </button>
               <button type="button" onClick={statusUpdate} className="text-white bg-green-600 hover:bg-green-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150">Change Status</button>
               <button type="button" onClick={multidelete} className="text-white bg-red-600 hover:bg-red-700 font-semibold rounded-lg text-md px-5 py-2 shadow transition-all duration-150">Delete</button>
             </div>
           </div>
+          {showSearch && (
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Search color..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="button"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 flex items-center cursor-pointer shadow transition-all duration-150"
+                onClick={handleSearch}
+                title="Search"
+              >
+                <FaSearch />
+              </button>
+            </div>
+          )}
           <div className="overflow-x-auto rounded-xl border border-gray-100 bg-gray-50">
             <table className="min-w-full table-auto text-sm">
               <thead>
