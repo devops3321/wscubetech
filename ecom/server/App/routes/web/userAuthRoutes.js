@@ -10,10 +10,8 @@ userAuthRoutes.post("/login", login);
 
 userAuthRoutes.get("/view-user", viewuser);
 
-// delete expects body: { ids: [id1, id2, ...] }
 userAuthRoutes.delete("/delete", deleteuser);
 
-// status update expects body: { ids: [...], status: true|false }
 userAuthRoutes.post("/statusupdate", userStatusUpdate);
 
 module.exports = { userAuthRoutes };
