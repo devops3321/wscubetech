@@ -40,41 +40,57 @@ let whychooseusCreate = async (req, res) => {
 }
 
 let whychooseusViewAll = async (req, res) => {
+  try {
+    const { search = "", status, page = 1, limit = 5 } = req.query;
 
-    let skip = 0;
-    let limit = 5;
-    try {
-        if (req.query.limit) {
-            limit = parseInt(req.query.limit);
-        }
-        
-        if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
-        }
+    const filter = {};
 
-        let whychooseusData = await whychooseusModel.find().skip(skip).limit(limit);
-
-        let whychooseusDataLength = await whychooseusModel.find();
-
-        let resObj = {
-            status: "success",
-            message: "WhyChooseUs items retrieved successfully",
-            whychooseusData,
-            length: whychooseusDataLength.length,
-            staticPath: process.env.WHYCHOOSEUS_IMAGE_PATH,
-            totalPage: Math.ceil(whychooseusDataLength.length / limit)
-        }
-        res.send(resObj);
+    // normalize status (accept active/inactive/true/false/1/0)
+    if (typeof status !== "undefined" && status !== null && String(status).trim() !== "") {
+      const s = String(status).toLowerCase().trim();
+      if (s === "active" || s === "true" || s === "1") filter.whychooseusStatus = true;
+      else if (s === "inactive" || s === "false" || s === "0") filter.whychooseusStatus = false;
     }
 
-    catch (err) {
-        let resObj = {
-            status: "failed",
-            message: "WhyChooseUs not found",
-            error: err
-        }
-        res.send(resObj);
+    // search by title/description/code (case-insensitive)
+    if (search && String(search).trim() !== "") {
+      const q = String(search).trim();
+      const regex = new RegExp(q, "i");
+      filter.$or = [
+        { whychooseusTitle: regex },
+        { whychooseusDescription: regex },
+        { whychooseusCode: regex }
+      ];
     }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const lim = Math.max(1, parseInt(limit, 10) || 5);
+    const skip = (pageNum - 1) * lim;
+
+    const [totalCount, whychooseusData] = await Promise.all([
+      whychooseusModel.countDocuments(filter),
+      whychooseusModel.find(filter).skip(skip).limit(lim).sort({ createdAt: -1 })
+    ]);
+
+    let resObj = {
+      status: "success",
+      message: "WhyChooseUs items retrieved successfully",
+      whychooseusData: whychooseusData,
+      totalCount,
+      staticPath: process.env.WHYCHOOSEUS_IMAGE_PATH,
+      page: pageNum,
+      limit: lim,
+      totalPage: Math.max(1, Math.ceil(totalCount / lim))
+    };
+    res.status(200).json(resObj);
+  } catch (err) {
+    let resObj = {
+      status: "failed",
+      message: "WhyChooseUs not found",
+      error: err
+    };
+    res.status(500).json(resObj);
+  }
 }
 
 let whychooseusViewById = async (req, res) => {
