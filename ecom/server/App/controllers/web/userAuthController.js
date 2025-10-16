@@ -142,4 +142,95 @@ let login = async (req, res) => {
     }
 }
 
-module.exports = { sendOtp, createuser, login };
+// VIEW USERS with optional searchTerm, page, limit
+let viewuser = async (req, res) => {
+    try {
+        let skip = 0;
+        let limit = 10;
+
+        if (req.query.limit) {
+            limit = parseInt(req.query.limit);
+        }
+        if (req.query.page) {
+            skip = (parseInt(req.query.page) - 1) * limit;
+        }
+
+        const term = req.query.searchTerm ? req.query.searchTerm.trim() : "";
+        let searchObj = {};
+
+        if (term) {
+            searchObj = {
+                $or: [
+                    { userName: { $regex: term, $options: "i" } },
+                    { userEmail: { $regex: term, $options: "i" } }
+                ]
+            };
+        }
+
+        let users = await userModel.find(searchObj).skip(skip).limit(limit).lean();
+        let total = await userModel.countDocuments(searchObj);
+
+        let resObj = {
+            status: "success",
+            message: "Users fetched successfully",
+            users,
+            length: total,
+            totalPage: Math.ceil(total / limit)
+        };
+        res.send(resObj);
+    }
+    catch (err) {
+        let resObj = {
+            status: "failed",
+            message: "Error fetching users",
+            error: err
+        }
+        res.send(resObj);
+    }
+}
+
+// DELETE users (accepts body.ids array)
+let deleteuser = async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.send({ status: "failed", message: "No ids provided" });
+        }
+
+        await userModel.deleteMany({ _id: { $in: ids } });
+
+        res.send({ status: "success", message: "User(s) deleted successfully" });
+    } catch (err) {
+        res.send({ status: "failed", message: "Error deleting users", error: err });
+    }
+}
+
+// UPDATE user status (disable/enable). Accepts body.ids array and body.status (true/false)
+let userStatusUpdate = async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        const status = req.body.status;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.send({ status: "failed", message: "No ids provided" });
+        }
+        if (typeof status !== "boolean") {
+            return res.send({ status: "failed", message: "Status must be boolean" });
+        }
+
+        const result = await userModel.updateMany(
+            { _id: { $in: ids } },
+            { $set: { userStatus: status } }
+        );
+
+        res.send({
+            status: "success",
+            message: `Users ${status ? "enabled" : "deactivated"} successfully`,
+            modifiedCount: result.modifiedCount
+        });
+    } catch (err) {
+        res.send({ status: "failed", message: "Error updating status", error: err.message });
+    }
+}
+
+module.exports = { sendOtp, createuser, login, viewuser, deleteuser, userStatusUpdate };

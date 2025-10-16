@@ -27,8 +27,13 @@ let userSchema = new mongoose.Schema(
             minLength: 2,
             maxLength: 100, 
             required:[true,"User Password is required"]
+        },
+        userStatus: {                // <-- added to allow disable/enable
+            type: Boolean,
+            default: true
         }
-    }
+    },
+    { timestamps: true }
 )
 
 let userModel = mongoose.model("user",userSchema);
