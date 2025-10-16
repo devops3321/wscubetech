@@ -109,4 +109,37 @@ let createuser = async (req, res) => {
         res.send(resObj);
     }
 }
-module.exports = { sendOtp, createuser };
+
+let login = async (req, res) => {
+    let { userEmail, userPassword } = req.body;
+
+    let user = await userModel.findOne({ userEmail: userEmail });
+
+    if (user) {
+        const match = await bcrypt.compareSync(userPassword, user.userPassword);
+        if (match) {
+            let resObj = {
+                status: "success",
+                message: "Login successful",
+                user
+            }
+            res.send(resObj);
+        }
+        else {
+            let resObj = {
+                status: "failed",
+                message: "Invalid password",
+            }
+            res.send(resObj);
+        }
+    }
+    else {
+        let resObj = {
+            status: "failed",
+            message: "User not found",
+        }
+        res.send(resObj);
+    }
+}
+
+module.exports = { sendOtp, createuser, login };

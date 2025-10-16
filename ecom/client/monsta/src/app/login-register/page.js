@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 
 export default function LoginRegister() {
     const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
@@ -17,6 +17,10 @@ export default function LoginRegister() {
         otp: ''
     });
 
+    const [loginData, setLoginData] = useState({
+        userEmail: '',
+        userPassword: ''
+    });
     const router = useRouter();
 
     const handleRegisterChange = (e) => {
@@ -29,10 +33,10 @@ export default function LoginRegister() {
         // Example: await axios.post('/api/register', registerData);
         // console.log('Registration data submitted:', registerData);
         axios.post(`${apiBaseurl}user/send-otp`, registerData)
-        .then((res)=> res.data)
-        .then((finResponse) => {
-            console.log(finResponse);
-        })
+            .then((res) => res.data)
+            .then((finResponse) => {
+                console.log(finResponse);
+            })
 
         setShowOtp(true);
     };
@@ -43,22 +47,44 @@ export default function LoginRegister() {
         // Example: await axios.post('/api/verify-otp', { ...registerData, otp });
         // On success, redirect or show success message
         axios.post(`${apiBaseurl}user/create-user`, registerData)
-        .then((res)=> res.data)
-        .then((finResponse) => {
-            if(finResponse.status === "success") {
-                toast.success(finResponse.message);
-                router.push('/thankyou'); 
-            }
-            else{
-                toast.error(finResponse.message);
-            }
-        })
+            .then((res) => res.data)
+            .then((finResponse) => {
+                if (finResponse.status === "success") {
+                    toast.success(finResponse.message);
+                    setInterval(() => {
+                        toast.info("Redirecting to Thank You Page...");
+                        router.push('/thankyou');
+                    }, 2000);
+                }
+                else {
+                    toast.error(finResponse.message);
+                }
+            })
 
         setShowOtp(false);
         setRegisterData({ userName: '', userEmail: '', userPhone: '', userPassword: '' });
     };
 
-        
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        axios.post(`${apiBaseurl}user/login`, loginData)
+            .then((res) => res.data)
+            .then((finResponse) => {
+                if (finResponse.status === "success") {
+                    toast.success(finResponse.message);
+                    setInterval(() => {
+                        toast.info("Redirecting to Home Page...");
+                        router.push('/');
+                    }, 2000);
+                }
+                else {
+                    toast.error(finResponse.message);
+                }
+            })
+
+        setLoginData({ userEmail: '', userPassword: '' });
+    };
+
     return (
         <div>
             <Breadcrumb pageName={"My Account"} />
@@ -67,12 +93,15 @@ export default function LoginRegister() {
                 {/* Login */}
                 <div>
                     <h2 className="text-3xl font-playfair mb-6 text-black">Login</h2>
-                    <form className="bg-white border-1 border-gray-300 rounded-lg p-6">
+                    <form onSubmit={handleLoginSubmit} className="bg-white border-1 border-gray-300 rounded-lg p-6">
                         <div className="mb-4">
                             <label className="block font-semibold mb-2 text-black" htmlFor="login-email">Email *</label>
                             <input
                                 type="email"
-                                id="login-email"
+                                name='userEmail'
+                                value={loginData.userEmail}
+                                onChange={(e) => setLoginData({ ...loginData, userEmail: e.target.value })}
+                                id="userEmail"
                                 placeholder="Email Address"
                                 className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400"
                             />
@@ -81,7 +110,10 @@ export default function LoginRegister() {
                             <label className="block font-semibold mb-2 text-black" htmlFor="login-password">Password *</label>
                             <input
                                 type="password"
-                                id="login-password"
+                                name='userPassword'
+                                value={loginData.userPassword}
+                                onChange={(e) => setLoginData({ ...loginData, userPassword: e.target.value })}
+                                id="userPassword"
                                 placeholder="Password"
                                 className="w-full border px-4 py-3 mb-2 rounded focus:outline-none text-black placeholder:text-gray-400"
                             />
