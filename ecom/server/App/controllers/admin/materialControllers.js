@@ -1,36 +1,36 @@
 const { materialModel } = require("../../models/materialModel");
 
-let materialCreate = async (req,res)=>{
+let materialCreate = async (req, res) => {
 
     let insertObj = {
-        categoryName: req.body.categoryName, 
+        categoryName: req.body.categoryName,
         order: req.body.order
     }
 
-    try{
+    try {
         let materialCollection = new materialModel(insertObj);
         let materialResult = await materialCollection.save();
 
-        let resObj ={
-            status:"success",
-            message:"material created successfully",
+        let resObj = {
+            status: "success",
+            message: "material created successfully",
             materialResult
         }
-        res.send(resObj);        
+        res.send(resObj);
     }
-    catch(err){
+    catch (err) {
         let errorMessage = "Unable to create material";
 
-        if (err.code == 11000){
+        if (err.code == 11000) {
             errorMessage = "Category Name already exists...";
         }
 
-        if (err.errors){
+        if (err.errors) {
             errorMessage = err.errors.categoryName?.message || err.errors.order?.message || "Validation error";
         }
 
         let resObj = {
-            status:"failed",
+            status: "failed",
             message: errorMessage,
             error: err
         }
@@ -39,30 +39,57 @@ let materialCreate = async (req,res)=>{
     }
 }
 
-let materialViewAll = async (req,res)=>{
+let materialViewAll = async (req, res) => {
     let skip = 0;
     let limit = 5;
-    
+
     try {
         if (req.query.limit) {
             limit = parseInt(req.query.limit);
         }
 
         if (req.query.page) {
-            skip = (req.query.page - 1) * limit;
+            skip = (parseInt(req.query.page) - 1) * limit;
         }
 
-        let materialData = await materialModel.find().skip(skip).limit(limit);
+        let searchObj = {};
+        const term = req.query.searchTerm ? req.query.searchTerm.trim() : "";
 
-        let materialDataLength = await materialModel.find();
+        if (term) {
+            const orClauses = [
+                { categoryName: { $regex: term, $options: "i" } }
+            ];
+
+            // If term is a number, match order as number equality
+            if (!isNaN(term)) {
+                orClauses.push({ order: Number(term) });
+            } else {
+                // For non-numeric terms, allow matching order by converting order to string (Mongo 4.0+)
+                orClauses.push({
+                    $expr: {
+                        $regexMatch: {
+                            input: { $toString: "$order" },
+                            regex: term,
+                            options: "i"
+                        }
+                    }
+                });
+            }
+
+            searchObj = { $or: orClauses };
+        }
+
+        // use countDocuments for length
+        let materialData = await materialModel.find(searchObj).skip(skip).limit(limit);
+        let materialDataLength = await materialModel.countDocuments(searchObj);
 
         let resObj = {
             status: "success",
             message: "material retrieved successfully",
             materialData,
-            length: materialDataLength.length,
-            totalPage: Math.ceil(materialDataLength.length / limit)
-        }
+            length: materialDataLength,
+            totalPage: Math.ceil(materialDataLength / limit)
+        };
         res.send(resObj);
     }
 
@@ -71,13 +98,13 @@ let materialViewAll = async (req,res)=>{
             status: "failed",
             message: "Material not found",
             error: err
-        }
+        };
         res.send(resObj);
     }
 
 }
 
-let materialViewbyId = async (req,res)=>{
+let materialViewbyId = async (req, res) => {
 
     let materialId = req.params.id;
 
@@ -103,7 +130,7 @@ let materialViewbyId = async (req,res)=>{
 
 }
 
-let materialDeleteAll = async (req,res)=>{
+let materialDeleteAll = async (req, res) => {
     let deleteObj;
 
     materialModel.deleteMany({})
@@ -125,7 +152,7 @@ let materialDeleteAll = async (req,res)=>{
         });
 }
 
-let materialMultiDeleteById = async (req,res)=>{
+let materialMultiDeleteById = async (req, res) => {
     let materialIds = req.body.ids;
 
     let deleteObj;
@@ -156,7 +183,7 @@ let materialStatusUpdate = async (req, res) => {
     try {
         let materialUpdate = await materialModel.updateMany(
             {
-                _id:  ids
+                _id: ids
             },
             [
                 {
@@ -184,7 +211,7 @@ let materialStatusUpdate = async (req, res) => {
 }
 
 
-let materialUpdate = async (req,res)=>{
+let materialUpdate = async (req, res) => {
     let { id } = req.params;
 
     console.log(id);
@@ -217,4 +244,4 @@ let materialUpdate = async (req,res)=>{
     }
 }
 
-module.exports = { materialCreate, materialViewAll, materialViewbyId , materialDeleteAll, materialMultiDeleteById, materialStatusUpdate, materialUpdate };
+module.exports = { materialCreate, materialViewAll, materialViewbyId, materialDeleteAll, materialMultiDeleteById, materialStatusUpdate, materialUpdate };
