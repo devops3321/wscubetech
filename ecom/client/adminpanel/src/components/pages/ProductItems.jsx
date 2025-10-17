@@ -165,7 +165,7 @@ export default function ProductItems() {
             <div className="mb-4 flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Search by product / category / subcategory"
+                placeholder="Search by product"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                 className="border px-3 py-2 rounded-md shadow-sm w-full md:w-64"
