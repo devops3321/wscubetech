@@ -77,7 +77,7 @@ export default function LoginRegister() {
             .then((res) => res.data)
             .then((finResponse) => {
                 if (finResponse.status === "success") {
-                    console.log(finResponse);
+                    // console.log(finResponse);
                     let userObj = {
                         id: finResponse.user._id,
                         userName: finResponse.user.userName

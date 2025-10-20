@@ -111,34 +111,28 @@ let createuser = async (req, res) => {
 }
 
 let login = async (req, res) => {
-    let { userEmail, userPassword } = req.body;
+    try {
+        const { userEmail, userPassword } = req.body;
 
-    let checkuser = await userModel.findOne({ userEmail: userEmail });
+        const checkuser = await userModel.findOne({ userEmail: userEmail });
+        if (!checkuser) {
+            return res.send({ status: "failed", message: "User not found" });
+        }
 
-    if (checkuser) {
-        const checkPassword = await bcrypt.compareSync(userPassword, checkuser.userPassword);
-        if (checkPassword) {
-            let resObj = {
-                status: "success",
-                message: "Login successful",
-                user: checkuser
-            }
-            res.send(resObj);
+        // allow login only if userStatus is true
+        if (!checkuser.userStatus) {
+            return res.send({ status: "failed", message: "User is disabled" });
         }
-        else {
-            let resObj = {
-                status: "failed",
-                message: "Invalid password",
-            }
-            res.send(resObj);
+
+        // use async compare
+        const checkPassword = await bcrypt.compare(userPassword, checkuser.userPassword);
+        if (!checkPassword) {
+            return res.send({ status: "failed", message: "Invalid password" });
         }
-    }
-    else {
-        let resObj = {
-            status: "failed",
-            message: "User not found",
-        }
-        res.send(resObj);
+
+        return res.send({ status: "success", message: "Login successful", user: checkuser });
+    } catch (err) {
+        return res.send({ status: "failed", message: "Login error", error: err.message });
     }
 }
 
