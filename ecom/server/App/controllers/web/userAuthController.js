@@ -113,25 +113,79 @@ let createuser = async (req, res) => {
 let login = async (req, res) => {
     try {
         const { userEmail, userPassword } = req.body;
+        const checkuser = await userModel.findOne({ userEmail });
 
-        const checkuser = await userModel.findOne({ userEmail: userEmail });
-        if (!checkuser) {
-            return res.send({ status: "failed", message: "User not found" });
+        if (!checkuser) return res.send({ status: "failed", message: "User not found" });
+
+        if (!checkuser.userStatus) return res.send({ status: "failed", message: "User is disabled" });
+
+        // Guard: if no password stored (OAuth account), instruct client to use provider or set password
+        if (!checkuser.userPassword) {
+            return res.send({
+                status: "failed",
+                message: "No local password set. Use Google login or reset/set a password."
+            });
         }
 
-        // allow login only if userStatus is true
-        if (!checkuser.userStatus) {
-            return res.send({ status: "failed", message: "User is disabled" });
-        }
-
-        // use async compare
         const checkPassword = await bcrypt.compare(userPassword, checkuser.userPassword);
-        if (!checkPassword) {
-            return res.send({ status: "failed", message: "Invalid password" });
-        }
+        if (!checkPassword) return res.send({ status: "failed", message: "Invalid password" });
 
         return res.send({ status: "success", message: "Login successful", user: checkuser });
     } catch (err) {
+        return res.send({ status: "failed", message: "Login error", error: err.message });
+    }
+}
+
+let googleLogin = async (req, res) => {
+    try {
+        const { userName, userEmail, providerId } = req.body;
+
+        if (!userEmail) {
+            return res.send({ status: "failed", message: "Email is required" });
+        }
+
+        // find existing user
+        let checkuser = await userModel.findOne({ userEmail: userEmail });
+
+        // if user exists -> allow login only if userStatus is true
+        if (checkuser) {
+            if (checkuser.userStatus === false) {
+                return res.send({ status: "failed", message: "User is disabled" });
+            }
+
+            const userResp = {
+                _id: checkuser._id,
+                userName: checkuser.userName,
+                userEmail: checkuser.userEmail
+            };
+
+            return res.send({ status: "success", message: "Login successful", user: userResp });
+        }
+
+        // User does not exist -> register using provider metadata (no plaintext password)
+        const finalUserName = userName && userName.trim() ? userName.trim() : userEmail.split("@")[0];
+
+        let userObj = {
+            userName: finalUserName,
+            userEmail,
+            authProvider: "google",
+            providerId: providerId || null,
+            userStatus: true
+            // note: no userPassword or userPhone required for OAuth-created user
+        };
+
+        let user = new userModel(userObj);
+        let userRes = await user.save();
+
+        const userResp = {
+            _id: userRes._id,
+            userName: userRes.userName,
+            userEmail: userRes.userEmail
+        };
+
+        return res.send({ status: "success", message: "User registered and logged in", user: userResp });
+    }
+    catch (err) {
         return res.send({ status: "failed", message: "Login error", error: err.message });
     }
 }
@@ -227,4 +281,4 @@ let userStatusUpdate = async (req, res) => {
     }
 }
 
-module.exports = { sendOtp, createuser, login, viewuser, deleteuser, userStatusUpdate };
+module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate };

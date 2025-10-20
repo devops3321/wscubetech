@@ -16,21 +16,32 @@ let userSchema = new mongoose.Schema(
             required:[true,"User Email is required"]    
         },
         userPhone:{
-            type:String, 
+            type:String,
             minLength:10,
-            maxLength:20, 
+            maxLength:20,
             unique:true,
-            required:[true,"User Phone is required"]    
+            sparse: true, // allow multiple docs without phone
+            required:false
         },        
         userPassword: {
             type: String,
             minLength: 2,
-            maxLength: 100, 
-            required:[true,"User Password is required"]
+            maxLength: 100,
+            required:false // not required for OAuth users
         },
-        userStatus: {                // <-- added to allow disable/enable
+        userStatus: {
             type: Boolean,
             default: true
+        },
+        authProvider: {     // store how the user signed up (local / google / etc.)
+            type: String,
+            enum: ["local", "google", "facebook", "other"],
+            default: "local"
+        },
+        providerId: {       // provider-specific id (optional)
+            type: String,
+            default: null,
+            sparse: true
         }
     },
     { timestamps: true }

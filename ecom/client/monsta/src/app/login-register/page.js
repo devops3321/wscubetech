@@ -6,6 +6,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { redirect, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { userData } from '../redux/slice/userSlice';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { app } from '../../config/fireBaseConfig';
 
 export default function LoginRegister() {
     const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
@@ -23,6 +25,8 @@ export default function LoginRegister() {
         userEmail: '',
         userPassword: ''
     });
+    const [googleLoading, setGoogleLoading] = useState(false);
+
     const router = useRouter();
 
     const dispatch = useDispatch();
@@ -100,6 +104,52 @@ export default function LoginRegister() {
             redirect('/dashboard');
         }
     }, [loginUser]);
+
+    const provider = new GoogleAuthProvider();
+
+    const auth = getAuth(app);
+
+    auth.languageCode = 'it';
+
+    let handleGoogleSignIn = async (e) => {
+        e?.preventDefault?.();
+        try {
+            setGoogleLoading(true);
+            const result = await signInWithPopup(auth, provider);
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential?.accessToken ?? null;
+            const user = result?.user;
+            if (!user || !user.email) throw new Error("Failed to get Google user info");
+
+            // send providerId so backend can link/store provider-specific id
+            const resp = await axios.post(`${apiBaseurl}user/google-login`, {
+                userName: user.displayName,
+                userEmail: user.email,
+                providerId: user.uid
+            });
+            const finResponse = resp.data;
+
+            if (finResponse?.status === "success") {
+                const userObj = {
+                    id: finResponse.user._id,
+                    userName: finResponse.user.userName
+                };
+                dispatch(userData(userObj));
+                toast.success(finResponse.message || "Login successful");
+                router.push('/dashboard');
+            } else {
+                toast.error(finResponse?.message || "Google login failed");
+                router.push('/login-register');
+            }
+        } catch (err) {
+            console.error("Google sign-in error:", err);
+            const msg = err?.response?.data?.message || err?.message || "Google sign-in failed";
+            toast.error(msg);
+        } finally {
+            setGoogleLoading(false);
+        }
+    }
+
     return (
         <div>
             <Breadcrumb pageName={"My Account"} />
@@ -143,21 +193,46 @@ export default function LoginRegister() {
                                 LOGIN
                             </button>
                         </div>
-                        <div className="flex items-center justify-center mt-4">
+                        <div className="flex items-center justify-center mt-4 w-full">
                             <button
                                 type="button"
-                                className="flex items-center gap-3 bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow duration-150 font-semibold cursor-pointer"
-                                aria-label="Continue with Google"
+                                onClick={handleGoogleSignIn}
+                                disabled={googleLoading}
+                                aria-label="Sign in with Google"
+                                aria-busy={googleLoading}
+                                className={
+                                    "flex items-center justify-center gap-3 w-full md:w-auto " +
+                                    "bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-full " +
+                                    "shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-150 " +
+                                    "font-semibold focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#C09578] " +
+                                    "disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                                }
                             >
-                                <span className="w-5 h-5">
+                                {/* Google icon */}
+                                <span className="w-5 h-5 flex-shrink-0">
                                     <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                                        <path d="M533.5 278.4c0-18.5-1.5-37.6-4.9-55.6H272v105.3h147.4c-6.4 34.6-26.5 63.9-56.6 83.4v69.3h91.5C498.1 421.9 533.5 355 533.5 278.4z" fill="#4285F4" />
-                                        <path d="M272 544.3c74.5 0 137.1-24.7 182.8-66.9l-91.5-69.3c-25.5 17.2-58.2 27.4-91.3 27.4-70.1 0-129.5-47.3-150.6-110.9H27.7v69.8C73.8 482.6 166.6 544.3 272 544.3z" fill="#34A853" />
-                                        <path d="M121.4 327.6c-6.1-18.2-9.6-37.6-9.6-57.6s3.5-39.4 9.6-57.6V142.6H27.7C10 180.5 0 221.4 0 270s10 89.5 27.7 127.4l93.7-69.8z" fill="#FBBC05" />
-                                        <path d="M272 108.1c39.7 0 75.4 13.7 103.5 40.6l77.6-77.6C409.1 24 346.5 0 272 0 166.6 0 73.8 61.7 27.7 162.6l93.7 69.8C142.5 155.4 201.9 108.1 272 108.1z" fill="#EA4335" />
+                                        <path d="M533.5 278.4c0-18.5-1.5-37.6-4.9-55.6H272v105.3h147.4c-6.4 34.6-26.5 63.9-56.6 83.4v69.3h91.5C498.1 421.9 533.5 355 533.5 278.4z" fill="#4285F4"/>
+                                        <path d="M272 544.3c74.5 0 137.1-24.7 182.8-66.9l-91.5-69.3c-25.5 17.2-58.2 27.4-91.3 27.4-70.1 0-129.5-47.3-150.6-110.9H27.7v69.8C73.8 482.6 166.6 544.3 272 544.3z" fill="#34A853"/>
+                                        <path d="M121.4 327.6c-6.1-18.2-9.6-37.6-9.6-57.6s3.5-39.4 9.6-57.6V142.6H27.7C10 180.5 0 221.4 0 270s10 89.5 27.7 127.4l93.7-69.8z" fill="#FBBC05"/>
+                                        <path d="M272 108.1c39.7 0 75.4 13.7 103.5 40.6l77.6-77.6C409.1 24 346.5 0 272 0 166.6 0 73.8 61.7 27.7 162.6l93.7 69.8C142.5 155.4 201.9 108.1 272 108.1z" fill="#EA4335"/>
                                     </svg>
                                 </span>
-                                <span>Continue with Google</span>
+
+                                {/* Label */}
+                                <span className="hidden sm:inline">
+                                    {googleLoading ? 'Signing in with Google...' : 'Continue with Google'}
+                                </span>
+                                <span className="sm:hidden">
+                                    {googleLoading ? 'Signing in...' : 'Google'}
+                                </span>
+
+                                {/* spinner */}
+                                {googleLoading && (
+                                    <svg className="w-4 h-4 ml-1 text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     </form>
