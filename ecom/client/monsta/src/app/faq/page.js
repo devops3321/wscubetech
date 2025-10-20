@@ -51,17 +51,17 @@ export default function FAQPage() {
 				{faqData.map((item, idx) => (
 					<div key={idx} className="mb-4">
 						<button
-							className={`w-full text-left px-6 py-4 rounded border ${idx === openIndex ? 'border-[#C09578] bg-[#f7f6f4]' : 'border-transparent bg-[#f5f5f5]'} font-bold text-xl flex justify-between items-center transition-all`}
+							className={`w-full text-left px-6 py-4 rounded border ${idx === openIndex ? 'border-[#C09578] bg-[#f7f6f4]' : 'border-transparent bg-[#f5f5f5]'} font-bold text-xl flex justify-between items-center transition-all cursor-pointer`}
 							style={{ color: idx === openIndex ? '#C09578' : '#222', fontFamily: 'inherit' }}
 							onClick={() => handleToggle(idx)}
 						>
 							{item.question}
-							<span className={`text-2xl transition-colors ${idx === openIndex ? 'text-[#C09578]' : 'text-gray-400'}`}>
+							<span className={`text-2xl cursor-pointer transition-colors ${idx === openIndex ? 'text-[#C09578]' : 'text-gray-400'}`}>
 								{idx === openIndex ? '−' : '+'}
 							</span>
 						</button>
 						{idx === openIndex && item.answer && (
-							<div className="px-6 py-4 border border-[#C09578] border-t-0 bg-white text-lg text-gray-700">
+							<div className="px-6 py-4 border border-[#C09578] border-t-0 bg-white text-lg text-gray-700 cursor-pointer">
 								{item.answer}
 							</div>
 						)}
