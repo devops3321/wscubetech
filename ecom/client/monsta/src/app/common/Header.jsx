@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { logOut } from '../redux/slice/userSlice';
+import { redirect } from 'next/navigation';
 
 export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
@@ -15,7 +17,6 @@ export default function Header() {
     };
 
     // Handles mouse leave with timeout
-    
     const handleMenuClose = () => {
         closeTimeout.current = setTimeout(() => setOpenMenu(null), 250);
     };
@@ -32,13 +33,22 @@ export default function Header() {
         setOpenMenu(null);
     };
 
+    let loginUser = useSelector((store) => store.myUser.user);
+
+    let dispatch = useDispatch();
+
+    let logOutUser = () => {
+        dispatch(logOut());
+        redirect('/login-register');
+    }
+
     let cart = useSelector((mystore) => {
         // console.log("mystore.cart", mystore);  // access the store
         // console.log("mystore.mycart", mystore.mycart); // access the cart state
         // console.log("cart items", mystore.mycart.cartItem); // log the number of items in the cart
 
         return mystore.mycart.cartItem;
-});
+    });
 
     return (
         <div>
@@ -48,7 +58,19 @@ export default function Header() {
                     Contact us 24/7 : <a href="tel:+9198745612330" className="hover:text-[#C09578] transition-colors duration-150">+91-98745612330</a> / <a href="mailto:furnitureinfo@gmail.com" className="hover:text-[#C09578] transition-colors duration-150">furnitureinfo@gmail.com</a>
                 </div>
                 <div>
-                    <Link href={"/login-register"} className="hover:text-[#C09578] transition-colors duration-150">Login / Register</Link>
+                    {loginUser ?
+                        (
+                            <div>
+                                <span className="mr-2">Welcome, {loginUser.userName}</span>
+                                <button onClick={logOutUser} className="hover:text-[#C09578] hover:font-bold transition-colors duration-150 cursor-pointer">Logout</button>
+                            </div>
+                        )
+                        :
+
+                        (
+                            <Link href={"/login-register"} className="hover:text-[#C09578] transition-colors duration-150">Login / Register</Link>
+                        )
+                    }
                 </div>
             </div>
             {/* Logo, Search, Wishlist, Cart Section */}
@@ -354,7 +376,7 @@ export default function Header() {
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                <Link href={"/cart"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                    <Link href={"/cart"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
                                                         Cart
                                                     </Link>
                                                 </li>

@@ -1,9 +1,22 @@
 "use client";
 import React, { useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
+import { useSelector, useDispatch } from 'react-redux';
+import { logOut } from '../redux/slice/userSlice';
+import { redirect } from 'next/navigation';
 
 export default function Dashboard() {
+
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  let loginUser = useSelector((store) => store.myUser.user);
+
+  let dispatch = useDispatch();
+
+  let logOutUser = () => {
+    dispatch(logOut());
+    redirect('/login-register');
+  }
 
   return (
     <div>
@@ -55,7 +68,7 @@ export default function Dashboard() {
             <li>
               <button
                 className={`w-full font-bold py-3 px-4 rounded text-left cursor-pointer ${activeTab === 'logout' ? 'bg-[#C09578] text-white' : 'bg-black text-white hover:bg-[#C09578]'}`}
-                onClick={() => setActiveTab('logout')}
+                onClick={logOutUser}
               >
                 Logout
               </button>

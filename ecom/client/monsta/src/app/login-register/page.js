@@ -1,9 +1,11 @@
 "use client"
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { userData } from '../redux/slice/userSlice';
 
 export default function LoginRegister() {
     const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
@@ -22,6 +24,10 @@ export default function LoginRegister() {
         userPassword: ''
     });
     const router = useRouter();
+
+    const dispatch = useDispatch();
+
+    const loginUser = useSelector((store) => store.myUser.user);
 
     const handleRegisterChange = (e) => {
         setRegisterData({ ...registerData, [e.target.id]: e.target.value });
@@ -71,11 +77,13 @@ export default function LoginRegister() {
             .then((res) => res.data)
             .then((finResponse) => {
                 if (finResponse.status === "success") {
+                    console.log(finResponse);
+                    let userObj = {
+                        id: finResponse.user._id,
+                        userName: finResponse.user.userName
+                    }
+                    dispatch(userData(userObj));
                     toast.success(finResponse.message);
-                    setTimeout(() => {
-                        toast.info("Redirecting to Home Page...");
-                        router.push('/');
-                    }, 2000);
                 }
                 else {
                     toast.error(finResponse.message);
@@ -85,6 +93,13 @@ export default function LoginRegister() {
         setLoginData({ userEmail: '', userPassword: '' });
     };
 
+
+    useEffect(() => {
+        if (loginUser) {
+            toast.info("Redirecting to Home Page...");
+            redirect('/dashboard');
+        }
+    }, [loginUser]);
     return (
         <div>
             <Breadcrumb pageName={"My Account"} />
