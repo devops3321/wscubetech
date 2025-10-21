@@ -141,7 +141,7 @@ export default function ContactUs() {
                                 placeholder="Message *"
                                 className="w-full border px-4 py-3 rounded focus:outline-none text-black placeholder:text-gray-400 resize-none"></textarea>
                         </div>
-                        <button type="submit" className="bg-black text-white font-bold px-8 py-2 rounded mt-2">Send</button>
+                        <button type="submit" className="bg-black text-white font-bold cursor-pointer px-8 py-2 rounded mt-2">Send</button>
                     </form>
                 </div>
             </div>
