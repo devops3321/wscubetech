@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Breadcrumb from '../common/Breadcrumb';
 import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../redux/slice/userSlice';
 import { redirect } from 'next/navigation';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import countries from '../staticData/countryData'; // <-- added import
 
 export default function Dashboard() {
 
@@ -15,12 +16,64 @@ export default function Dashboard() {
 
   let token = useSelector((store) => store.myUser.token);
 
+  let user = useSelector((store) => store.myUser.user);
+
   let dispatch = useDispatch();
 
   let logOutUser = () => {
     dispatch(logOut());
     redirect('/login-register');
   }
+
+  // form state to keep values before & after update
+  const [profile, setProfile] = useState({
+    id: "",
+    title: "Mr",
+    name: "",
+    email: user?.email || "",
+    mobileNumber: "",
+    address: ""
+  });
+
+  // fetch profile on mount (uses view-user endpoint with searchTerm)
+  useEffect(() => {
+    if (!token || !apiBaseurl || !user?.email) return;
+
+    const fetchProfile = async () => {
+      try {
+        // Using view-user with searchTerm to get current user info
+        const resp = await axios.get(`${apiBaseurl}user/view-user`, {
+          params: { searchTerm: user.email, limit: 1 },
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = resp.data;
+        if (data && data.status === "success" && Array.isArray(data.users) && data.users.length > 0) {
+          const u = data.users[0];
+          setProfile(prev => ({
+            ...prev,
+            id: u._id || u.id || prev.id,
+            // adapt to available fields in user object
+            title: u.title || u.userTitle || prev.title,
+            name: u.userName || u.name || prev.name,
+            email: u.userEmail || u.email,
+            mobileNumber: u.userPhone || u.mobileNumber || "",
+            address: u.address || prev.address || ""
+          }));
+        } else {
+          // fallback: populate from redux user if available
+          setProfile(prev => ({
+            ...prev,
+            email: user.email || prev.email,
+            name: user.name || user.userName || prev.name
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [token, apiBaseurl, user]);
 
   let changePassword = (e) => {
     e.preventDefault();
@@ -46,6 +99,48 @@ export default function Dashboard() {
         }
       });
   }
+
+  let updateProfile = (e) => {
+    e.preventDefault();
+
+    const reqObj = {
+      id: profile.id, // include id required by backend
+      title: profile.title, // ensure format matches backend enum ("Mr" / "Mrs")
+      name: profile.name,
+      email: profile.email,
+      mobileNumber: profile.mobileNumber,
+      address: profile.address
+    };
+
+    axios.post(`${apiBaseurl}user/update-profile`, reqObj, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then((response) => response.data)
+      .then((finRes) => {
+        if (finRes.status === "success") {
+          toast.success(finRes.message);
+          // keep fields populated (do not reset)
+        } else {
+          toast.error(finRes.message);
+        }
+      })
+      .catch(err => {
+        toast.error("Update failed");
+        console.error(err);
+      });
+  }
+
+  // controlled input handlers
+  const onChange = (key) => (e) => {
+    let val = e.target.value;
+    // radio inputs in UI used "Mr." / "Mrs." previously; normalize to "Mr"/"Mrs"
+    if (key === 'title') {
+      val = val.replace(/\./g, "").trim();
+    }
+    setProfile(prev => ({ ...prev, [key]: val }));
+  };
 
   return (
     <div>
@@ -181,154 +276,10 @@ export default function Dashboard() {
                     </div>
                     <div className="mb-3">
                       <label className="block text-black mb-1">Country*</label>
-                      <select className="w-full border text-black border-gray-300 rounded px-3 py-2">
-                        <option className="text-black">Select Country</option>
-                        <option className="text-black">India</option>
-                        <option className="text-black">Afghanistan</option>
-                        <option className="text-black">Albania</option>
-                        <option className="text-black">Algeria</option>
-                        <option className="text-black">Andorra</option>
-                        <option className="text-black">Angola</option>
-                        <option className="text-black">Argentina</option>
-                        <option className="text-black">Armenia</option>
-                        <option className="text-black">Australia</option>
-                        <option className="text-black">Austria</option>
-                        <option className="text-black">Azerbaijan</option>
-                        <option className="text-black">Bahrain</option>
-                        <option className="text-black">Bangladesh</option>
-                        <option className="text-black">Belarus</option>
-                        <option className="text-black">Belgium</option>
-                        <option className="text-black">Benin</option>
-                        <option className="text-black">Bosnia and Herzegovina</option>
-                        <option className="text-black">Botswana</option>
-                        <option className="text-black">Brazil</option>
-                        <option className="text-black">Bulgaria</option>
-                        <option className="text-black">Burkina Faso</option>
-                        <option className="text-black">Cambodia</option>
-                        <option className="text-black">Cameroon</option>
-                        <option className="text-black">Canada</option>
-                        <option className="text-black">Cape Verde</option>
-                        <option className="text-black">Central African Republic</option>
-                        <option className="text-black">Chile</option>
-                        <option className="text-black">China</option>
-                        <option className="text-black">Colombia</option>
-                        <option className="text-black">Comoros</option>
-                        <option className="text-black">Croatia</option>
-                        <option className="text-black">Cyprus</option>
-                        <option className="text-black">Czech Republic</option>
-                        <option className="text-black">Denmark</option>
-                        <option className="text-black">Djibouti</option>
-                        <option className="text-black">Democratic Republic of the Congo</option>
-                        <option className="text-black">Ecuador</option>
-                        <option className="text-black">Egypt</option>
-                        <option className="text-black">Equatorial Guinea</option>
-                        <option className="text-black">Estonia</option>
-                        <option className="text-black">Eritrea</option>
-                        <option className="text-black">Ethiopia</option>
-                        <option className="text-black">Fiji</option>
-                        <option className="text-black">Finland</option>
-                        <option className="text-black">France</option>
-                        <option className="text-black">Gabon</option>
-                        <option className="text-black">Gambia</option>
-                        <option className="text-black">Georgia</option>
-                        <option className="text-black">Germany</option>
-                        <option className="text-black">Ghana</option>
-                        <option className="text-black">Greece</option>
-                        <option className="text-black">Greenland</option>
-                        <option className="text-black">Guinea</option>
-                        <option className="text-black">Hong Kong</option>
-                        <option className="text-black">Hungary</option>
-                        <option className="text-black">Iceland</option>
-                        <option className="text-black">Indonesia</option>
-                        <option className="text-black">Iran</option>
-                        <option className="text-black">Iraq</option>
-                        <option className="text-black">Ireland</option>
-                        <option className="text-black">Israel</option>
-                        <option className="text-black">Italy</option>
-                        <option className="text-black">Ivory Coast</option>
-                        <option className="text-black">Japan</option>
-                        <option className="text-black">Jordan</option>
-                        <option className="text-black">Kazakhstan</option>
-                        <option className="text-black">Kenya</option>
-                        <option className="text-black">Kuwait</option>
-                        <option className="text-black">Laos</option>
-                        <option className="text-black">Latvia</option>
-                        <option className="text-black">Lebanon</option>
-                        <option className="text-black">Lesotho</option>
-                        <option className="text-black">Liberia</option>
-                        <option className="text-black">Liechtenstein</option>
-                        <option className="text-black">Lithuania</option>
-                        <option className="text-black">Luxembourg</option>
-                        <option className="text-black">Madagascar</option>
-                        <option className="text-black">Malawi</option>
-                        <option className="text-black">Malaysia</option>
-                        <option className="text-black">Malta</option>
-                        <option className="text-black">Mauritius</option>
-                        <option className="text-black">Mexico</option>
-                        <option className="text-black">Moldova</option>
-                        <option className="text-black">Monaco</option>
-                        <option className="text-black">Mongolia</option>
-                        <option className="text-black">Montenegro</option>
-                        <option className="text-black">Morocco</option>
-                        <option className="text-black">Mozambique</option>
-                        <option className="text-black">Myanmar</option>
-                        <option className="text-black">Namibia</option>
-                        <option className="text-black">Nepal</option>
-                        <option className="text-black">Netherlands</option>
-                        <option className="text-black">New Zealand</option>
-                        <option className="text-black">Nigeria</option>
-                        <option className="text-black">North Macedonia</option>
-                        <option className="text-black">Norway</option>
-                        <option className="text-black">Oman</option>
-                        <option className="text-black">Pakistan</option>
-                        <option className="text-black">Papua New Guinea</option>
-                        <option className="text-black">Peru</option>
-                        <option className="text-black">Philippines</option>
-                        <option className="text-black">Poland</option>
-                        <option className="text-black">Portugal</option>
-                        <option className="text-black">Qatar</option>
-                        <option className="text-black">Republic of the Congo</option>
-                        <option className="text-black">Romania</option>
-                        <option className="text-black">Russia</option>
-                        <option className="text-black">Rwanda</option>
-                        <option className="text-black">San Marino</option>
-                        <option className="text-black">Saudi Arabia</option>
-                        <option className="text-black">Senegal</option>
-                        <option className="text-black">Serbia</option>
-                        <option className="text-black">Seychelles</option>
-                        <option className="text-black">Sierra Leone</option>
-                        <option className="text-black">Singapore</option>
-                        <option className="text-black">Slovakia</option>
-                        <option className="text-black">Slovenia</option>
-                        <option className="text-black">Solomon Islands</option>
-                        <option className="text-black">Somalia</option>
-                        <option className="text-black">South Africa</option>
-                        <option className="text-black">South Korea</option>
-                        <option className="text-black">South Sudan</option>
-                        <option className="text-black">Spain</option>
-                        <option className="text-black">Sri Lanka</option>
-                        <option className="text-black">Sudan</option>
-                        <option className="text-black">Swaziland</option>
-                        <option className="text-black">Sweden</option>
-                        <option className="text-black">Switzerland</option>
-                        <option className="text-black">Syria</option>
-                        <option className="text-black">Taiwan</option>
-                        <option className="text-black">Tanzania</option>
-                        <option className="text-black">Thailand</option>
-                        <option className="text-black">Togo</option>
-                        <option className="text-black">Tonga</option>
-                        <option className="text-black">Turkey</option>
-                        <option className="text-black">Uganda</option>
-                        <option className="text-black">Ukraine</option>
-                        <option className="text-black">United Arab Emirates</option>
-                        <option className="text-black">United Kingdom</option>
-                        <option className="text-black">United States</option>
-                        <option className="text-black">Uruguay</option>
-                        <option className="text-black">Uzbekistan</option>
-                        <option className="text-black">Vatican City</option>
-                        <option className="text-black">Venezuela</option>
-                        <option className="text-black">Vietnam</option>
-                        <option className="text-black">Zimbabwe</option>
+                      <select className="w-full border text-black border-gray-300 rounded px-3 py-2" value={undefined} onChange={()=>{}}>
+                        {countries.map((c) => (
+                          <option key={c} className="text-black">{c}</option>
+                        ))}
                       </select>
                     </div>
                     <div className="mb-3">
@@ -366,154 +317,10 @@ export default function Dashboard() {
                     </div>
                     <div className="mb-3">
                       <label className="block text-black mb-1">Country*</label>
-                      <select className="w-full text-black border border-gray-300 rounded px-3 py-2">
-                        <option className="text-black">Select Country</option>
-                        <option className="text-black">India</option>
-                        <option className="text-black">Afghanistan</option>
-                        <option className="text-black">Albania</option>
-                        <option className="text-black">Algeria</option>
-                        <option className="text-black">Andorra</option>
-                        <option className="text-black">Angola</option>
-                        <option className="text-black">Argentina</option>
-                        <option className="text-black">Armenia</option>
-                        <option className="text-black">Australia</option>
-                        <option className="text-black">Austria</option>
-                        <option className="text-black">Azerbaijan</option>
-                        <option className="text-black">Bahrain</option>
-                        <option className="text-black">Bangladesh</option>
-                        <option className="text-black">Belarus</option>
-                        <option className="text-black">Belgium</option>
-                        <option className="text-black">Benin</option>
-                        <option className="text-black">Bosnia and Herzegovina</option>
-                        <option className="text-black">Botswana</option>
-                        <option className="text-black">Brazil</option>
-                        <option className="text-black">Bulgaria</option>
-                        <option className="text-black">Burkina Faso</option>
-                        <option className="text-black">Cambodia</option>
-                        <option className="text-black">Cameroon</option>
-                        <option className="text-black">Canada</option>
-                        <option className="text-black">Cape Verde</option>
-                        <option className="text-black">Central African Republic</option>
-                        <option className="text-black">Chile</option>
-                        <option className="text-black">China</option>
-                        <option className="text-black">Colombia</option>
-                        <option className="text-black">Comoros</option>
-                        <option className="text-black">Croatia</option>
-                        <option className="text-black">Cyprus</option>
-                        <option className="text-black">Czech Republic</option>
-                        <option className="text-black">Denmark</option>
-                        <option className="text-black">Djibouti</option>
-                        <option className="text-black">Democratic Republic of the Congo</option>
-                        <option className="text-black">Ecuador</option>
-                        <option className="text-black">Egypt</option>
-                        <option className="text-black">Equatorial Guinea</option>
-                        <option className="text-black">Estonia</option>
-                        <option className="text-black">Eritrea</option>
-                        <option className="text-black">Ethiopia</option>
-                        <option className="text-black">Fiji</option>
-                        <option className="text-black">Finland</option>
-                        <option className="text-black">France</option>
-                        <option className="text-black">Gabon</option>
-                        <option className="text-black">Gambia</option>
-                        <option className="text-black">Georgia</option>
-                        <option className="text-black">Germany</option>
-                        <option className="text-black">Ghana</option>
-                        <option className="text-black">Greece</option>
-                        <option className="text-black">Greenland</option>
-                        <option className="text-black">Guinea</option>
-                        <option className="text-black">Hong Kong</option>
-                        <option className="text-black">Hungary</option>
-                        <option className="text-black">Iceland</option>
-                        <option className="text-black">Indonesia</option>
-                        <option className="text-black">Iran</option>
-                        <option className="text-black">Iraq</option>
-                        <option className="text-black">Ireland</option>
-                        <option className="text-black">Israel</option>
-                        <option className="text-black">Italy</option>
-                        <option className="text-black">Ivory Coast</option>
-                        <option className="text-black">Japan</option>
-                        <option className="text-black">Jordan</option>
-                        <option className="text-black">Kazakhstan</option>
-                        <option className="text-black">Kenya</option>
-                        <option className="text-black">Kuwait</option>
-                        <option className="text-black">Laos</option>
-                        <option className="text-black">Latvia</option>
-                        <option className="text-black">Lebanon</option>
-                        <option className="text-black">Lesotho</option>
-                        <option className="text-black">Liberia</option>
-                        <option className="text-black">Liechtenstein</option>
-                        <option className="text-black">Lithuania</option>
-                        <option className="text-black">Luxembourg</option>
-                        <option className="text-black">Madagascar</option>
-                        <option className="text-black">Malawi</option>
-                        <option className="text-black">Malaysia</option>
-                        <option className="text-black">Malta</option>
-                        <option className="text-black">Mauritius</option>
-                        <option className="text-black">Mexico</option>
-                        <option className="text-black">Moldova</option>
-                        <option className="text-black">Monaco</option>
-                        <option className="text-black">Mongolia</option>
-                        <option className="text-black">Montenegro</option>
-                        <option className="text-black">Morocco</option>
-                        <option className="text-black">Mozambique</option>
-                        <option className="text-black">Myanmar</option>
-                        <option className="text-black">Namibia</option>
-                        <option className="text-black">Nepal</option>
-                        <option className="text-black">Netherlands</option>
-                        <option className="text-black">New Zealand</option>
-                        <option className="text-black">Nigeria</option>
-                        <option className="text-black">North Macedonia</option>
-                        <option className="text-black">Norway</option>
-                        <option className="text-black">Oman</option>
-                        <option className="text-black">Pakistan</option>
-                        <option className="text-black">Papua New Guinea</option>
-                        <option className="text-black">Peru</option>
-                        <option className="text-black">Philippines</option>
-                        <option className="text-black">Poland</option>
-                        <option className="text-black">Portugal</option>
-                        <option className="text-black">Qatar</option>
-                        <option className="text-black">Republic of the Congo</option>
-                        <option className="text-black">Romania</option>
-                        <option className="text-black">Russia</option>
-                        <option className="text-black">Rwanda</option>
-                        <option className="text-black">San Marino</option>
-                        <option className="text-black">Saudi Arabia</option>
-                        <option className="text-black">Senegal</option>
-                        <option className="text-black">Serbia</option>
-                        <option className="text-black">Seychelles</option>
-                        <option className="text-black">Sierra Leone</option>
-                        <option className="text-black">Singapore</option>
-                        <option className="text-black">Slovakia</option>
-                        <option className="text-black">Slovenia</option>
-                        <option className="text-black">Solomon Islands</option>
-                        <option className="text-black">Somalia</option>
-                        <option className="text-black">South Africa</option>
-                        <option className="text-black">South Korea</option>
-                        <option className="text-black">South Sudan</option>
-                        <option className="text-black">Spain</option>
-                        <option className="text-black">Sri Lanka</option>
-                        <option className="text-black">Sudan</option>
-                        <option className="text-black">Swaziland</option>
-                        <option className="text-black">Sweden</option>
-                        <option className="text-black">Switzerland</option>
-                        <option className="text-black">Syria</option>
-                        <option className="text-black">Taiwan</option>
-                        <option className="text-black">Tanzania</option>
-                        <option className="text-black">Thailand</option>
-                        <option className="text-black">Togo</option>
-                        <option className="text-black">Tonga</option>
-                        <option className="text-black">Turkey</option>
-                        <option className="text-black">Uganda</option>
-                        <option className="text-black">Ukraine</option>
-                        <option className="text-black">United Arab Emirates</option>
-                        <option className="text-black">United Kingdom</option>
-                        <option className="text-black">United States</option>
-                        <option className="text-black">Uruguay</option>
-                        <option className="text-black">Uzbekistan</option>
-                        <option className="text-black">Vatican City</option>
-                        <option className="text-black">Venezuela</option>
-                        <option className="text-black">Vietnam</option>
-                        <option className="text-black">Zimbabwe</option>
+                      <select className="w-full text-black border border-gray-300 rounded px-3 py-2" value={undefined} onChange={()=>{}}>
+                        {countries.map((c) => (
+                          <option key={c} className="text-black">{c}</option>
+                        ))}
                       </select>
                     </div>
                     <div className="mb-3">
@@ -536,35 +343,71 @@ export default function Dashboard() {
             <>
               <h2 className="font-bold font-playfair text-2xl md:text-3xl mb-4 text-black">My Profile</h2>
               <div className="border border-gray-200 rounded-lg p-6">
-                <form>
+                <form onSubmit={updateProfile}>
                   <div className="mb-4 flex items-center gap-6">
                     <label className="inline-flex items-center">
-                      <input type="radio" name="salutation" value="Mr." defaultChecked className="accent-black" />
+                      <input
+                        type="radio"
+                        name="title"
+                        value="Mr"
+                        checked={profile.title === "Mr"}
+                        onChange={onChange('title')}
+                        className="accent-black" />
                       <span className="ml-2 text-black">Mr.</span>
                     </label>
                     <label className="inline-flex items-center">
-                      <input type="radio" name="salutation" value="Mrs." className="accent-black" />
+                      <input
+                        type="radio"
+                        name="title"
+                        value="Mrs"
+                        checked={profile.title === "Mrs"}
+                        onChange={onChange('title')}
+                        className="accent-black" />
                       <span className="ml-2 text-black">Mrs.</span>
                     </label>
                   </div>
                   <div className="mb-3">
                     <label className="block text-black mb-1">Name*</label>
-                    <input type="text" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="text"
+                      name='name'
+                      value={profile.name}
+                      onChange={onChange('name')}
+                      className="w-full text-black border border-gray-300 rounded px-3 py-2" />
                   </div>
                   <div className="mb-3">
                     <label className="block text-black mb-1">Email*</label>
-                    <input type="email" value="johndoe@example.com" readOnly className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-black" />
+                    <input
+                      type="email"
+                      name='email'
+                      value={profile.email}
+                      readOnly className="w-full text-black border border-gray-300 rounded px-3 py-2 bg-gray-100 text-black" />
                   </div>
                   <div className="mb-3">
                     <label className="block text-black mb-1">Mobile Number*</label>
-                    <input type="text" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="text"
+                      name='mobileNumber'
+                      value={profile.mobileNumber}
+                      onChange={onChange('mobileNumber')}
+                      className="w-full text-black border border-gray-300 rounded px-3 py-2" />
                   </div>
                   <div className="mb-6">
                     <label className="block text-black mb-1">Address*</label>
-                    <input type="text" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="text"
+                      name='address'
+                      value={profile.address}
+                      onChange={onChange('address')}
+                      className="w-full text-black border border-gray-300 rounded px-3 py-2" />
                   </div>
                   <div className="flex justify-end">
-                    <button type="submit" className="bg-[#C09578] text-white font-bold px-6 py-2 rounded-full cursor-pointer">UPDATE</button>
+                    <button
+                      type="submit"
+                      className="bg-[#C09578] text-white font-bold px-6 py-2 rounded-full cursor-pointer"
+                    >
+                      UPDATE
+                    </button>
                   </div>
                 </form>
               </div>

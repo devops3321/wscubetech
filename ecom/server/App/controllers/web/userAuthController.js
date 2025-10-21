@@ -1,4 +1,5 @@
 const { transporter } = require("../../config/mailConfig");
+const { profileModel } = require("../../models/profileModel");
 const { userModel } = require("../../models/userModel");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -332,4 +333,37 @@ let changePassword = async (req, res) => {
     }
 }
 
-module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword };
+let updateProfile = async (req, res) => {
+    try {
+
+        const { id, title, name, email, mobileNumber, address } = req.body;
+
+        if (!id || !title || !name || !email || !mobileNumber || !address) {
+            return res.send({ status: "failed", message: "All fields are required" });
+        }
+
+        checkUser = await profileModel.findById(id).lean();
+        if (!checkUser) {
+            return res.send({ status: "failed", message: "User not found" });
+        }
+
+        await profileModel.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    title,
+                    name,
+                    email,
+                    mobileNumber,
+                    address
+                }
+            }
+        );
+
+        return res.send({ status: "success", message: "Profile updated successfully" });
+    } catch (err) {
+        return res.send({ status: "failed", message: "Error updating profile", error: err.message });
+    }
+}
+
+module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile };
