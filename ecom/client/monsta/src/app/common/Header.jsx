@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../redux/slice/userSlice';
@@ -9,6 +9,10 @@ export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const closeTimeout = useRef();
+    const [clientLoginUser, setClientLoginUser] = useState(null);
+
+
+    // Then conditionally render based on clientLoginUser, so server and client render differencing is avoided
 
     // Handles mouse enter for menu buttons
     const handleMenuOpen = (menu) => {
@@ -49,6 +53,11 @@ export default function Header() {
 
         return mystore.mycart.cartItem;
     });
+
+    useEffect(() => {
+        setClientLoginUser(loginUser);
+    }, [loginUser]);
+
 
     return (
         <div>
