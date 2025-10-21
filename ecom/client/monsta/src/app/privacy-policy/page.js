@@ -6,64 +6,116 @@ export default function PrivacyPolicy() {
         <section>
             <Breadcrumb pageName={"Privacy Policy"} />
             <div className="max-w-4xl mx-auto px-4 text-black">
-                <h2 className="text-2xl font-bold mb-6 font-playfair">Who we are</h2>
+                <h2 className="text-2xl font-bold mb-6 font-playfair">Who We Are</h2>
                 <p className="mb-6">
-                    Our website address is: <a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>
+                    Welcome to Monsta, your trusted furniture destination. Our website address is: <a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>
                 </p>
 
-                <h2 className="text-2xl font-bold mb-4 font-playfair">What personal data we collect and why we collect it</h2>
+                <h2 className="text-2xl font-bold mb-4 font-playfair">Personal Data We Collect and Why</h2>
+
                 <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Comments</h3>
                 <p className="mb-4">
-                    When visitors leave comments on the site we collect the data shown in the comments form, and also the visitor’s IP address and browser user agent string to help spam detection.
-                </p>
-                <p className="mb-4">
-                    An anonymized string created from your email address (also called a hash) may be provided to the Gravatar service to see if you are using it. The Gravatar service privacy policy is available here: <a href="https://automattic.com/privacy/" className="text-[#C09578] underline">https://automattic.com/privacy/</a>. After approval of your comment, your profile picture is visible to the public in the context of your comment.
+                    When visitors leave comments on our site, we collect the data shown in the comments form, along with the visitor’s IP address and browser user agent string to help detect spam. An anonymized string (hash) from your email may be shared with the Gravatar service to check your profile picture. Your profile picture appears publicly after comment approval.
                 </p>
 
                 <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Media</h3>
                 <p className="mb-4">
-                    If you upload images to the website, you should avoid uploading images with embedded location data (EXIF GPS) included. Visitors to the website can download and extract any location data from images on the website.
+                    If you upload images, avoid files with embedded location data (EXIF GPS), as visitors may extract this.
                 </p>
 
                 <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Cookies</h3>
                 <p className="mb-4">
-                    If you leave a comment on our site you may opt-in to saving your name, email address and website in cookies. These are for your convenience so that you do not have to fill in your details again when you leave another comment. These cookies will last for one year.
+                    We use cookies to save your comment details for convenience for up to one year.
                 </p>
                 <p className="mb-4">
-                    If you have an account and you log in to this site, we will set a temporary cookie to determine if your browser accepts cookies. This cookie contains no personal data and is discarded when you close your browser.
+                    Registered users receive cookies to manage login sessions and display preferences, lasting from two days up to two weeks depending on “Remember Me” selection.
                 </p>
                 <p className="mb-4">
-                    When you log in, we will also set up several cookies to save your login information and your screen display choices. Login cookies last for two days, and screen options cookies last for a year. If you select “Remember Me”, your login will persist for two weeks. If you log out of your account, the login cookies will be removed.
+                    Editing or publishing content sets a cookie with a post ID, expiring in one day.
                 </p>
                 <p className="mb-4">
-                    If you edit or publish an article, an additional cookie will be saved in your browser. This cookie includes no personal data and simply indicates the post ID of the article you just edited. It expires after 1 day.
+                    Temporary cookies test if your browser accepts cookies and disappear after closing the browser.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Embedded content from other websites</h3>
+                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Embedded Content</h3>
                 <p className="mb-4">
-                    Articles on this site may include embedded content (e.g. videos, images, articles, etc.). Embedded content from other websites behaves in the exact same way as if the visitor has visited the other website.
-                </p>
-                <p className="mb-4">
-                    These websites may collect data about you, use cookies, embed additional third-party tracking, and monitor your interaction with that embedded content, including tracking your interaction with the embedded content if you have an account and are logged in to that website.
+                    We may embed content from third-party websites, which collect data and track your interactions according to their own privacy policies.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">How long we retain your data</h3>
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">How We Use Your Data</h2>
                 <p className="mb-4">
-                    If you leave a comment, the comment and its metadata are retained indefinitely. This is so we can recognize and approve any follow-up comments automatically instead of holding them in a moderation queue.
+                    Your data is used to:
+                </p>
+                <ul className="list-disc pl-6 mb-6">
+                    <li>Manage and moderate comments and user profiles</li>
+                    <li>Prevent and detect spam and security issues</li>
+                    <li>Improve and personalize your website experience</li>
+                    <li>Comply with legal obligations and resolve disputes</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Retention of Data</h2>
+                <p className="mb-4">
+                    Comments and associated metadata are retained indefinitely for automatic moderation.
                 </p>
                 <p className="mb-4">
-                    For users that register on our website (if any), we also store the personal information they provide in their user profile. All users can see, edit, or delete their personal information at any time (except they cannot change their username). Website administrators can also see and edit that information.
+                    Registered user data is retained until profile deletion or update. Administrators have access to edit data.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">What rights you have over your data</h3>
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Your Data Protection Rights (GDPR)</h2>
                 <p className="mb-4">
-                    If you have an account on this site, or have left comments, you can request to receive an exported file of the personal data we hold about you, including any data you have provided to us. You can also request that we erase any personal data we hold about you. This does not include any data we are obliged to keep for administrative, legal, or security purposes.
+                    If you are located in the European Economic Area (EEA), you have rights including but not limited to:
+                </p>
+                <ul className="list-disc pl-6 mb-6">
+                    <li>Right to access your personal data</li>
+                    <li>Right to rectify inaccurate or incomplete data</li>
+                    <li>Right to erasure (“right to be forgotten”) under certain conditions</li>
+                    <li>Right to restrict or object to processing</li>
+                    <li>Right to data portability</li>
+                    <li>Right to withdraw consent at any time where applicable</li>
+                    <li>Right to lodge a complaint with a supervisory authority</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Your California Privacy Rights (CCPA)</h2>
+                <p className="mb-4">
+                    If you are a California resident, you have the right to:
+                </p>
+                <ul className="list-disc pl-6 mb-6">
+                    <li>Request disclosure of personal information collected and its categories</li>
+                    <li>Request deletion of personal information, with some exceptions</li>
+                    <li>Opt-out of the sale of personal information (Monsta does not sell personal data)</li>
+                    <li>Receive equal service and price even if you exercise these rights</li>
+                </ul>
+                <p className="mb-6">
+                    To exercise your rights under GDPR or CCPA, please contact Monsta at <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline">privacy@monsta.com</a>.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Where we send your data</h3>
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Where We Send Your Data</h2>
                 <p className="mb-10">
-                    Visitor comments may be checked through an automated spam detection service.
+                    Comments may be checked with automated spam detection services to protect the community.
                 </p>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Security of Your Data</h2>
+                <p className="mb-4">
+                    We implement appropriate security measures to protect your data but cannot guarantee absolute security due to internet risks.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Children’s Privacy</h2>
+                <p className="mb-4">
+                    Our website is not intended for children under 16, and we do not knowingly collect data from children without parental consent.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Changes to This Privacy Policy</h2>
+                <p className="mb-4">
+                    We may update this Privacy Policy to reflect changes in legal or operational requirements. We encourage you to review it periodically.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Contact Us</h2>
+                <p className="mb-6">
+                    If you have any questions or concerns about the privacy policy or your data, contact:
+                </p>
+                <p className="mb-2 font-semibold">Monsta Furniture</p>
+                <p className="mb-2">Email: <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline">privacy@monsta.com</a></p>
+                <p className="mb-10">Address: 123 Design Street, Mumbai, India</p>
             </div>
         </section>
     )
