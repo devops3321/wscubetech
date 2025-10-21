@@ -6,63 +6,85 @@ export default function TermsOfUse() {
         <section>
             <Breadcrumb pageName={"Terms of Use"} />
             <div className="max-w-4xl mx-auto px-4 text-black">
-                <h2 className="text-2xl font-bold mb-6 font-playfair">Who we are</h2>
-                <p className="mb-6">
-                    Our website address is: <a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>
+                <h1 className="text-3xl font-bold mb-2 font-playfair">Monsta Terms of Use</h1>
+                <p className="mb-6">Last updated: October 21, 2025</p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">1. Agreement to Terms</h2>
+                <p className="mb-4">
+                    By accessing or using the Monsta website (<a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>) and our services, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any part of these terms, you must not use our website.
                 </p>
 
-                <h2 className="text-2xl font-bold mb-4 font-playfair">What personal data we collect and why we collect it</h2>
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Comments</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">2. Use of Website</h2>
                 <p className="mb-4">
-                    When visitors leave comments on the site we collect the data shown in the comments form, and also the visitor’s IP address and browser user agent string to help spam detection.
-                </p>
-                <p className="mb-4">
-                    An anonymized string created from your email address (also called a hash) may be provided to the Gravatar service to see if you are using it. The Gravatar service privacy policy is available here: <a href="https://automattic.com/privacy/" className="text-[#C09578] underline">https://automattic.com/privacy/</a>. After approval of your comment, your profile picture is visible to the public in the context of your comment.
+                    You agree to use Monsta only for lawful purposes and in ways that do not infringe the rights of others or restrict or inhibit anyone else’s use and enjoyment of the site. Prohibited uses include transmitting harmful, offensive, or illegal content.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Media</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">3. Intellectual Property Rights</h2>
                 <p className="mb-4">
-                    If you upload images to the website, you should avoid uploading images with embedded location data (EXIF GPS) included. Visitors to the website can download and extract any location data from images on the website.
+                    All content on the Monsta website, including text, images, logos, graphics, and product designs, are the property of Monsta or its licensors and are protected by intellectual property laws. You may not use, reproduce, or distribute any content without express written permission.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Cookies</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">4. User Accounts</h2>
                 <p className="mb-4">
-                    If you leave a comment on our site you may opt-in to saving your name, email address and website in cookies. These are for your convenience so that you do not have to fill in your details again when you leave another comment. These cookies will last for one year.
-                </p>
-                <p className="mb-4">
-                    If you have an account and you log in to this site, we will set a temporary cookie to determine if your browser accepts cookies. This cookie contains no personal data and is discarded when you close your browser.
-                </p>
-                <p className="mb-4">
-                    When you log in, we will also set up several cookies to save your login information and your screen display choices. Login cookies last for two days, and screen options cookies last for a year. If you select “Remember Me”, your login will persist for two weeks. If you log out of your account, the login cookies will be removed.
-                </p>
-                <p className="mb-4">
-                    If you edit or publish an article, an additional cookie will be saved in your browser. This cookie includes no personal data and simply indicates the post ID of the article you just edited. It expires after 1 day.
+                    If you create an account on Monsta, you are responsible for maintaining the confidentiality of your login credentials and for all activities under your account. You agree to notify us immediately of any unauthorized use.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Embedded content from other websites</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">5. Product Information and Orders</h2>
                 <p className="mb-4">
-                    Articles on this site may include embedded content (e.g. videos, images, articles, etc.). Embedded content from other websites behaves in the exact same way as if the visitor has visited the other website.
-                </p>
-                <p className="mb-4">
-                    These websites may collect data about you, use cookies, embed additional third-party tracking, and monitor your interaction with that embedded content, including tracking your interaction with the embedded content if you have an account and are logged in to that website.
+                    Monsta strives to ensure that product details and prices are accurate. However, we reserve the right to correct errors or update information without prior notice. Orders placed are subject to acceptance and availability. We reserve the right to refuse or cancel orders for any reason.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">How long we retain your data</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">6. Payment and Pricing</h2>
                 <p className="mb-4">
-                    If you leave a comment, the comment and its metadata are retained indefinitely. This is so we can recognize and approve any follow-up comments automatically instead of holding them in a moderation queue.
-                </p>
-                <p className="mb-4">
-                    For users that register on our website (if any), we also store the personal information they provide in their user profile. All users can see, edit, or delete their personal information at any time (except they cannot change their username). Website administrators can also see and edit that information.
+                    Prices listed on the website are in the applicable currency and include taxes unless stated otherwise. Payments must be made using the available methods during checkout. Failure to make payment as required may result in cancellation of orders.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">What rights you have over your data</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">7. Returns and Refunds</h2>
                 <p className="mb-4">
-                    If you have an account on this site, or have left comments, you can request to receive an exported file of the personal data we hold about you, including any data you have provided to us. You can also request that we erase any personal data we hold about you. This does not include any data we are obliged to keep for administrative, legal, or security purposes.
+                    Our return and refund policy is described separately on our website. Please review it carefully prior to making purchases.
                 </p>
 
-                <h3 className="text-xl font-semibold mb-2 mt-6 font-playfair">Where we send your data</h3>
+                <h2 className="text-2xl font-bold mb-3 font-playfair">8. Links to Third-Party Sites</h2>
+                <p className="mb-4">
+                    The Monsta website may contain links to third-party websites that are not owned or controlled by Monsta. We are not responsible for the content or practices of these sites and encourage users to review their terms and policies.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">9. Limitation of Liability</h2>
+                <p className="mb-4">
+                    To the fullest extent permitted by law, Monsta and its affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the website or products purchased, even if Monsta has been advised of the possibility of such damages.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">10. Disclaimers</h2>
+                <p className="mb-4">
+                    The Monsta website and all content are provided "as is" and "as available" without warranty of any kind. We do not guarantee uninterrupted or error-free access.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">11. Indemnification</h2>
+                <p className="mb-4">
+                    You agree to indemnify and hold harmless Monsta, its affiliates, and employees from any claims, damages, obligations, losses, liabilities, costs, or debt resulting from your violation of these Terms or improper use of the site.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">12. Governing Law and Dispute Resolution</h2>
+                <p className="mb-4">
+                    These Terms are governed by the laws of India. Any disputes arising out of or relating to these Terms or your use of the site shall be resolved through binding arbitration in Mumbai or through the courts of competent jurisdiction.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">13. Termination</h2>
+                <p className="mb-4">
+                    Monsta reserves the right to suspend or terminate your access to the website at our sole discretion, without prior notice, for conduct that violates these Terms or is harmful to others.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">14. Changes to Terms</h2>
+                <p className="mb-4">
+                    We may update or modify these Terms from time to time. We will post changes on this page with an updated "Last updated" date. Continued use of the website after changes constitutes acceptance of the new Terms.
+                </p>
+
+                <h2 className="text-2xl font-bold mb-3 font-playfair">15. Contact Information</h2>
                 <p className="mb-10">
-                    Visitor comments may be checked through an automated spam detection service.
+                    For questions about these Terms, please contact:<br/>
+                    Monsta Furniture<br/>
+                    Email: <a href="mailto:support@monsta.com" className="text-[#C09578] underline">support@monsta.com</a><br/>
+                    Address: 123 Design Street, Mumbai, India
                 </p>
             </div>
         </section>
