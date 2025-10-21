@@ -2,6 +2,7 @@ const { transporter } = require("../../config/mailConfig");
 const { userModel } = require("../../models/userModel");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken');
 
 let userOTP = new Map();
 
@@ -128,9 +129,13 @@ let login = async (req, res) => {
         }
 
         const checkPassword = await bcrypt.compare(userPassword, checkuser.userPassword);
+
+        //Create JWT Token
+        let token = jwt.sign({ id: checkuser._id }, process.env.TOKENKEY, { expiresIn: '1h' });
+
         if (!checkPassword) return res.send({ status: "failed", message: "Invalid password" });
 
-        return res.send({ status: "success", message: "Login successful", user: checkuser });
+        return res.send({ status: "success", message: "Login successful", user: checkuser, token: token });
     } catch (err) {
         return res.send({ status: "failed", message: "Login error", error: err.message });
     }
@@ -159,7 +164,10 @@ let googleLogin = async (req, res) => {
                 userEmail: checkuser.userEmail
             };
 
-            return res.send({ status: "success", message: "Login successful", user: userResp });
+            // generate token for existing user
+            const token = jwt.sign({ id: checkuser._id }, process.env.TOKENKEY, { expiresIn: '1h' });
+
+            return res.send({ status: "success", message: "Login successful", user: userResp, token });
         }
 
         // User does not exist -> register using provider metadata (no plaintext password)
@@ -171,7 +179,6 @@ let googleLogin = async (req, res) => {
             authProvider: "google",
             providerId: providerId || null,
             userStatus: true
-            // note: no userPassword or userPhone required for OAuth-created user
         };
 
         let user = new userModel(userObj);
@@ -183,7 +190,10 @@ let googleLogin = async (req, res) => {
             userEmail: userRes.userEmail
         };
 
-        return res.send({ status: "success", message: "User registered and logged in", user: userResp });
+        // generate token for newly created user
+        const token = jwt.sign({ id: userRes._id }, process.env.TOKENKEY, { expiresIn: '1h' });
+
+        return res.send({ status: "success", message: "User registered and logged in", user: userResp, token });
     }
     catch (err) {
         return res.send({ status: "failed", message: "Login error", error: err.message });
@@ -281,4 +291,45 @@ let userStatusUpdate = async (req, res) => {
     }
 }
 
-module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate };
+let changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword, id } = req.body;
+
+        if (!id || !oldPassword || !newPassword || !confirmPassword) {
+            return res.send({ status: "failed", message: "All fields are required" });
+        }
+
+        const checkUser = await userModel.findById(id).lean();
+        if (!checkUser) {
+            return res.send({ status: "failed", message: "User not found" });
+        }
+
+        if (!checkUser.userPassword) {
+            return res.send({ status: "failed", message: "No local password set for this account" });
+        }
+
+        const dbPass = checkUser.userPassword;
+        const isOldValid = await bcrypt.compare(oldPassword, dbPass);
+
+        if (!isOldValid) {
+            return res.send({ status: "failed", message: "Old password is incorrect" });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.send({ status: "failed", message: "New password and confirm password do not match" });
+        }
+
+        const hash = await bcrypt.hash(newPassword, saltRounds);
+
+        await userModel.updateOne(
+            { _id: id },
+            { $set: { userPassword: hash } }
+        );
+
+        return res.send({ status: "success", message: "Password changed successfully" });
+    } catch (err) {
+        return res.send({ status: "failed", message: "Error changing password", error: err.message });
+    }
+}
+
+module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword };

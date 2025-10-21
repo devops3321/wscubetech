@@ -86,7 +86,7 @@ export default function LoginRegister() {
                         id: finResponse.user._id,
                         userName: finResponse.user.userName
                     }
-                    dispatch(userData(userObj));
+                    dispatch(userData({ user: userObj, token: finResponse.token }));
                     toast.success(finResponse.message);
                 }
                 else {
@@ -134,7 +134,10 @@ export default function LoginRegister() {
                     id: finResponse.user._id,
                     userName: finResponse.user.userName
                 };
-                dispatch(userData(userObj));
+
+                // dispatch both user and token (userSlice expects { user, token })
+                dispatch(userData({ user: userObj, token: finResponse.token }));
+
                 toast.success(finResponse.message || "Login successful");
                 router.push('/dashboard');
             } else {
@@ -211,10 +214,10 @@ export default function LoginRegister() {
                                 {/* Google icon */}
                                 <span className="w-5 h-5 flex-shrink-0">
                                     <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                                        <path d="M533.5 278.4c0-18.5-1.5-37.6-4.9-55.6H272v105.3h147.4c-6.4 34.6-26.5 63.9-56.6 83.4v69.3h91.5C498.1 421.9 533.5 355 533.5 278.4z" fill="#4285F4"/>
-                                        <path d="M272 544.3c74.5 0 137.1-24.7 182.8-66.9l-91.5-69.3c-25.5 17.2-58.2 27.4-91.3 27.4-70.1 0-129.5-47.3-150.6-110.9H27.7v69.8C73.8 482.6 166.6 544.3 272 544.3z" fill="#34A853"/>
-                                        <path d="M121.4 327.6c-6.1-18.2-9.6-37.6-9.6-57.6s3.5-39.4 9.6-57.6V142.6H27.7C10 180.5 0 221.4 0 270s10 89.5 27.7 127.4l93.7-69.8z" fill="#FBBC05"/>
-                                        <path d="M272 108.1c39.7 0 75.4 13.7 103.5 40.6l77.6-77.6C409.1 24 346.5 0 272 0 166.6 0 73.8 61.7 27.7 162.6l93.7 69.8C142.5 155.4 201.9 108.1 272 108.1z" fill="#EA4335"/>
+                                        <path d="M533.5 278.4c0-18.5-1.5-37.6-4.9-55.6H272v105.3h147.4c-6.4 34.6-26.5 63.9-56.6 83.4v69.3h91.5C498.1 421.9 533.5 355 533.5 278.4z" fill="#4285F4" />
+                                        <path d="M272 544.3c74.5 0 137.1-24.7 182.8-66.9l-91.5-69.3c-25.5 17.2-58.2 27.4-91.3 27.4-70.1 0-129.5-47.3-150.6-110.9H27.7v69.8C73.8 482.6 166.6 544.3 272 544.3z" fill="#34A853" />
+                                        <path d="M121.4 327.6c-6.1-18.2-9.6-37.6-9.6-57.6s3.5-39.4 9.6-57.6V142.6H27.7C10 180.5 0 221.4 0 270s10 89.5 27.7 127.4l93.7-69.8z" fill="#FBBC05" />
+                                        <path d="M272 108.1c39.7 0 75.4 13.7 103.5 40.6l77.6-77.6C409.1 24 346.5 0 272 0 166.6 0 73.8 61.7 27.7 162.6l93.7 69.8C142.5 155.4 201.9 108.1 272 108.1z" fill="#EA4335" />
                                     </svg>
                                 </span>
 

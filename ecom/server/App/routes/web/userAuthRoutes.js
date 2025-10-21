@@ -1,6 +1,7 @@
 let express = require("express");   
 let userAuthRoutes = express.Router();
-const { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate } = require("../../controllers/web/userAuthController");
+const { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword } = require("../../controllers/web/userAuthController");
+const { checkToken } = require("../../middleware/checkToken");
 
 userAuthRoutes.post("/send-otp",sendOtp);
 
@@ -15,5 +16,7 @@ userAuthRoutes.get("/view-user", viewuser);
 userAuthRoutes.delete("/delete", deleteuser);
 
 userAuthRoutes.post("/statusupdate", userStatusUpdate);
+
+userAuthRoutes.post("/change-password", checkToken ,changePassword);
 
 module.exports = { userAuthRoutes };

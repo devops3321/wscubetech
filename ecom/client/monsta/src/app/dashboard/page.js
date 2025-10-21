@@ -1,15 +1,19 @@
 "use client";
-import React, { useState } from 'react'
-import Breadcrumb from '../common/Breadcrumb'
+import React, { useState } from 'react';
+import Breadcrumb from '../common/Breadcrumb';
 import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../redux/slice/userSlice';
 import { redirect } from 'next/navigation';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Dashboard() {
 
+  const apiBaseurl = process.env.NEXT_PUBLIC_APIBASEURL;
+
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  let loginUser = useSelector((store) => store.myUser.user);
+  let token = useSelector((store) => store.myUser.token);
 
   let dispatch = useDispatch();
 
@@ -18,8 +22,34 @@ export default function Dashboard() {
     redirect('/login-register');
   }
 
+  let changePassword = (e) => {
+    e.preventDefault();
+
+    const reqObj = {
+      oldPassword: e.target.oldPassword.value,
+      newPassword: e.target.newPassword.value,
+      confirmPassword: e.target.confirmPassword.value
+    };
+
+    axios.post(`${apiBaseurl}user/change-password`, reqObj, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then((response) => response.data)
+      .then((finRes) => {
+        if (finRes.status === "success") {
+          toast.success(finRes.message);
+          e.target.reset();
+        } else {
+          toast.error(finRes.message);
+        }
+      });
+  }
+
   return (
     <div>
+      <ToastContainer />
       <Breadcrumb pageName={"My Dashboard"} />
       <div className="max-w-6xl mx-auto mt-8 mb-10 flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
@@ -544,18 +574,33 @@ export default function Dashboard() {
             <>
               <h2 className="font-bold font-playfair text-2xl md:text-3xl mb-4 text-black">Change Password</h2>
               <div className="border border-gray-200 rounded-lg p-6">
-                <form>
+                <form onSubmit={changePassword}>
                   <div className="mb-4">
                     <label className="block text-black mb-1">Current Password</label>
-                    <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="password"
+                      name="oldPassword"
+                      // value={oldPassword}
+                      // onChange={(e) => setOldPassword(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-black" />
                   </div>
                   <div className="mb-4">
                     <label className="block text-black mb-1">New Password</label>
-                    <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="password"
+                      name="newPassword"
+                      // value={newPassword}
+                      // onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-black" />
                   </div>
                   <div className="mb-6">
                     <label className="block text-black mb-1">Confirm Password</label>
-                    <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      // value={confirmPassword}
+                      // onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-black" />
                   </div>
                   <div className="flex justify-end">
                     <button type="submit" className="bg-[#C09578] text-white font-bold px-6 py-2 rounded-full cursor-pointer">CHANGE PASSWORD</button>
