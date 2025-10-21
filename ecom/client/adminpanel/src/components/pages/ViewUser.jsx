@@ -237,7 +237,6 @@ export default function ViewUser() {
                   <th className="px-4 py-3 text-center w-1/6">EMAIL ID</th>
                   <th className="px-4 py-3 text-center">MOBILE NUMBER</th>
                   <th className="px-4 py-3 text-center w-1/8">STATUS</th>
-                  <th className="px-4 py-3 text-center">ACTION</th>
                 </tr>
               </thead>
               <tbody>
@@ -272,13 +271,6 @@ export default function ViewUser() {
                                 <span className="px-4 py-1 rounded-full font-semibold bg-red-100 text-red-700 border border-red-300 text-xs">Deactivated</span>
                               )
                           }
-                        </td>
-                        <td className="px-4 py-2 align-middle text-center w-1/6">
-                          <div className="flex items-center justify-center h-full">
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition-colors duration-200 cursor-pointer" title="View / Edit User">
-                              <FaPen />
-                            </button>
-                          </div>
                         </td>
                       </tr>
                     ))
