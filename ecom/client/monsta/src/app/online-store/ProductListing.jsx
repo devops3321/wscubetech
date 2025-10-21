@@ -39,7 +39,7 @@ export default function ProductListing() {
       <div className="flex flex-col md:flex-row justify-end items-center mb-8 border-2 border-gray-200 p-4 rounded gap-4">
         <div className="flex items-center gap-2 w-full md:w-auto">
           <span className="text-black font-semibold font-playfair">Sort By :</span>
-          <select className="border px-3 py-2 rounded text-black w-full md:w-auto">
+          <select className="border px-3 py-2 rounded text-black w-full md:w-auto cursor-pointer">
             <option defaultValue={0}>Sort By</option>
             <optgroup label="Featured">
                 <option>Featured Products</option>

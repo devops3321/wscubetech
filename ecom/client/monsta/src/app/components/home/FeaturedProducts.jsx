@@ -167,7 +167,7 @@ export default function FeaturedProducts() {
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`px-10 py-4 text-xl font-playfair font-bold border border-[#e5e5e5] border-b-0 rounded-t transition-colors duration-150
+                className={`px-10 py-4 text-xl font-playfair font-bold border border-[#e5e5e5] border-b-0 rounded-t transition-colors duration-150 cursor-pointer
                   ${activeTab === tab.value
                     ? 'text-[#C09578] bg-white border-[#C09578] font-bold'
                     : 'text-black bg-white hover:text-[#C09578]' }

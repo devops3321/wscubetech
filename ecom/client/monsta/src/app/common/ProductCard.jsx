@@ -29,10 +29,10 @@ export default function ProductCard({
         </div>
         <div className="flex justify-center gap-2">
           {/* Solid Heart Icon for Wishlist */}
-          <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group" aria-label="Add to Wishlist">
+          <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group cursor-pointer" aria-label="Add to Wishlist">
             <FaHeart className="text-black group-hover:text-[#C09578] text-[22px] transition-colors duration-150" />
           </button>
-          <button className="border border-gray-300 rounded px-5 py-2 bg-[#f7f7f7] text-gray-700 font-medium hover:bg-[#C09578] hover:text-white transition-colors duration-150">
+          <button className="border border-gray-300 rounded px-5 py-2 bg-[#f7f7f7] text-gray-700 font-medium hover:bg-[#C09578] hover:text-white transition-colors duration-150 cursor-pointer">
             Add To Cart
           </button>
         </div>

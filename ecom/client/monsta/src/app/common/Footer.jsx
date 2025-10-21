@@ -110,7 +110,7 @@ export default function Footer() {
         {/* Scroll to top button */}
         {showScroll && (
           <button
-            className="fixed bottom-6 right-4 md:bottom-8 md:right-8 bg-[#222] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-[#C09578] transition-colors"
+            className="fixed bottom-6 right-4 md:bottom-8 md:right-8 bg-[#222] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-[#C09578] transition-colors cursor-pointer"
             aria-label="Scroll to top"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
