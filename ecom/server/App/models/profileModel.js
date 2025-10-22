@@ -9,14 +9,12 @@ let profileSchema = new mongoose.Schema(
         },
         name: {
             type: String,
-            required: [true, "Name is required"],
             minlength: 2,
             maxlength: 100,
             trim: true
         },
         email: {
             type: String,
-            required: [true, "Email is required"],
             unique: true,
             lowercase: true,
             trim: true,
@@ -25,14 +23,12 @@ let profileSchema = new mongoose.Schema(
         },
         mobileNumber: {
             type: String,
-            required: [true, "Mobile number is required"],
             trim: true,
             unique: true
         },
         address: {
             type: String,
-            required: [true, "Address is required"],
-            minlength: 5,
+            minlength: 0,
             maxlength: 500,
             trim: true
         },

@@ -159,6 +159,20 @@ let googleLogin = async (req, res) => {
                 return res.send({ status: "failed", message: "User is disabled" });
             }
 
+            // --- ADD: Ensure profile exists for Google user ---
+            let profile = await profileModel.findById(checkuser._id).lean();
+            if (!profile) {
+                await profileModel.create({
+                    _id: checkuser._id,
+                    title: "Mr",
+                    name: checkuser.userName,
+                    email: checkuser.userEmail,
+                    mobileNumber: checkuser.userPhone || "",
+                    address: ""
+                });
+            }
+            // --- END ADD ---
+
             const userResp = {
                 _id: checkuser._id,
                 userName: checkuser.userName,
@@ -184,6 +198,17 @@ let googleLogin = async (req, res) => {
 
         let user = new userModel(userObj);
         let userRes = await user.save();
+
+        // --- ADD: Create profile for new Google user ---
+        await profileModel.create({
+            _id: userRes._id,
+            title: "Mr",
+            name: userRes.userName,
+            email: userRes.userEmail,
+            mobileNumber: userRes.userPhone || "",
+            address: ""
+        });
+        // --- END ADD ---
 
         const userResp = {
             _id: userRes._id,
