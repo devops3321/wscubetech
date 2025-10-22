@@ -31,7 +31,7 @@ let sendOtp = async (req, res) => {
                     <p style="font-size: 1.1rem; color: #333; margin-bottom: 24px;">
                     Use the code below to verify your email address and complete your registration.
                     </p>
-                    <div style="display: inline-block; background: #f7c873; color: #222; font-size: 2rem; font-weight: bold; letter-spacing: 8px; padding: 16px 32px; border-radius: 8px; margin-bottom: 24px;">
+                    <div style="display: inline-block; background: #f7c873; color: #222; font-size: 2rem; font-weight: bold, letter-spacing: 8px; padding: 16px 32px; border-radius: 8px; margin-bottom: 24px;">
                     ${otp}
                     </div>
                     <p style="color: #888; font-size: 0.95rem;">
@@ -70,6 +70,11 @@ let sendOtp = async (req, res) => {
 
 let createuser = async (req, res) => {
     let { userName, userEmail, userPhone, userPassword, otp } = req.body;
+
+    // Enforce required fields for normal registration
+    if (!userName || !userEmail || !userPhone || !userPassword) {
+        return res.send({ status: "failed", message: "All fields are required" });
+    }
 
     // Check if user already exists
     let existingUser = await userModel.findOne({ userEmail: userEmail });
@@ -362,13 +367,16 @@ let updateProfile = async (req, res) => {
     try {
         const { id, title, name, email, mobileNumber, address } = req.body;
 
-        if (!id || !title || !name || !email || !mobileNumber || !address) {
-            return res.send({ status: "failed", message: "All fields are required" });
-        }
-
         const checkUser = await userModel.findById(id).lean();
         if (!checkUser) {
             return res.send({ status: "failed", message: "User not found" });
+        }
+
+        // Enforce required fields for normal users only
+        if (checkUser.authProvider === "local") {
+            if (!title || !name || !email || !mobileNumber || !address) {
+                return res.send({ status: "failed", message: "All fields are required" });
+            }
         }
 
         // Update user basic info as well (optional, but keeps user and profile in sync)
