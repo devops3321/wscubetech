@@ -1,5 +1,5 @@
 "use client"
-import React, { use, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Breadcrumb from '../common/Breadcrumb'
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -39,9 +39,6 @@ export default function LoginRegister() {
 
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
-        // Send registration data to backend, which should trigger OTP send
-        // Example: await axios.post('/api/register', registerData);
-        // console.log('Registration data submitted:', registerData);
         axios.post(`${apiBaseurl}user/send-otp`, registerData)
             .then((res) => res.data)
             .then((finResponse) => {
@@ -53,9 +50,6 @@ export default function LoginRegister() {
 
     const handleOtpSubmit = async (e) => {
         e.preventDefault();
-        // Send OTP and registration data to backend for verification
-        // Example: await axios.post('/api/verify-otp', { ...registerData, otp });
-        // On success, redirect or show success message
         axios.post(`${apiBaseurl}user/create-user`, registerData)
             .then((res) => res.data)
             .then((finResponse) => {
@@ -81,13 +75,14 @@ export default function LoginRegister() {
             .then((res) => res.data)
             .then((finResponse) => {
                 if (finResponse.status === "success") {
-                    // console.log(finResponse);
                     let userObj = {
                         id: finResponse.user._id,
-                        userName: finResponse.user.userName
-                    }
-                    dispatch(userData({ user: userObj, token: finResponse.token }));
+                        userName: finResponse.user.userName,
+                        userEmail: finResponse.user.userEmail
+                    };
+                    dispatch(userData({ user: userObj, token: finResponse.token, email: finResponse.user.userEmail }));
                     toast.success(finResponse.message);
+                    router.push('/dashboard');
                 }
                 else {
                     toast.error(finResponse.message);
@@ -97,13 +92,6 @@ export default function LoginRegister() {
         setLoginData({ userEmail: '', userPassword: '' });
     };
 
-
-    useEffect(() => {
-        if (loginUser) {
-            toast.info("Redirecting to Home Page...");
-            redirect('/dashboard');
-        }
-    }, [loginUser]);
 
     const provider = new GoogleAuthProvider();
 
@@ -132,11 +120,12 @@ export default function LoginRegister() {
             if (finResponse?.status === "success") {
                 const userObj = {
                     id: finResponse.user._id,
-                    userName: finResponse.user.userName
+                    userName: finResponse.user.userName,
+                    userEmail: finResponse.user.userEmail
                 };
 
-                // dispatch both user and token (userSlice expects { user, token })
-                dispatch(userData({ user: userObj, token: finResponse.token }));
+                // dispatch both user and token (userSlice expects { user, token, email })
+                dispatch(userData({ user: userObj, token: finResponse.token, email: finResponse.user.userEmail }));
 
                 toast.success(finResponse.message || "Login successful");
                 router.push('/dashboard');

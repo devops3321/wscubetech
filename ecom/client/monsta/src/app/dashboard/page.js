@@ -6,7 +6,8 @@ import { logOut } from '../redux/slice/userSlice';
 import { redirect } from 'next/navigation';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import countries from '../staticData/countryData'; // <-- added import
+import countries from '../staticData/countryData'; 
+import Cookies from 'js-cookie';
 
 export default function Dashboard() {
 
@@ -30,20 +31,25 @@ export default function Dashboard() {
     id: "",
     title: "Mr",
     name: "",
-    email: user?.email || "",
+    // email removed from local editable state - always taken from redux `user`
     mobileNumber: "",
     address: ""
   });
 
+  // cookie fallback for email (auto-fill)
+  const cookieEmail = Cookies.get('USER_EMAIL');
+
   // fetch profile on mount (uses view-user endpoint with searchTerm)
   useEffect(() => {
-    if (!token || !apiBaseurl || !user?.email) return;
+    // require token + apiBaseurl + an email value from redux user (userEmail or email)
+    const userEmailForSearch = cookieEmail;
+    if (!token || !apiBaseurl || !userEmailForSearch) return;
 
     const fetchProfile = async () => {
       try {
         // Using view-user with searchTerm to get current user info
         const resp = await axios.get(`${apiBaseurl}user/view-user`, {
-          params: { searchTerm: user.email, limit: 1 },
+          params: { searchTerm: userEmailForSearch, limit: 1 },
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = resp.data;
@@ -55,16 +61,14 @@ export default function Dashboard() {
             // adapt to available fields in user object
             title: u.title || u.userTitle || prev.title,
             name: u.userName || u.name || prev.name,
-            email: u.userEmail || u.email,
             mobileNumber: u.userPhone || u.mobileNumber || "",
             address: u.address || prev.address || ""
           }));
         } else {
-          // fallback: populate from redux user if available
+          // fallback: populate name from redux user if available
           setProfile(prev => ({
             ...prev,
-            email: user.email || prev.email,
-            name: user.name || user.userName || prev.name
+            name: user?.userName || user?.name || prev.name
           }));
         }
       } catch (err) {
@@ -73,7 +77,7 @@ export default function Dashboard() {
     };
 
     fetchProfile();
-  }, [token, apiBaseurl, user]);
+  }, [token, apiBaseurl, user, cookieEmail]);
 
   let changePassword = (e) => {
     e.preventDefault();
@@ -103,11 +107,14 @@ export default function Dashboard() {
   let updateProfile = (e) => {
     e.preventDefault();
 
+    // email must come from redux user and not be editable
+    const emailToSend = cookieEmail || "";
+
     const reqObj = {
       id: profile.id, // include id required by backend
       title: profile.title, // ensure format matches backend enum ("Mr" / "Mrs")
       name: profile.name,
-      email: profile.email,
+      email: emailToSend,
       mobileNumber: profile.mobileNumber,
       address: profile.address
     };
@@ -380,8 +387,10 @@ export default function Dashboard() {
                     <input
                       type="email"
                       name='email'
-                      value={profile.email}
-                      readOnly className="w-full text-black border border-gray-300 rounded px-3 py-2 bg-gray-100 text-black" />
+                      value={cookieEmail || ""}
+                      readOnly
+                      disabled
+                      className="w-full text-black border border-gray-300 rounded px-3 py-2 bg-gray-100 text-black" />
                   </div>
                   <div className="mb-3">
                     <label className="block text-black mb-1">Mobile Number*</label>
