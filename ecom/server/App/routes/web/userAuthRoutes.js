@@ -1,6 +1,6 @@
 let express = require("express");   
 let userAuthRoutes = express.Router();
-const { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile } = require("../../controllers/web/userAuthController");
+const { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile, getProfile } = require("../../controllers/web/userAuthController");
 const { checkToken } = require("../../middleware/checkToken");
 
 userAuthRoutes.post("/send-otp",sendOtp);
@@ -20,5 +20,7 @@ userAuthRoutes.post("/statusupdate", userStatusUpdate);
 userAuthRoutes.post("/change-password", checkToken ,changePassword);
 
 userAuthRoutes.post("/update-profile", checkToken ,updateProfile);
+
+userAuthRoutes.get("/get-profile", checkToken ,getProfile);
 
 module.exports = { userAuthRoutes };

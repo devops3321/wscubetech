@@ -335,35 +335,78 @@ let changePassword = async (req, res) => {
 
 let updateProfile = async (req, res) => {
     try {
-
         const { id, title, name, email, mobileNumber, address } = req.body;
 
         if (!id || !title || !name || !email || !mobileNumber || !address) {
             return res.send({ status: "failed", message: "All fields are required" });
         }
 
-        checkUser = await profileModel.findById(id).lean();
+        const checkUser = await userModel.findById(id).lean();
         if (!checkUser) {
             return res.send({ status: "failed", message: "User not found" });
         }
 
-        await profileModel.updateOne(
+        // Update user basic info as well (optional, but keeps user and profile in sync)
+        await userModel.updateOne(
             { _id: id },
             {
                 $set: {
-                    title,
-                    name,
-                    email,
-                    mobileNumber,
-                    address
+                    userName: name,
+                    userEmail: email,
+                    userPhone: mobileNumber
                 }
             }
         );
 
-        return res.send({ status: "success", message: "Profile updated successfully" });
+        // Check if profile exists
+        let profile;
+        const existingProfile = await profileModel.findById(id).lean();
+
+        if (existingProfile) {
+            // Update profile
+            await profileModel.updateOne(
+                { _id: id },
+                {
+                    $set: {
+                        title,
+                        name,
+                        email,
+                        mobileNumber,
+                        address
+                    }
+                }
+            );
+            profile = await profileModel.findById(id).lean();
+        } else {
+            // Create new profile
+            profile = await profileModel.create({
+                _id: id,
+                title,
+                name,
+                email,
+                mobileNumber,
+                address
+            });
+        }
+
+        return res.send({ status: "success", message: "Profile updated successfully", profile });
     } catch (err) {
         return res.send({ status: "failed", message: "Error updating profile", error: err.message });
     }
 }
 
-module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile };
+let getProfile = async (req, res) => {
+    try {
+        const { id } = req.query;
+        if (!id) return res.send({ status: "failed", message: "User ID required" });
+
+        const profile = await profileModel.findById(id).lean();
+        if (!profile) return res.send({ status: "failed", message: "Profile not found" });
+
+        res.send({ status: "success", profile });
+    } catch (err) {
+        res.send({ status: "failed", message: "Error fetching profile", error: err.message });
+    }
+}
+
+module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile, getProfile };

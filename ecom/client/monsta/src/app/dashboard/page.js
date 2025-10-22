@@ -41,35 +41,23 @@ export default function Dashboard() {
 
   // fetch profile on mount (uses view-user endpoint with searchTerm)
   useEffect(() => {
-    // require token + apiBaseurl + an email value from redux user (userEmail or email)
-    const userEmailForSearch = cookieEmail;
-    if (!token || !apiBaseurl || !userEmailForSearch) return;
+    if (!token || !apiBaseurl || !user?.id) return;
 
     const fetchProfile = async () => {
       try {
-        // Using view-user with searchTerm to get current user info
-        const resp = await axios.get(`${apiBaseurl}user/view-user`, {
-          params: { searchTerm: userEmailForSearch, limit: 1 },
+        const resp = await axios.get(`${apiBaseurl}user/get-profile`, {
+          params: { id: user.id }, // <-- use user.id here
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = resp.data;
-        if (data && data.status === "success" && Array.isArray(data.users) && data.users.length > 0) {
-          const u = data.users[0];
-          setProfile(prev => ({
-            ...prev,
-            id: u._id || u.id || prev.id,
-            // adapt to available fields in user object
-            title: u.title || u.userTitle || prev.title,
-            name: u.userName || u.name || prev.name,
-            mobileNumber: u.userPhone || u.mobileNumber || "",
-            address: u.address || prev.address || ""
-          }));
-        } else {
-          // fallback: populate name from redux user if available
-          setProfile(prev => ({
-            ...prev,
-            name: user?.userName || user?.name || prev.name
-          }));
+        if (data && data.status === "success" && data.profile) {
+          setProfile({
+            id: data.profile._id,
+            title: data.profile.title,
+            name: data.profile.name,
+            mobileNumber: data.profile.mobileNumber,
+            address: data.profile.address
+          });
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -77,7 +65,7 @@ export default function Dashboard() {
     };
 
     fetchProfile();
-  }, [token, apiBaseurl, user, cookieEmail]);
+  }, [token, apiBaseurl, user]);
 
   let changePassword = (e) => {
     e.preventDefault();
@@ -111,8 +99,8 @@ export default function Dashboard() {
     const emailToSend = cookieEmail || "";
 
     const reqObj = {
-      id: profile.id, // include id required by backend
-      title: profile.title, // ensure format matches backend enum ("Mr" / "Mrs")
+      id: user.id, // <-- use user.id here
+      title: profile.title,
       name: profile.name,
       email: emailToSend,
       mobileNumber: profile.mobileNumber,
@@ -127,8 +115,16 @@ export default function Dashboard() {
       .then((response) => response.data)
       .then((finRes) => {
         if (finRes.status === "success") {
+          if (finRes.profile) {
+            setProfile({
+              id: finRes.profile._id,
+              title: finRes.profile.title,
+              name: finRes.profile.name,
+              mobileNumber: finRes.profile.mobileNumber,
+              address: finRes.profile.address
+            });
+          }
           toast.success(finRes.message);
-          // keep fields populated (do not reset)
         } else {
           toast.error(finRes.message);
         }

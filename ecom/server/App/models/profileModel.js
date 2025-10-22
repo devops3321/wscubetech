@@ -27,7 +27,7 @@ let profileSchema = new mongoose.Schema(
             type: String,
             required: [true, "Mobile number is required"],
             trim: true,
-            match: [/^[0-9]{7,15}$/, "Please provide a valid mobile number (7-15 digits)"]
+            unique: true
         },
         address: {
             type: String,
