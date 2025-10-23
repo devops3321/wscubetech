@@ -1,4 +1,5 @@
 const { adminModel } = require("../../models/adminModel");
+const { companyProfileModel } = require("../../models/companyprofileModel");
 
 let adminLogin = async (req, res) => {
     let { adminEmail, adminPassword } = req.body;
@@ -79,4 +80,90 @@ let changePassword = async (req, res) => {
     }
 }
 
-module.exports = { adminLogin, changePassword };
+// View company profile (no id required)
+let viewCompanyProfile = async (req, res) => {
+    try {
+        let profile = await companyProfileModel.findOne();
+        if (!profile) {
+            return res.send({
+                status: "failed",
+                message: "Company profile not found",
+                data: null,
+                staticPath: process.env.COMPANY_PROFILE_IMAGE_PATH
+            });
+        }
+        res.send({
+            status: "success",
+            message: "Company profile fetched successfully",
+            data: profile,
+            staticPath: process.env.COMPANY_PROFILE_IMAGE_PATH
+        });
+    } catch (err) {
+        res.send({
+            status: "failed",
+            message: "Error fetching company profile",
+            error: err.message
+        });
+    }
+};
+
+// Update company profile (no id required)
+let companyProfileUpdate = async (req, res) => {
+    try {
+        let profile = await companyProfileModel.findOne();
+
+        // Prepare update data
+        let updateData = {
+            name: req.body.name,
+            email: req.body.email,
+            mobile: req.body.mobile,
+            address: req.body.address,
+            mapUrl: req.body.mapUrl,
+            facebook: req.body.facebook,
+            youtube: req.body.youtube,
+            instagram: req.body.instagram,
+            twitter: req.body.twitter,
+        };
+
+        // Only set avatar if a new file is uploaded
+        if (req.files && req.files.avatar && req.files.avatar[0]) {
+            updateData.avatar = req.files.avatar[0].filename;
+        } else if (profile && profile.avatar) {
+            updateData.avatar = profile.avatar; // Keep existing avatar
+        } else {
+            updateData.avatar = ""; // No avatar at all
+        }
+
+        if (!profile) {
+            // Create new profile
+            let newProfile = new companyProfileModel(updateData);
+            await newProfile.save();
+            return res.send({
+                status: "success",
+                message: "Company profile created successfully",
+                data: newProfile,
+                staticPath: process.env.COMPANY_PROFILE_IMAGE_PATH
+            });
+        } else {
+            // Update existing profile
+            let updated = await companyProfileModel.findByIdAndUpdate(
+                profile._id,
+                { $set: updateData },
+                { new: true }
+            );
+            return res.send({
+                status: "success",
+                message: "Company profile updated successfully",
+                data: updated
+            });
+        }
+    } catch (err) {
+        res.send({
+            status: "failed",
+            message: "Error updating company profile",
+            error: err.message
+        });
+    }
+};
+
+module.exports = { adminLogin, changePassword, companyProfileUpdate, viewCompanyProfile };

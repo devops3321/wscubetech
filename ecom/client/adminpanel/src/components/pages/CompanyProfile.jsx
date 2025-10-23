@@ -1,18 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CompanyProfile() {
+  const API_BASE = (import.meta.env.VITE_APIBASEURL).replace(/\/+$/, "");
+  const PROFILE_API = `${API_BASE}/auth/companyprofileupdate/`;
+
   const [profile, setProfile] = useState({
-    name: 'Nehru Dyer',
-    email: 'rowssyzy@mailinator.com',
-    mobile: '567567567',
+    name: '',
+    email: '',
+    mobile: '',
     address: '',
     mapUrl: '',
-    avatar: null,
+    avatar: '',
     facebook: '',
     youtube: '',
     instagram: '',
     twitter: '',
   });
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch company profile on mount
+  useEffect(() => {
+    axios
+      .get(`${API_BASE}/auth/view-company-profile/`)
+      .then((res) => res.data)
+      .then((finResponse) => {
+        console.log("Company Profile Response:", finResponse);
+
+        if (finResponse.status === "success" && finResponse.data) {
+          setProfile({
+            name: finResponse.data.name || '',
+            email: finResponse.data.email || '',
+            mobile: finResponse.data.mobile || '',
+            address: finResponse.data.address || '',
+            mapUrl: finResponse.data.mapUrl || '',
+            avatar: finResponse.data.avatar || '',
+            facebook: finResponse.data.facebook || '',
+            youtube: finResponse.data.youtube || '',
+            instagram: finResponse.data.instagram || '',
+            twitter: finResponse.data.twitter || '',
+          });
+
+          // Set avatar preview if avatar exists
+          if (finResponse.data.avatar) {
+            setAvatarPreview(`${finResponse.staticPath}${finResponse.data.avatar}`);
+          } else {
+            setAvatarPreview(null);
+          }
+        }
+      })
+      .catch(() => {
+        toast.error('Failed to fetch company profile');
+      });
+  }, [API_BASE]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,24 +65,76 @@ export default function CompanyProfile() {
   const handleAvatarChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfile((prev) => ({ ...prev, avatar: e.target.files[0] }));
+      setAvatarPreview(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      let formData = new FormData();
+      Object.entries(profile).forEach(([key, value]) => {
+        if (key === 'avatar') {
+          if (value && value instanceof File) formData.append('avatar', value);
+        } else {
+          formData.append(key, value || '');
+        }
+      });
+
+      const res = await axios.post(`${PROFILE_API}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (res.data.status === 'success') {
+        toast.success(res.data.message || 'Profile updated!');
+        // Refresh profile data after update
+        const updatedProfile = res.data.data;
+        setProfile({
+          name: updatedProfile.name || '',
+          email: updatedProfile.email || '',
+          mobile: updatedProfile.mobile || '',
+          address: updatedProfile.address || '',
+          mapUrl: updatedProfile.mapUrl || '',
+          avatar: updatedProfile.avatar || '',
+          facebook: updatedProfile.facebook || '',
+          youtube: updatedProfile.youtube || '',
+          instagram: updatedProfile.instagram || '',
+          twitter: updatedProfile.twitter || '',
+        });
+        // Build full URL for avatar if present
+        if (updatedProfile.avatar) {
+          setAvatarPreview(`${API_BASE}/uploads/companyprofile/${updatedProfile.avatar}`);
+        } else {
+          setAvatarPreview(null);
+        }
+      } else {
+        toast.error(res.data.message || 'Update failed');
+      }
+    } catch (err) {
+      toast.error('Error updating profile');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 border border-gray-200 mt-8">
-      <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
+      <ToastContainer />
+      <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Category Image Upload */}
+          {/* Avatar Upload */}
           <div className="md:w-1/3">
-            <label className="block mb-2 text-md font-semibold text-gray-700">Category Image</label>
+            <label className="block mb-2 text-md font-semibold text-gray-700">Company Logo</label>
             <div className="w-full h-56 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 cursor-pointer">
               <label
                 htmlFor="avatar-upload"
                 className="flex flex-col items-center cursor-pointer w-full h-full justify-center"
               >
-                {profile.avatar ? (
+                {avatarPreview ? (
                   <img
-                    src={URL.createObjectURL(profile.avatar)}
+                    src={avatarPreview}
                     alt="avatar"
                     className="w-32 h-32 rounded-full object-cover mb-2"
                   />
@@ -56,6 +151,7 @@ export default function CompanyProfile() {
                 <input
                   id="avatar-upload"
                   type="file"
+                  name="avatar"
                   accept="image/*"
                   className="hidden"
                   onChange={handleAvatarChange}
@@ -88,12 +184,12 @@ export default function CompanyProfile() {
                 id="email"
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
                 value={profile.email}
-                disabled
+                onChange={handleInputChange}
               />
             </div>
             <div>
               <label htmlFor="mobile" className="block mb-2 text-sm font-medium text-gray-700">
-                Mob.
+                Mobile
               </label>
               <input
                 type="text"
@@ -101,7 +197,7 @@ export default function CompanyProfile() {
                 id="mobile"
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
                 value={profile.mobile}
-                disabled
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -200,8 +296,9 @@ export default function CompanyProfile() {
           <button
             type="submit"
             className="bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-md px-5 py-2.5 shadow transition-all duration-150 cursor-pointer"
+            disabled={loading}
           >
-            Submit
+            {loading ? 'Saving...' : 'Submit'}
           </button>
         </div>
       </form>

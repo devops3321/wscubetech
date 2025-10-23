@@ -18,6 +18,7 @@ const { subsubcategoryRoutes } = require("./App/routes/admin/subsubcategoryRoute
 const { productRoutes } = require("./App/routes/admin/productRoutes");
 const { adminModel } = require("./App/models/adminModel");
 const { webRoutes } = require("./App/routes/web/webRoutes");
+const { adminauthRoutes } = require("./App/routes/admin/adminauthRoutes");
 
 App.use(cors());
 App.use(express.json());
@@ -30,6 +31,7 @@ App.use("/uploads/testimonial", express.static("uploads/testimonial"));
 App.use("/uploads/subcategory", express.static("uploads/subcategory"));
 App.use("/uploads/subsubcategory", express.static("uploads/subsubcategory"));
 App.use("/uploads/product", express.static("uploads/product"));
+App.use("/uploads/companyprofile", express.static("uploads/companyprofile"));
 
 //admin routes
 // http://localhost:<port>/admin/login
@@ -45,6 +47,7 @@ App.use("/testimonial", testimonialRoutes);
 App.use("/subcategory", subcategoryRoutes);
 App.use("/subsubcategory", subsubcategoryRoutes);
 App.use("/product", productRoutes);
+App.use("/auth", adminauthRoutes);
 
 //web routes
 App.use("/web", webRoutes);
