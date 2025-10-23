@@ -24,6 +24,7 @@ const storage_admin_profile = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
+
 const upload = multer({ storage: storage });
 
 const upload_admin_profile = multer({ storage: storage_admin_profile });
