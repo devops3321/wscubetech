@@ -57,7 +57,7 @@ export default function Cart() {
     <div className="min-h-screen bg-gray-50 pb-16">
       <Breadcrumb pageName={"Shopping Cart"} />
       <div className="max-w-4xl mx-auto mt-8 bg-white rounded-xl shadow p-6">
-        <h2 className="text-2xl font-bold mb-6 text-black">Your Cart</h2>
+        <h2 className="text-2xl font-bold mb-6 text-black text-center">Your Cart</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full text-left">
             <thead>
