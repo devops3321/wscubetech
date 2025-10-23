@@ -117,7 +117,7 @@ export default function Cart() {
               <span className="text-black">₹{total}</span>
             </div>
             <button
-              className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow transition-all duration-200"
+              className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow transition-all duration-200 cursor-pointer"
             >
               Proceed to Checkout
             </button>
