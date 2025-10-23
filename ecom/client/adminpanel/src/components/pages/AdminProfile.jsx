@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoginContext } from '../context/MainContext';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -8,14 +8,39 @@ export default function AdminProfile() {
   const apiBaseurl = import.meta.env.VITE_APIBASEURL;
   const [activeTab, setActiveTab] = useState('edit');
   const [profile, setProfile] = useState({
-    name: '',
-    email: 'admin@monsta.com',
-    mobile: '',
-    avatar: null,
+    adminName: '',
+    adminEmail: 'admin@monsta.com',
+    adminMobile: '',
+    adminAvatar: null,
   });
-  const [formValue, setFormValue] = React. useState();
+  const [loading, setLoading] = useState(false);
 
   const { id, setId } = React.useContext(LoginContext);
+
+  // Fetch admin profile on mount and after update
+  const fetchAdminProfile = async () => {
+    try {
+      const response = await axios.get(`${apiBaseurl}auth/view-admin-profile`);
+      const finResponse = response.data;
+      if (finResponse.status === "success" && finResponse.data) {
+        setProfile({
+          adminName: finResponse.data.adminName || '',
+          adminEmail: finResponse.data.adminEmail || '',
+          adminMobile: finResponse.data.adminMobile || '',
+          adminAvatar: finResponse.data.adminAvatar
+            ? `${finResponse.staticPath || ''}${finResponse.data.adminAvatar}`
+            : null,
+        });
+      }
+    } catch (error) {
+      // Optionally handle error
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminProfile();
+    // eslint-disable-next-line
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,8 +49,42 @@ export default function AdminProfile() {
 
   const handleAvatarChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setProfile((prev) => ({ ...prev, avatar: e.target.files[0] }));
+      setProfile((prev) => ({ ...prev, adminAvatar: e.target.files[0] }));
     }
+  };
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('adminName', profile.adminName);
+      formData.append('adminEmail', profile.adminEmail);
+      formData.append('adminMobile', profile.adminMobile);
+      if (profile.adminAvatar && profile.adminAvatar instanceof File) {
+        formData.append('adminAvatar', profile.adminAvatar);
+      }
+
+      const response = await axios.post(
+        `${apiBaseurl}auth/adminprofileupdate`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      const finResponse = response.data;
+      if (finResponse.status === "success") {
+        toast.success(finResponse.message);
+        fetchAdminProfile(); // Refresh profile after update
+      } else {
+        toast.error(finResponse.message || "Profile update failed");
+      }
+    } catch (error) {
+      toast.error("Server error. Please try again.");
+    }
+    setLoading(false);
   };
 
   const changePassword = async (e) => {
@@ -61,9 +120,15 @@ export default function AdminProfile() {
         <div className="md:w-1/3 flex flex-col items-center">
           <div className="w-24 h-24 rounded-full bg-purple-200 flex items-center justify-center text-4xl mb-2">
             {/* Avatar preview */}
-            {profile.avatar ? (
+            {profile.adminAvatar && typeof profile.adminAvatar === "string" ? (
               <img
-                src={URL.createObjectURL(profile.avatar)}
+                src={profile.adminAvatar}
+                alt="avatar"
+                className="w-24 h-24 rounded-full object-cover"
+              />
+            ) : profile.adminAvatar && profile.adminAvatar instanceof File ? (
+              <img
+                src={URL.createObjectURL(profile.adminAvatar)}
                 alt="avatar"
                 className="w-24 h-24 rounded-full object-cover"
               />
@@ -76,11 +141,11 @@ export default function AdminProfile() {
             <div className="font-semibold mb-2">Contact Information</div>
             <div className="flex items-center justify-center gap-2 text-gray-700 mb-1">
               <span>📞</span>
-              <span>+91 1234567890</span>
+              <span>{profile.adminMobile || "+91 1234567890"}</span>
             </div>
             <div className="flex items-center justify-center gap-2 text-gray-700">
               <span>✉️</span>
-              <span>admin@monsta.com</span>
+              <span>{profile.adminEmail}</span>
             </div>
           </div>
         </div>
@@ -103,7 +168,7 @@ export default function AdminProfile() {
           </div>
           {/* Tab Content */}
           {activeTab === 'edit' ? (
-            <form className="flex gap-8" onSubmit={e => e.preventDefault()}>
+            <form className="flex gap-8" onSubmit={handleProfileSubmit}>
               {/* Avatar Upload */}
               <div className="w-56 h-56 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 cursor-pointer mr-4">
                 <label htmlFor="avatar-upload" className="flex flex-col items-center cursor-pointer w-full h-full justify-center">
@@ -125,45 +190,46 @@ export default function AdminProfile() {
               {/* Profile Fields */}
               <div className="flex-1 space-y-6">
                 <div>
-                  <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">Name</label>
+                  <label htmlFor="adminName" className="block mb-2 text-sm font-medium text-gray-700">Name</label>
                   <input
                     type="text"
-                    name="name"
-                    id="name"
+                    name="adminName"
+                    id="adminName"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5"
                     placeholder="Name"
-                    value={profile.name}
+                    value={profile.adminName}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+                  <label htmlFor="adminEmail" className="block mb-2 text-sm font-medium text-gray-700">Email</label>
                   <input
                     type="email"
-                    name="email"
-                    id="email"
+                    name="adminEmail"
+                    id="adminEmail"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
-                    value={profile.email}
+                    value={profile.adminEmail}
                     disabled
                   />
                 </div>
                 <div>
-                  <label htmlFor="mobile" className="block mb-2 text-sm font-medium text-gray-700">Mob.</label>
+                  <label htmlFor="adminMobile" className="block mb-2 text-sm font-medium text-gray-700">Mob.</label>
                   <input
                     type="text"
-                    name="mobile"
-                    id="mobile"
+                    name="adminMobile"
+                    id="adminMobile"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
                     placeholder="Full mobile number"
-                    value={profile.mobile}
+                    value={profile.adminMobile}
                     onChange={handleInputChange}
                   />
                 </div>
                 <button
                   type="submit"
                   className="bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg text-md px-5 py-2.5 shadow transition-all duration-150 cursor-pointer"
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? "Updating..." : "Submit"}
                 </button>
               </div>
             </form>

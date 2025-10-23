@@ -1,5 +1,6 @@
 const { adminModel } = require("../../models/adminModel");
 const { companyProfileModel } = require("../../models/companyprofileModel");
+const { adminProfileModel } = require("../../models/adminprofileModel");
 
 let adminLogin = async (req, res) => {
     let { adminEmail, adminPassword } = req.body;
@@ -166,4 +167,84 @@ let companyProfileUpdate = async (req, res) => {
     }
 };
 
-module.exports = { adminLogin, changePassword, companyProfileUpdate, viewCompanyProfile };
+let adminProfileUpdate = async (req, res) => {
+    try {
+        // Extract fields from body
+        const { adminName, adminEmail, adminMobile } = req.body;
+        let updateData = {
+            adminName,
+            adminEmail,
+            adminMobile,
+        };
+
+        // Handle avatar upload
+        if (req.files && req.files.adminAvatar && req.files.adminAvatar[0]) {
+            updateData.adminAvatar = req.files.adminAvatar[0].filename;
+        }
+
+        // Find existing profile by email (unique)
+        let profile = await adminProfileModel.findOne({ adminEmail });
+
+        if (!profile) {
+            // Create new profile if not exists
+            let newProfile = new adminProfileModel(updateData);
+            await newProfile.save();
+            return res.send({
+                status: "success",
+                message: "Admin profile created successfully",
+                data: newProfile,
+                staticPath: process.env.ADMIN_PROFILE_IMAGE_PATH
+            });
+        } else {
+            // Update existing profile
+            let updated = await adminProfileModel.findByIdAndUpdate(
+                profile._id,
+                { $set: updateData },
+                { new: true }
+            );
+            return res.send({
+                status: "success",
+                message: "Admin profile updated successfully",
+                data: updated,
+                staticPath: process.env.ADMIN_PROFILE_IMAGE_PATH
+            });
+        }
+    } catch (err) {
+        res.send({
+            status: "failed",
+            message: "Error updating admin profile",
+            error: err.message,
+        });
+    }
+}
+
+let viewAdminProfile = async (req, res) => {
+    try {
+        // You can use req.query.adminEmail or req.body.adminEmail if you want to filter by email
+        // For now, fetch the first admin profile (assuming single admin)
+        let profile = await adminProfileModel.findOne();
+        if (!profile) {
+            return res.send({
+                status: "failed",
+                message: "Admin profile not found",
+                data: null,
+                staticPath: process.env.ADMIN_PROFILE_IMAGE_PATH
+            });
+        }
+        res.send({
+            status: "success",
+            message: "Admin profile fetched successfully",
+            data: profile,
+            staticPath: process.env.ADMIN_PROFILE_IMAGE_PATH
+        });
+    } catch (err) {
+        res.send({
+            status: "failed",
+            message: "Error fetching admin profile",
+            error: err.message,
+            data: null
+        });
+    }
+}
+
+module.exports = { adminLogin, changePassword, companyProfileUpdate, viewCompanyProfile, adminProfileUpdate, viewAdminProfile };

@@ -32,6 +32,7 @@ App.use("/uploads/subcategory", express.static("uploads/subcategory"));
 App.use("/uploads/subsubcategory", express.static("uploads/subsubcategory"));
 App.use("/uploads/product", express.static("uploads/product"));
 App.use("/uploads/companyprofile", express.static("uploads/companyprofile"));
+App.use("/uploads/adminprofile", express.static("uploads/adminprofile"));
 
 //admin routes
 // http://localhost:<port>/admin/login
