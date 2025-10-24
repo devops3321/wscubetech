@@ -1,6 +1,7 @@
 const { transporter } = require("../../config/mailConfig");
 const { profileModel } = require("../../models/profileModel");
 const { userModel } = require("../../models/userModel");
+const { companyProfileModel } = require("../../models/companyprofileModel");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
@@ -442,4 +443,30 @@ let getProfile = async (req, res) => {
     }
 }
 
-module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile, getProfile };
+let viewCompanyProfile = async (req, res) => {
+    try {
+        let profile = await companyProfileModel.findOne();
+        if (!profile) {
+            return res.send({
+                status: "failed",
+                message: "Company profile not found",
+                data: null,
+                staticPath: process.env.COMPANY_PROFILE_IMAGE_PATH
+            });
+        }
+        res.send({
+            status: "success",
+            message: "Company profile fetched successfully",
+            data: profile,
+            staticPath: process.env.COMPANY_PROFILE_IMAGE_PATH
+        });
+    } catch (err) {
+        res.send({
+            status: "failed",
+            message: "Error fetching company profile",
+            error: err.message
+        });
+    }
+};
+
+module.exports = { sendOtp, createuser, login, googleLogin, viewuser, deleteuser, userStatusUpdate, changePassword, updateProfile, getProfile, viewCompanyProfile };

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../redux/slice/userSlice';
 import { redirect } from 'next/navigation';
+import { viewCompanyProfile } from '../../apiServices/addressUpdate';
 
 export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
@@ -11,6 +12,11 @@ export default function Header() {
     const closeTimeout = useRef();
     const [clientLoginUser, setClientLoginUser] = useState(null);
 
+    const [companyInfo, setCompanyInfo] = useState({
+        address: '',
+        phone: '',
+        email: ''
+    });
 
     // Then conditionally render based on clientLoginUser, so server and client render differencing is avoided
 
@@ -56,6 +62,31 @@ export default function Header() {
 
     useEffect(() => {
         setClientLoginUser(loginUser);
+
+        // Fetch company profile details
+        async function fetchCompanyDetails() {
+            try {
+                const res = await viewCompanyProfile();
+                if (res.status === "success" && res.data) {
+                    setCompanyInfo({
+                        address: res.data.address || '',
+                        phone: res.data.mobile || '',
+                        email: res.data.email || ''
+                    });
+                }
+            } catch (err) {
+                // fallback to default if error
+                setCompanyInfo({
+                    address: '',
+                    phone: '',
+                    email: ''
+                });
+            }
+        }
+        fetchCompanyDetails();
+    }, [loginUser]);
+    useEffect(() => {
+        setClientLoginUser(loginUser);
     }, [loginUser]);
 
 
@@ -64,7 +95,7 @@ export default function Header() {
             {/* Top Contact Bar */}
             <div className="w-full border-b border-gray-200 bg-white flex flex-col md:flex-row justify-evenly items-center px-4 md:px-8 py-3 text-sm gap-y-2 md:gap-x-40 text-black">
                 <div>
-                    Contact us 24/7 : <a href="tel:+9198745612330" className="hover:text-[#C09578] transition-colors duration-150">+91-98745612330</a> / <a href="mailto:furnitureinfo@gmail.com" className="hover:text-[#C09578] transition-colors duration-150">furnitureinfo@gmail.com</a>
+                    Contact us 24/7 : <a href={`tel:${companyInfo.phone || '+9198745612330'}`} className="hover:text-[#C09578] transition-colors duration-150">{companyInfo.phone || '+91-98745612330'}</a> / <a href={`mailto:${companyInfo.email || 'furnitureinfo@gmail.com'}`} className="hover:text-[#C09578] transition-colors duration-150">{companyInfo.email || 'furnitureinfo@gmail.com'}</a>
                 </div>
                 <div>
                     {loginUser ?
