@@ -64,6 +64,25 @@ export default function Footer() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const smoothScrollToTop = () => {
+    const duration = 900; // milliseconds
+    const start = window.scrollY;
+    const startTime = performance.now();
+
+    function scrollStep(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo(0, start * (1 - ease));
+      if (progress < 1) {
+        requestAnimationFrame(scrollStep);
+      }
+    }
+
+    requestAnimationFrame(scrollStep);
+  };
+
   return (
     <footer className="bg-white pt-12 pb-4 border-t-2 border-[#f2f2f2]">
       <div className="max-w-7xl mx-auto px-2">
@@ -163,7 +182,7 @@ export default function Footer() {
           <button
             className="fixed bottom-6 right-4 md:bottom-8 md:right-8 bg-[#222] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-[#C09578] transition-colors cursor-pointer"
             aria-label="Scroll to top"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={smoothScrollToTop}
           >
             <i className="fa fa-angle-up text-2xl animate-bounce-up"></i>
           </button>
