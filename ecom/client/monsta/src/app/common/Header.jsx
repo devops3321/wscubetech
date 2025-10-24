@@ -86,7 +86,7 @@ export default function Header() {
         fetchCompanyDetails();
     }, [loginUser]);
 
-    
+
     useEffect(() => {
         setClientLoginUser(loginUser);
     }, [loginUser]);
@@ -138,17 +138,19 @@ export default function Header() {
                         </button>
                     </div>
                     {/* Wishlist */}
-                    <button className="border border-gray-200 rounded px-4 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group w-full sm:w-auto">
-                        <svg
-                            width="20"
-                            height="20"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                            className="text-black group-hover:text-[#C09578] transition-colors duration-150"
-                        >
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                        </svg>
-                    </button>
+                    <Link href={"/wishlist"} className="w-full sm:w-auto">
+                        <button className="border border-gray-200 rounded px-4 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group w-full sm:w-auto cursor-pointer">
+                            <svg
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                                className="text-black group-hover:text-[#C09578] transition-colors duration-150"
+                            >
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                    </Link>
                     {/* Cart */}
                     <div className="flex items-center border border-gray-300 rounded px-4 py-2 bg-white hover:bg-gray-100 w-full sm:w-auto">
                         <span className="relative flex items-center mr-3">
