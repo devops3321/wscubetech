@@ -47,6 +47,14 @@ let companyProfileSchema = new mongoose.Schema(
         twitter: {
             type: String,
             default: ""
+        },
+        linkedin: {
+            type: String,
+            default: ""
+        },
+        telegram: {
+            type: String,
+            default: ""
         }
     },
     { timestamps: true }

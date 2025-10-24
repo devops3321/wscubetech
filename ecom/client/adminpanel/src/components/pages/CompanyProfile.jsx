@@ -18,6 +18,8 @@ export default function CompanyProfile() {
     youtube: '',
     instagram: '',
     twitter: '',
+    linkedin: '',
+    telegram: ''
   });
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,6 +44,8 @@ export default function CompanyProfile() {
             youtube: finResponse.data.youtube || '',
             instagram: finResponse.data.instagram || '',
             twitter: finResponse.data.twitter || '',
+            linkedin: finResponse.data.linkedin || '',
+            telegram: finResponse.data.telegram || '',
           });
 
           // Set avatar preview if avatar exists
@@ -287,6 +291,34 @@ export default function CompanyProfile() {
               className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
               placeholder="Twitter URL"
               value={profile.twitter}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="linkedin" className="block mb-2 text-sm font-medium text-gray-700">
+              LinkedIn URL
+            </label>
+            <input
+              type="url"
+              name="linkedin"
+              id="linkedin"
+              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+              placeholder="LinkedIn URL"
+              value={profile.linkedin}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="telegram" className="block mb-2 text-sm font-medium text-gray-700">
+              Telegram URL
+            </label>
+            <input
+              type="url"
+              name="telegram"
+              id="telegram"
+              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+              placeholder="Telegram URL"
+              value={profile.telegram}
               onChange={handleInputChange}
             />
           </div>

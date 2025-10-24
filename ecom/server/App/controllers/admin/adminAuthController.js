@@ -124,6 +124,8 @@ let companyProfileUpdate = async (req, res) => {
             youtube: req.body.youtube,
             instagram: req.body.instagram,
             twitter: req.body.twitter,
+            linkedin: req.body.linkedin,
+            telegram: req.body.telegram
         };
 
         // Only set avatar if a new file is uploaded

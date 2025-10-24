@@ -28,7 +28,13 @@ export default function Footer() {
           setCompanyInfo({
             address: res.data.address || '',
             phone: res.data.mobile || '',
-            email: res.data.email || ''
+            email: res.data.email || '',
+            facebook: res.data.facebook || '',
+            instagram: res.data.instagram || '',
+            twitter: res.data.twitter || '',
+            youtube: res.data.youtube || '',
+            linkedin: res.data.linkedin || '',
+            telegram: res.data.telegram || ''
           });
         }
       } catch (err) {
@@ -36,7 +42,13 @@ export default function Footer() {
         setCompanyInfo({
           address: '',
           phone: '',
-          email: ''
+          email: '',
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          youtube: '',
+          linkedin: '',
+          telegram: ''
         });
       }
     }
@@ -63,22 +75,22 @@ export default function Footer() {
             <p className="text-gray-700 mb-1 text-sm md:text-base">Phone: {companyInfo.phone || '+9198745612330'}</p>
             <p className="text-gray-700 mb-4 text-sm md:text-base">Email: {companyInfo.email || 'furnitureinfo@gmail.com'}</p>
             <div className="flex gap-3 flex-wrap">
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.facebook || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-facebook"></i>
               </Link>
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.instagram || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-instagram"></i>
               </Link>
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.twitter || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-twitter"></i>
               </Link>
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.linkedin || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-linkedin"></i>
               </Link>
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.youtube || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-youtube"></i>
               </Link>
-              <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
+              <Link href={companyInfo.telegram || '#'} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-telegram"></i>
               </Link>
             </div>
@@ -160,4 +172,3 @@ export default function Footer() {
     </footer>
   )
 }
-
