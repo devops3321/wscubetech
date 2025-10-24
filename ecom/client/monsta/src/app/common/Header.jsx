@@ -85,6 +85,8 @@ export default function Header() {
         }
         fetchCompanyDetails();
     }, [loginUser]);
+
+    
     useEffect(() => {
         setClientLoginUser(loginUser);
     }, [loginUser]);

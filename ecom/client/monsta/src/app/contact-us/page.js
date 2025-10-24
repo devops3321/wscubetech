@@ -1,13 +1,52 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../common/Breadcrumb'
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
+import { viewCompanyProfile } from '../../apiServices/addressUpdate';
+
 
 export default function ContactUs() {
 
+    const [clientLoginUser, setClientLoginUser] = useState(null);
+    const [companyInfo, setCompanyInfo] = useState({
+        address: '',
+        phone: '',
+        email: ''
+    });
+
+    let loginUser = useSelector((store) => store.myUser.user);
+
+    let dispatch = useDispatch();
+
+    useEffect(() => {
+        setClientLoginUser(loginUser);
+
+        // Fetch company profile details
+        async function fetchCompanyDetails() {
+            try {
+                const res = await viewCompanyProfile();
+                if (res.status === "success" && res.data) {
+                    setCompanyInfo({
+                        address: res.data.address || '',
+                        phone: res.data.mobile || '',
+                        email: res.data.email || ''
+                    });
+                }
+            } catch (err) {
+                // fallback to default if error
+                setCompanyInfo({
+                    address: '',
+                    phone: '',
+                    email: ''
+                });
+            }
+        }
+        fetchCompanyDetails();
+    }, [loginUser]);
 
     const [contactus, setContactus] = useState({
         name: '',
@@ -76,15 +115,15 @@ export default function ContactUs() {
                     <h2 className="font-bold text-2xl mb-6 font-playfair text-black border-b-1 border-gray-500 pb-5 ">Contact Us</h2>
                     <div className="mb-4 flex items-center gap-3 border-b-1 border-gray-500  pb-5">
                         <span className="text-xl text-black"><i className="fa fa-file-text-o"></i></span>
-                        <span className="text-black ">Address : Claritas est etiam processus dynamicus</span>
+                        <span className="text-black ">Address : {companyInfo.address || 'Claritas est etiam processus dynamicus'}</span>
                     </div>
                     <div className="mb-4 flex items-center gap-3 border-b-1 border-gray-500 pb-5">
                         <span className="text-xl text-black"><i className="fa fa-phone"></i></span>
-                        <span className="text-black">98745612330</span>
+                        <span className="text-black">Phone: {companyInfo.phone || '+9198745612330'}</span>
                     </div>
                     <div className="mb-4 flex items-center gap-3 border-b-1 border-gray-500 pb-5">
                         <span className="text-xl text-black"><i className="fa fa-envelope-o"></i></span>
-                        <span className="text-black">furnitureinfo@gmail.com</span>
+                        <span className="text-black">Email: {companyInfo.email || 'furnitureinfo@gmail.com'}</span>
                     </div>
                 </div>
                 {/* Contact Form */}

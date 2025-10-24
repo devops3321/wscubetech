@@ -1,9 +1,48 @@
 "use client";
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
+import { useSelector, useDispatch } from 'react-redux';
+import { viewCompanyProfile } from '../../apiServices/addressUpdate';
 
 export default function Footer() {
   const [showScroll, setShowScroll] = useState(false);
+  const [clientLoginUser, setClientLoginUser] = useState(null);
+  const [companyInfo, setCompanyInfo] = useState({
+    address: '',
+    phone: '',
+    email: ''
+  });
+
+  let loginUser = useSelector((store) => store.myUser.user);
+
+  let dispatch = useDispatch();
+
+  useEffect(() => {
+    setClientLoginUser(loginUser);
+
+    // Fetch company profile details
+    async function fetchCompanyDetails() {
+      try {
+        const res = await viewCompanyProfile();
+        if (res.status === "success" && res.data) {
+          setCompanyInfo({
+            address: res.data.address || '',
+            phone: res.data.mobile || '',
+            email: res.data.email || ''
+          });
+        }
+      } catch (err) {
+        // fallback to default if error
+        setCompanyInfo({
+          address: '',
+          phone: '',
+          email: ''
+        });
+      }
+    }
+    fetchCompanyDetails();
+  }, [loginUser]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,9 +59,9 @@ export default function Footer() {
           {/* Contact Us */}
           <div>
             <h3 className="font-bold font-playfair text-[22px] md:text-[25px] text-black mb-6 md:mb-8">Contact Us</h3>
-            <p className="text-gray-700 mb-1 text-sm md:text-base">Address: Claritas est etiam processus dynamicus</p>
-            <p className="text-gray-700 mb-1 text-sm md:text-base">Phone: 98745612330</p>
-            <p className="text-gray-700 mb-4 text-sm md:text-base">Email: furnitureinfo@gmail.com</p>
+            <p className="text-gray-700 mb-1 text-sm md:text-base">Address: {companyInfo.address || 'Claritas est etiam processus dynamicus'}</p>
+            <p className="text-gray-700 mb-1 text-sm md:text-base">Phone: {companyInfo.phone || '+9198745612330'}</p>
+            <p className="text-gray-700 mb-4 text-sm md:text-base">Email: {companyInfo.email || 'furnitureinfo@gmail.com'}</p>
             <div className="flex gap-3 flex-wrap">
               <Link href="#" className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-[#e5e5e5] text-gray-500 hover:text-[#C09578]">
                 <i className="fa fa-facebook"></i>
@@ -103,9 +142,9 @@ export default function Footer() {
           All Rights Reserved By Monsta | © 2025
         </div>
         <div className="flex justify-center gap-2 md:gap-4 mb-5 flex-wrap">
-          <img 
-          src="https://wscubetech.co/Assignments/furniture/public/frontend/img/icon/papyel2.png" 
-          alt="Skrill" className="h-8" />
+          <img
+            src="https://wscubetech.co/Assignments/furniture/public/frontend/img/icon/papyel2.png"
+            alt="Skrill" className="h-8" />
         </div>
         {/* Scroll to top button */}
         {showScroll && (
