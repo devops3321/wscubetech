@@ -6,24 +6,30 @@ let cartSlice = createSlice(
         initialState: {
             cartItem: [{
                 id: 1,
-                title: "Sample Product",
-                price: 29.99,
+                title: "Modern Wooden Chair",
+                price: 2499,
+                qty: 2,
+                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/1.jpg",
                 description: "This is a sample product description.",
-                category: "Sample Category",
+                category: "Furniture",
             },
             {
                 id: 2,
-                title: "Another Product",
-                price: 49.99,
+                title: "Elegant Sofa Set",
+                price: 7999,
+                qty: 1,
+                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/2.jpg",
                 description: "This is another product description.",
-                category: "Another Category",
+                category: "Furniture",
             },
             {
                 id: 3,
-                title: "Yet Another Product",
-                price: 39.99,
+                title: "Coffee Table",
+                price: 3999,
+                qty: 1,
+                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/3.jpg",
                 description: "This is another product description.",
-                category: "Another Category",
+                category: "Furniture",
             },
             ]
         },
@@ -37,6 +43,14 @@ let cartSlice = createSlice(
                 // const {id} = payload;
                 const pid = payload.id;
                 state.cartItem = state.cartItem.filter((item) => item.id !== pid);
+            },
+            updateQuantity: (state, reqData) => {
+                const { payload } = reqData;
+                const { id, qty } = payload;
+                const item = state.cartItem.find(item => item.id === id);
+                if (item) {
+                    item.qty = qty;
+                }
             }
         }
     }
@@ -44,6 +58,6 @@ let cartSlice = createSlice(
 
 export default cartSlice.reducer;
 
-export const { addToCart, deleteCart } = cartSlice.actions;
+export const { addToCart, deleteCart, updateQuantity } = cartSlice.actions;
 
 

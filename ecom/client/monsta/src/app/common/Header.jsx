@@ -3,12 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../redux/slice/userSlice';
+import { deleteCart, updateQuantity } from '../redux/slice/cartSlice';
 import { redirect } from 'next/navigation';
 import { viewCompanyProfile } from '../../apiServices/addressUpdate';
 
 export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
+    const [cartSliderOpen, setCartSliderOpen] = useState(false);
     const closeTimeout = useRef();
     const [clientLoginUser, setClientLoginUser] = useState(null);
 
@@ -152,7 +154,10 @@ export default function Header() {
                         </button>
                     </Link>
                     {/* Cart */}
-                    <div className="flex items-center border border-gray-300 rounded px-4 py-2 bg-white hover:bg-gray-100 w-full sm:w-auto">
+                    <div 
+                        className="flex items-center border border-gray-300 rounded px-4 py-2 bg-white hover:bg-gray-100 w-full sm:w-auto cursor-pointer"
+                        onClick={() => setCartSliderOpen(true)}
+                    >
                         <span className="relative flex items-center mr-3">
                             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-black">
                                 <circle cx="9" cy="21" r="1" />
@@ -165,7 +170,7 @@ export default function Header() {
                         <span className="h-6 w-px bg-gray-300 mx-2"></span>
                         <span className="font-bold text-black flex items-center">
                             <span className="mr-1">₹.</span>
-                            <span>0.00</span>
+                            <span>{cart.reduce((total, item) => total + (item.price * (item.qty || 1)), 0).toFixed(2)}</span>
                         </span>
                         <svg className="w-4 h-4 text-black ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path d="M6 9l6 6 6-6" />
@@ -448,6 +453,118 @@ export default function Header() {
                 </div>
             </nav>
             <hr className="border-[#f2f2f2] border-1" />
+            
+            {/* Cart Slider */}
+            {cartSliderOpen && (
+                <>
+                    {/* Overlay */}
+                    <div 
+                        className="fixed inset-0  bg-opacity-50 z-40"
+                        onClick={() => setCartSliderOpen(false)}
+                    ></div>
+                    
+                    {/* Slider */}
+                    <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out animate-slide-in-right">
+                        <div className="flex flex-col h-full">
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+                                <h2 className="text-xl font-bold text-black">Shopping Cart</h2>
+                                <button 
+                                    onClick={() => setCartSliderOpen(false)}
+                                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            
+                            {/* Cart Items */}
+                            <div className="flex-1 overflow-y-auto p-4">
+                                {cart.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="9" cy="21" r="1" />
+                                            <circle cx="20" cy="21" r="1" />
+                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                                        </svg>
+                                        <p className="mt-2 text-gray-500">Your cart is empty</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {cart.map((item) => (
+                                            <div key={item.id} className="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg">
+                                                <img 
+                                                    src={item.image || "https://via.placeholder.com/60x60"} 
+                                                    alt={item.title || item.name} 
+                                                    className="w-16 h-16 object-cover rounded"
+                                                />
+                                                <div className="flex-1">
+                                                    <h3 className="font-medium text-black text-sm">{item.title || item.name}</h3>
+                                                    <p className="text-gray-600 text-sm">₹{item.price}</p>
+                                                    <div className="flex items-center space-x-2 mt-2">
+                                                        <span className="text-sm text-gray-600">Qty:</span>
+                                                        <div className="flex items-center border border-gray-300 rounded">
+                                                            <button 
+                                                                onClick={() => dispatch(updateQuantity({id: item.id, qty: Math.max(1, (item.qty || 1) - 1)}))}
+                                                                className="px-2 py-1 text-gray-600 hover:text-black"
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span className="px-3 py-1 text-sm border-x border-gray-300">{item.qty || 1}</span>
+                                                            <button 
+                                                                onClick={() => dispatch(updateQuantity({id: item.id, qty: (item.qty || 1) + 1}))}
+                                                                className="px-2 py-1 text-gray-600 hover:text-black"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-semibold text-black">₹{(item.price * (item.qty || 1)).toFixed(2)}</p>
+                                                    <button 
+                                                        onClick={() => dispatch(deleteCart({id: item.id}))}
+                                                        className="text-red-500 hover:text-red-700 text-sm mt-1"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Footer */}
+                            {cart.length > 0 && (
+                                <div className="border-t border-gray-200 p-4 bg-gray-50">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="text-lg font-semibold text-black">Total:</span>
+                                        <span className="text-lg font-bold text-black">
+                                            ₹{cart.reduce((total, item) => total + (item.price * (item.qty || 1)), 0).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Link 
+                                            href="/cart"
+                                            className="block w-full bg-[#C09578] text-white text-center py-3 rounded-lg font-semibold hover:bg-[#A07A5A] transition-colors"
+                                            onClick={() => setCartSliderOpen(false)}
+                                        >
+                                            View Cart
+                                        </Link>
+                                        <Link 
+                                            href="/checkout"
+                                            className="block w-full bg-black text-white text-center py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                                            onClick={() => setCartSliderOpen(false)}
+                                        >
+                                            Checkout
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
