@@ -3,33 +3,31 @@ import React from 'react'
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-const testimonials = [
-  {
-    text: "These guys have been absolutely outstanding. Perfect Themes and the best of all that you have many options to choose! Best Support team ever! Very fast responding! Thank you very much! I highly recommend this theme and these people!",
-    name: "KATHY YOUNG",
-    role: "CEO of SunPark",
-    image: "https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/testimonial/3023f95a-ce85-434c-b9c5-2b0943b865e2-1670161621.jpg",
-    rating: 5
-  },
-  {
-    text: "These guys have been absolutely outstanding. Perfect Themes and the best of all that you have many options to choose! Best Support team ever! Very fast responding! Thank you very much! I highly recommend this theme and these people!",
-    name: "KATHY YOUNG",
-    role: "CEO of SunPark",
-    image: "https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/testimonial/c6381687-5a5e-4914-9373-9cbec4937be6-1670161604.jpg",
-    rating: 5
-  },
-  {
-    text: "These guys have been absolutely outstanding. Perfect Themes and the best of all that you have many options to choose! Best Support team ever! Very fast responding! Thank you very much! I highly recommend this theme and these people!",
-    name: "KATHY YOUNG",
-    role: "CEO of SunPark",
-    image: "https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/testimonial/35b5a0a0-e80f-4038-a75a-2811de92118b-1670161614.png",
-    rating: 5
-  },    
-  // Add more testimonials if needed
-];
+import { viewTestimonials } from '@/apiServices/testimonialView';
 
 export default function Testimonial() {
+
+  const [testimonials, setTestimonials] = React.useState([]);
+
+  let testimonialData = async () => {
+    let data = await viewTestimonials();
+    // Convert API object to list of testimonials with staticPath
+    if (data && Array.isArray(data.testimonialData)) {
+      // Attach staticPath to each testimonial for easy access
+      const list = data.testimonialData.map(t => ({
+        ...t,
+        staticPath: data.staticPath || ""
+      }));
+      setTestimonials(list);
+    } else {
+      setTestimonials([]);
+    }
+  }
+
+  React.useEffect(() => {
+    testimonialData();
+  }, [])
+
   const settings = {
     dots: true,
     infinite: true,
@@ -64,17 +62,17 @@ export default function Testimonial() {
         <Slider {...settings}>
           {testimonials.map((t, idx) => (
             <div key={idx}>
-              <p className="text-gray-700 mb-8">{t.text}</p>
+              <p className="text-gray-700 mb-8">{t.testimonialMessage}</p>
               <div className="flex flex-col items-center">
                 <img
-                  src={t.image}
-                  alt={t.name}
+                  src={`${t.staticPath}${t.testimonialImage}`}
+                  alt={t.testimonialName}
                   className="w-20 h-20 rounded-full object-cover mb-4"
                 />
-                <div className="font-bold text-lg text-black mb-3">{t.name}</div>
-                <div className="text-gray-500 mb-4">{t.role}</div>
+                <div className="font-bold text-lg text-black mb-3">{t.testimonialName}</div>
+                <div className="text-gray-500 mb-4">{t.testimonialDesignation}</div>
                 <div className="flex justify-center mb-6">
-                  {[...Array(t.rating)].map((_, i) => (
+                  {[...Array(t.testimonialRating)].map((_, i) => (
                     <span key={i} className="text-[#C09578] text-xl">&#9733;</span>
                   ))}
                 </div>
