@@ -509,7 +509,7 @@ export default function Header() {
                                                             >
                                                                 -
                                                             </button>
-                                                            <span className="px-3 py-1 text-sm border-x border-gray-300">{item.qty || 1}</span>
+                                                            <span className="px-3 py-1 text-sm text-black border-x border-gray-300">{item.qty || 1}</span>
                                                             <button 
                                                                 onClick={() => dispatch(updateQuantity({id: item.id, qty: (item.qty || 1) + 1}))}
                                                                 className="px-2 py-1 text-gray-600 hover:text-black"
