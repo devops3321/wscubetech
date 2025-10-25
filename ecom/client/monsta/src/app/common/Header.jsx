@@ -132,7 +132,7 @@ export default function Header() {
                             placeholder="Search product..."
                             className="outline-none border-none bg-transparent flex-1 text-sm text-black"
                         />
-                        <button className="ml-2 text-black hover:text-[#C09578]">
+                        <button className="ml-2 text-black hover:text-[#C09578] cursor-pointer">
                             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <circle cx="11" cy="11" r="8" />
                                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -181,7 +181,7 @@ export default function Header() {
             {/* Mobile Nav Toggle */}
             <div className="md:hidden flex justify-end px-4 py-2">
                 <button
-                    className="text-black text-2xl"
+                    className="text-black text-2xl cursor-pointer"
                     aria-label="Toggle navigation"
                     onClick={toggleMobileNav}
                 >
@@ -471,7 +471,7 @@ export default function Header() {
                                 <h2 className="text-xl font-bold text-black">Shopping Cart</h2>
                                 <button 
                                     onClick={() => setCartSliderOpen(false)}
-                                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                                    className="text-gray-500 hover:text-gray-700 text-2xl cursor-pointer"
                                 >
                                     ×
                                 </button>
@@ -505,14 +505,14 @@ export default function Header() {
                                                         <div className="flex items-center border border-gray-300 rounded">
                                                             <button 
                                                                 onClick={() => dispatch(updateQuantity({id: item.id, qty: Math.max(1, (item.qty || 1) - 1)}))}
-                                                                className="px-2 py-1 text-gray-600 hover:text-black"
+                                                                className="px-2 py-1 text-gray-600 hover:text-black cursor-pointer"
                                                             >
                                                                 -
                                                             </button>
                                                             <span className="px-3 py-1 text-sm text-black border-x border-gray-300">{item.qty || 1}</span>
                                                             <button 
                                                                 onClick={() => dispatch(updateQuantity({id: item.id, qty: (item.qty || 1) + 1}))}
-                                                                className="px-2 py-1 text-gray-600 hover:text-black"
+                                                                className="px-2 py-1 text-gray-600 hover:text-black cursor-pointer"
                                                             >
                                                                 +
                                                             </button>
@@ -523,7 +523,7 @@ export default function Header() {
                                                     <p className="font-semibold text-black">₹{(item.price * (item.qty || 1)).toFixed(2)}</p>
                                                     <button 
                                                         onClick={() => dispatch(deleteCart({id: item.id}))}
-                                                        className="text-red-500 hover:text-red-700 text-sm mt-1"
+                                                        className="text-red-500 hover:text-red-700 text-sm mt-1 cursor-pointer"
                                                     >
                                                         Remove
                                                     </button>

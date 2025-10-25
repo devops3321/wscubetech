@@ -31,7 +31,7 @@ export default function ThankYouPage() {
         </p>
         <Link
           href="/dashboard"
-          className="inline-block bg-[#C09578] text-white font-bold px-6 py-3 rounded-full shadow hover:bg-[#a67c52] transition"
+          className="inline-block bg-[#C09578] text-white font-bold px-6 py-3 rounded-full shadow hover:bg-[#a67c52] transition cursor-pointer"
         >
           Go to Dashboard
         </Link>

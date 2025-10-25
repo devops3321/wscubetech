@@ -93,7 +93,7 @@ export default function Wishlist() {
             <div className="mt-4 sm:mt-0">
               <button
                 onClick={() => setWishlist([])}
-                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200"
+                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer"
               >
                 Clear All
               </button>
@@ -121,7 +121,7 @@ export default function Wishlist() {
                 {/* Remove Button */}
                 <button
                   onClick={() => handleRemove(item.id)}
-                  className="absolute top-4 right-4 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center text-red-500 hover:bg-opacity-100 hover:text-red-700 transition-all duration-200 shadow-lg"
+                  className="absolute top-4 right-4 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center text-red-500 hover:bg-opacity-100 hover:text-red-700 transition-all duration-200 shadow-lg cursor-pointer"
                   title="Remove from wishlist"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +175,7 @@ export default function Wishlist() {
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
-                  <button className="w-full bg-[#C09578] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#A07A5A] transition-colors duration-200 shadow-lg hover:shadow-xl">
+                  <button className="w-full bg-[#C09578] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#A07A5A] transition-colors duration-200 shadow-lg hover:shadow-xl cursor-pointer">
                     Add to Cart
                   </button>
                   <Link 

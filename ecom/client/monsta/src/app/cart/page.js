@@ -105,7 +105,7 @@ export default function Cart() {
             <div className="mt-4 sm:mt-0">
               <button
                 onClick={() => setCart([])}
-                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200"
+                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer"
               >
                 Clear Cart
               </button>
@@ -171,16 +171,16 @@ export default function Cart() {
                         <div className="flex items-center border border-gray-300 rounded-lg">
                           <button 
                             onClick={() => handleQtyChange(item.id, Math.max(1, item.qty - 1))}
-                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200"
+                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
                             </svg>
                           </button>
-                          <span className="px-4 py-2 text-center border-x border-gray-300 min-w-[60px]">{item.qty}</span>
+                          <span className="px-4 py-2 text-center text-black border-x border-gray-300 min-w-[60px]">{item.qty}</span>
                           <button 
                             onClick={() => handleQtyChange(item.id, item.qty + 1)}
-                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200"
+                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -197,7 +197,7 @@ export default function Cart() {
                         {/* Remove Button */}
                         <button
                           onClick={() => handleRemove(item.id)}
-                          className="flex items-center px-4 py-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                          className="flex items-center px-4 py-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer"
                           title="Remove from cart"
                         >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

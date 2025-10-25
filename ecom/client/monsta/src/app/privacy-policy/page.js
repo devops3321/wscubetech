@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
             <div className="max-w-4xl mx-auto px-4 text-black">
                 <h2 className="text-2xl font-bold mb-6 font-playfair">Who We Are</h2>
                 <p className="mb-6">
-                    Welcome to Monsta, your trusted furniture destination. Our website address is: <a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>
+                    Welcome to Monsta, your trusted furniture destination. Our website address is: <a href="http://localhost/furniture" className="text-[#C09578] underline cursor-pointer">http://localhost/furniture</a>
                 </p>
 
                 <h2 className="text-2xl font-bold mb-4 font-playfair">Personal Data We Collect and Why</h2>
@@ -86,7 +86,7 @@ export default function PrivacyPolicy() {
                     <li>Receive equal service and price even if you exercise these rights</li>
                 </ul>
                 <p className="mb-6">
-                    To exercise your rights under GDPR or CCPA, please contact Monsta at <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline">privacy@monsta.com</a>.
+                    To exercise your rights under GDPR or CCPA, please contact Monsta at <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline cursor-pointer">privacy@monsta.com</a>.
                 </p>
 
                 <h2 className="text-2xl font-bold mb-4 mt-8 font-playfair">Where We Send Your Data</h2>
@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
                     If you have any questions or concerns about the privacy policy or your data, contact:
                 </p>
                 <p className="mb-2 font-semibold">Monsta Furniture</p>
-                <p className="mb-2">Email: <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline">privacy@monsta.com</a></p>
+                <p className="mb-2">Email: <a href="mailto:privacy@monsta.com" className="text-[#C09578] underline cursor-pointer">privacy@monsta.com</a></p>
                 <p className="mb-10">Address: 123 Design Street, Mumbai, India</p>
             </div>
         </section>

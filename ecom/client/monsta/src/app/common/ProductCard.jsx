@@ -9,7 +9,7 @@ export default function ProductCard({
   price,
 }) {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden w-[260px] mx-auto">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden w-[260px] mx-auto cursor-pointer">
       {/* Product Image */}
       <div className="relative w-full h-[160px] mb-2 bg-gray-100 flex items-center justify-center">
         <img

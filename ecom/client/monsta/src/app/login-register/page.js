@@ -176,7 +176,7 @@ export default function LoginRegister() {
                             />
                         </div>
                         <div className="mb-4 flex items-center">
-                            <a href="#" className="text-[#C09578] text-[15px] font-bold">Lost your password?</a>
+                            <a href="#" className="text-[#C09578] text-[15px] font-bold cursor-pointer">Lost your password?</a>
                             <div className="flex-1"></div>
                             <button
                                 type="submit"

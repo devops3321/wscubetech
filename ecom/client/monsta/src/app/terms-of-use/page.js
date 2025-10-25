@@ -11,7 +11,7 @@ export default function TermsOfUse() {
 
                 <h2 className="text-2xl font-bold mb-3 font-playfair">1. Agreement to Terms</h2>
                 <p className="mb-4">
-                    By accessing or using the Monsta website (<a href="http://localhost/furniture" className="text-[#C09578] underline">http://localhost/furniture</a>) and our services, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any part of these terms, you must not use our website.
+                    By accessing or using the Monsta website (<a href="http://localhost/furniture" className="text-[#C09578] underline cursor-pointer">http://localhost/furniture</a>) and our services, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any part of these terms, you must not use our website.
                 </p>
 
                 <h2 className="text-2xl font-bold mb-3 font-playfair">2. Use of Website</h2>
@@ -83,7 +83,7 @@ export default function TermsOfUse() {
                 <p className="mb-10">
                     For questions about these Terms, please contact:<br/>
                     Monsta Furniture<br/>
-                    Email: <a href="mailto:support@monsta.com" className="text-[#C09578] underline">support@monsta.com</a><br/>
+                    Email: <a href="mailto:support@monsta.com" className="text-[#C09578] underline cursor-pointer">support@monsta.com</a><br/>
                     Address: 123 Design Street, Mumbai, India
                 </p>
             </div>

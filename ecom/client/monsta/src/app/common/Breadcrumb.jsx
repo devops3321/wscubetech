@@ -6,7 +6,7 @@ export default function Breadcrumb({ pageName }) {
     <div className="py-10 bg-white ">
       <h1 className="text-center font-bold text-[40px] text-black font-playfair mb-2">{pageName}</h1>
       <div className="text-center text-lg text-[18px]">
-        <Link href="/" className="text-[#222] hover:text-[#C09578]">Home</Link>
+        <Link href="/" className="text-[#222] hover:text-[#C09578] cursor-pointer">Home</Link>
         <span className="mx-2 text-[#222]">{'>'}</span>
         <span className="text-[#C09578] font-bold ">{pageName}</span>
       </div>
