@@ -18,10 +18,10 @@ export default function Aboutus() {
       <div className="max-w-4xl mx-auto text-center mb-12">
         <h2 className="text-3xl text-black md:text-4xl font-bold mb-6 font-playfair">Welcome To Monsta!</h2>
         <p className="text-lg text-gray-700 mb-6">
-          Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam, est usus legentis in iis qui facit eorum claritatem.
+          Monsta is dedicated to bringing you the finest in modern furniture and home décor. Our mission is to blend style, comfort, and quality, offering a curated selection of products that transform your living spaces. With a passion for design and a commitment to customer satisfaction, we strive to make every home unique and inspiring.
         </p>
         <p className="italic text-[#C09578] text-lg mb-2">
-          “There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.”
+          “Discover the difference with Monsta – where creativity meets craftsmanship, and your vision for a beautiful home becomes reality.”
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export default function Aboutus() {
             </div>
             <h3 className="font-bold text-xl text-black mb-2 font-playfair">Creative Design</h3>
             <p className="text-gray-700 text-base">
-              Erat metus sodales eget dolor consectetur, porta ut purus at et alias, nulla ornare velit amet enim
+              Our team of designers brings you the latest trends and timeless styles, ensuring every piece is both beautiful and functional. We believe in creativity that enhances your lifestyle and reflects your personality.
             </p>
           </div>
           {/* 100% Money Back Guarantee */}
@@ -50,7 +50,7 @@ export default function Aboutus() {
             </div>
             <h3 className="font-bold text-xl text-black mb-2 font-playfair">100% Money Back Guarantee</h3>
             <p className="text-gray-700 text-base">
-              Erat metus sodales eget dolor consectetur, porta ut purus at et alias, nulla ornare velit amet enim
+              Shop with confidence at Monsta. If you’re not completely satisfied with your purchase, we offer a hassle-free money back guarantee to ensure your peace of mind.
             </p>
           </div>
           {/* Online Support 24/7 */}
@@ -62,7 +62,7 @@ export default function Aboutus() {
             </div>
             <h3 className="font-bold text-xl text-black mb-2 font-playfair">Online Support 24/7</h3>
             <p className="text-gray-700 text-base">
-              Erat metus sodales eget dolor consectetur, porta ut purus at et alias, nulla ornare velit amet enim
+              Our dedicated support team is available around the clock to assist you with any questions or concerns. We’re here to help you every step of the way.
             </p>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function Aboutus() {
             />
             <h3 className="font-bold text-2xl text-black mb-3 font-playfair text-center">What Do We Do?</h3>
             <p className="text-gray-700 text-lg text-center">
-              Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima.
+              At Monsta, we source, design, and deliver premium furniture and décor to elevate your home. From contemporary sofas to elegant lighting, our curated collections are crafted to suit every taste and space.
             </p>
           </div>
           {/* Our Mission */}
@@ -92,7 +92,7 @@ export default function Aboutus() {
             />
             <h3 className="font-bold text-2xl text-black mb-3 font-playfair text-center">Our Mission</h3>
             <p className="text-gray-700 text-lg text-center">
-              Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima.
+              Our mission is to inspire and empower our customers to create homes they love. We are committed to quality, sustainability, and exceptional service, making stylish living accessible to everyone.
             </p>
           </div>
           {/* History Of Us */}
@@ -104,7 +104,7 @@ export default function Aboutus() {
             />
             <h3 className="font-bold text-2xl text-black mb-3 font-playfair text-center">History Of Us</h3>
             <p className="text-gray-700 text-lg text-center">
-              Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima.
+              Founded with a vision to redefine home interiors, Monsta has grown from a small team of enthusiasts to a trusted name in furniture and décor. Our journey is built on passion, innovation, and a deep understanding of our customers’ needs.
             </p>
           </div>
         </div>
