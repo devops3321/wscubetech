@@ -4,34 +4,7 @@ let cartSlice = createSlice(
     {
         name: "cart",
         initialState: {
-            cartItem: [{
-                id: 1,
-                title: "Modern Wooden Chair",
-                price: 2499,
-                qty: 2,
-                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/1.jpg",
-                description: "This is a sample product description.",
-                category: "Furniture",
-            },
-            {
-                id: 2,
-                title: "Elegant Sofa Set",
-                price: 7999,
-                qty: 1,
-                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/2.jpg",
-                description: "This is another product description.",
-                category: "Furniture",
-            },
-            {
-                id: 3,
-                title: "Coffee Table",
-                price: 3999,
-                qty: 1,
-                image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/3.jpg",
-                description: "This is another product description.",
-                category: "Furniture",
-            },
-            ]
+            cartItem: []
         },
         reducers: {
             addToCart: (state, reqData) => {

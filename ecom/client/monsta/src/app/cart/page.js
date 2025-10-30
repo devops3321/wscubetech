@@ -1,61 +1,24 @@
 "use client";
-import React, { useState } from 'react';
-import Breadcrumb from '../common/Breadcrumb'
-import Link from 'next/link'
-
-const demoCart = [
-  {
-    id: 1,
-    name: "Modern Wooden Chair",
-    image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/1.jpg",
-    price: 2499,
-    originalPrice: 2999,
-    qty: 2,
-    category: "Furniture",
-    rating: 4.5,
-    reviews: 23
-  },
-  {
-    id: 2,
-    name: "Elegant Sofa Set",
-    image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/2.jpg",
-    price: 7999,
-    originalPrice: 9999,
-    qty: 1,
-    category: "Furniture",
-    rating: 4.8,
-    reviews: 45
-  },
-  {
-    id: 3,
-    name: "Coffee Table",
-    image: "https://wscubetech.co/Assignments/furniture/public/frontend/img/product/3.jpg",
-    price: 3999,
-    originalPrice: 4999,
-    qty: 1,
-    category: "Furniture",
-    rating: 4.3,
-    reviews: 18
-  }
-];
+import React from 'react';
+import Breadcrumb from '../common/Breadcrumb';
+import Link from 'next/link';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteCart, updateQuantity } from '../redux/slice/cartSlice';
 
 export default function Cart() {
-  // Set to [] for empty cart, or demoCart for demo data
-  const [cart, setCart] = useState(demoCart);
+  const dispatch = useDispatch();
+  const cart = useSelector(state => state.mycart.cartItem);
 
   const handleQtyChange = (id, newQty) => {
-    setCart(cart =>
-      cart.map(item =>
-        item.id === id ? { ...item, qty: newQty < 1 ? 1 : newQty } : item
-      )
-    );
+    if (newQty < 1) newQty = 1;
+    dispatch(updateQuantity({ id, qty: newQty }));
   };
 
   const handleRemove = (id) => {
-    setCart(cart => cart.filter(item => item.id !== id));
+    dispatch(deleteCart({ id }));
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
 
   if (!cart.length) {
     return (
@@ -104,7 +67,7 @@ export default function Cart() {
             </div>
             <div className="mt-4 sm:mt-0">
               <button
-                onClick={() => setCart([])}
+                onClick={() => cart.forEach(item => handleRemove(item.id))}
                 className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer"
               >
                 Clear Cart

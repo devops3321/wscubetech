@@ -196,47 +196,53 @@ const getProductById = async (req, res) => {
 // Get featured/best-selling/top-rated/upsell products (public)
 const getFeaturedProducts = async (req, res) => {
 	try {
-		const { type = "bestSelling", limit = 10, productType } = req.query;
-		let filter = { productStatus: true };
-		if (type === "bestSelling") filter.isBestSelling = true;
-		else if (type === "topRated") filter.isTopRated = true;
-		else if (type === "upsell") filter.isUpsell = true;
-		// Add productType filter for Featured, New Arrivals, On Sale
-		if (productType && ["Featured", "New Arrivals", "On Sale"].includes(productType)) {
-			filter.productType = productType;
-		}
+		   const { type = "bestSelling", limit = 10, productType } = req.query;
+		   let filter = { productStatus: true };
+		   if (type === "bestSelling") filter.isBestSelling = true;
+		   else if (type === "topRated") filter.isTopRated = true;
+		   else if (type === "upsell") filter.isUpsell = true;
+		   // Add productType filter for Featured, New Arrivals, On Sale
+		   if (productType && ["Featured", "New Arrivals", "On Sale"].includes(productType)) {
+			   filter.productType = productType;
+		   }
 
-		let products = await productModel.find(filter)
-			.sort({ createdAt: -1 })
-			.limit(Number(limit))
-			.populate('parentCategory', 'name _id')
-			.populate('subCategory', 'subcategoryName _id')
-			.populate('subSubCategory', 'subsubcategoryName _id')
-			.lean();
-		// Ensure populated fields are plain objects with name and _id
-		products = products.map(prod => {
-			return {
-				...prod,
-				parentCategory: prod.parentCategory && typeof prod.parentCategory === 'object' ? {
-					_id: prod.parentCategory._id,
-					name: prod.parentCategory.name || null
-				} : null,
-				subCategory: prod.subCategory && typeof prod.subCategory === 'object' ? {
-					_id: prod.subCategory._id,
-					name: prod.subCategory.subcategoryName || null
-				} : null,
-				subSubCategory: prod.subSubCategory && typeof prod.subSubCategory === 'object' ? {
-					_id: prod.subSubCategory._id,
-					name: prod.subSubCategory.subsubcategoryName || null
-				} : null
-			};
-		});
-		res.status(200).json({
-			status: true,
-			message: "Featured products fetched successfully",
-			data: products,
-			staticPath: process.env.PRODUCT_IMAGE_PATH
-		});
+		   // Get all unique productType values for dynamic tabs
+		   let productTypes = await productModel.distinct("productType", { productStatus: true, productType: { $ne: null } });
+		   // Optionally, sort or filter out empty strings
+		   productTypes = productTypes.filter(pt => pt && pt.trim() !== "");
+
+		   let products = await productModel.find(filter)
+			   .sort({ createdAt: -1 })
+			   .limit(Number(limit))
+			   .populate('parentCategory', 'name _id')
+			   .populate('subCategory', 'subcategoryName _id')
+			   .populate('subSubCategory', 'subsubcategoryName _id')
+			   .lean();
+		   // Ensure populated fields are plain objects with name and _id
+		   products = products.map(prod => {
+			   return {
+				   ...prod,
+				   parentCategory: prod.parentCategory && typeof prod.parentCategory === 'object' ? {
+					   _id: prod.parentCategory._id,
+					   name: prod.parentCategory.name || null
+				   } : null,
+				   subCategory: prod.subCategory && typeof prod.subCategory === 'object' ? {
+					   _id: prod.subCategory._id,
+					   name: prod.subCategory.subcategoryName || null
+				   } : null,
+				   subSubCategory: prod.subSubCategory && typeof prod.subSubCategory === 'object' ? {
+					   _id: prod.subSubCategory._id,
+					   name: prod.subSubCategory.subsubcategoryName || null
+				   } : null
+			   };
+		   });
+		   res.status(200).json({
+			   status: true,
+			   message: "Featured products fetched successfully",
+			   data: products,
+			   productTypes,
+			   staticPath: process.env.PRODUCT_IMAGE_PATH
+		   });
 	} catch (error) {
 		res.status(500).json({ status: false, message: error.message });
 	}

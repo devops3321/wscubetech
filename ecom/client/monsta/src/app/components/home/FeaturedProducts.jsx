@@ -1,26 +1,21 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ProductCard from '@/app/common/ProductCard';
 
+// Accept productTypes and productsByType as props
+export default function FeaturedProducts({ productTypes = [], productsByType = {}, staticPath = "" }) {
+  // Use the first productType as the default active tab
+  const [activeTab, setActiveTab] = useState(productTypes[0] || '');
 
-const TABS = [
-  { label: 'Featured', value: 'featured' },
-  { label: 'New Arrivals', value: 'newArrivals' },
-  { label: 'On Sale', value: 'onSale' },
-];
+  // Memoize the tab list for rendering
+  const tabs = useMemo(() => productTypes.map(pt => ({ label: pt, value: pt })), [productTypes]);
 
-export default function FeaturedProducts({ featuredProducts = [], newArrivalsProducts = [], onSaleProducts = [], staticPath = "" }) {
-  const [activeTab, setActiveTab] = useState('featured');
-
-  const tabProductMap = {
-    featured: featuredProducts,
-    newArrivals: newArrivalsProducts,
-    onSale: onSaleProducts,
-  };
+  // Get products for the active tab
+  const products = productsByType[activeTab] || [];
 
   return (
     <section className="py-10 bg-white">
-      <div> <hr className="border-t border-[#f2f2f2] w-full border-2 mb-10"  /> </div>
+      <div> <hr className="border-t border-[#f2f2f2] w-full border-2 mb-10" /> </div>
       <div className="max-w-6xl mx-auto">
         {/* Tabs with line */}
         <div className="relative flex flex-col items-center mb-8">
@@ -28,7 +23,7 @@ export default function FeaturedProducts({ featuredProducts = [], newArrivalsPro
           <div className="absolute top-1/2 left-0 w-full h-0.5 bg-[#f2f2f2] z-0" style={{ transform: 'translateY(-50%)' }} />
           {/* Tabs */}
           <div className="relative flex z-10 bg-transparent">
-            {TABS.map((tab, idx) => (
+            {tabs.map((tab, idx) => (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
@@ -52,7 +47,7 @@ export default function FeaturedProducts({ featuredProducts = [], newArrivalsPro
         </div>
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 cursor-pointer">
-          {tabProductMap[activeTab]?.map((product, idx) => {
+          {products.map((product, idx) => {
             let imageUrl = product.image || product.productImage || '';
             if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
               let basePath = staticPath || product.staticPath || "";

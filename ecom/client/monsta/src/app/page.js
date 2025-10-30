@@ -9,37 +9,32 @@ import Testimonial from "./components/home/Testimonial";
 import NewsLetter from "./components/home/NewsLetter";
 
 export default async function Home() {
-  // Fetch best selling and tabbed products (SSR)
   let bestSellingProducts = [];
   let bestSellingStaticPath = "";
-  let featuredProducts = [];
-  let newArrivalsProducts = [];
-  let onSaleProducts = [];
   let featuredStaticPath = "";
+  let productTypes = [];
+  let productsByType = {};
+
   try {
     // Best Selling
     const bestSellingRes = await getFeaturedProducts({ type: "bestSelling", limit: 12 });
     bestSellingProducts = bestSellingRes?.data || [];
     bestSellingStaticPath = bestSellingRes?.staticPath || "";
 
-    // Featured
+    // Get product types from API
     const featuredRes = await getFeaturedProducts({ productType: "Featured", limit: 8 });
-    featuredProducts = featuredRes?.data || [];
+    productTypes = featuredRes?.productTypes || [];
     featuredStaticPath = featuredRes?.staticPath || "";
 
-    // New Arrivals
-    const newArrivalsRes = await getFeaturedProducts({ productType: "New Arrivals", limit: 8 });
-    newArrivalsProducts = newArrivalsRes?.data || [];
-
-    // On Sale
-    const onSaleRes = await getFeaturedProducts({ productType: "On Sale", limit: 8 });
-    onSaleProducts = onSaleRes?.data || [];
+    // Fetch products for each productType
+    for (const type of productTypes) {
+      const res = await getFeaturedProducts({ productType: type, limit: 8 });
+      productsByType[type] = res?.data || [];
+    }
   } catch (e) {
-    // fallback to empty
     bestSellingProducts = [];
-    featuredProducts = [];
-    newArrivalsProducts = [];
-    onSaleProducts = [];
+    productsByType = {};
+    productTypes = [];
   }
 
   return (
@@ -47,9 +42,8 @@ export default async function Home() {
       <HomeBanner />
       <HomeCollection />
       <FeaturedProducts
-        featuredProducts={featuredProducts}
-        newArrivalsProducts={newArrivalsProducts}
-        onSaleProducts={onSaleProducts}
+        productTypes={productTypes}
+        productsByType={productsByType}
         staticPath={featuredStaticPath}
       />
       <NewTrendingCollection />
