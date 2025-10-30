@@ -1,3 +1,7 @@
+import axios from 'axios';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_APIBASEURL.replace(/\/+$/, '');
+
 // Get all subcategories for a parent category
 export const getSubCategories = async (parentCategoryId) => {
 	try {
@@ -17,9 +21,7 @@ export const getSubSubCategories = async (subcategoryId) => {
 		throw error?.response?.data || error;
 	}
 };
-import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_APIBASEURL.replace(/\/+$/, '');
 
 // Get all products (with filters, pagination, search)
 export const getAllProducts = async (params = {}) => {
@@ -76,4 +78,3 @@ export const getRelatedProducts = async (params = {}) => {
 		throw error?.response?.data || error;
 	}
 };
-
