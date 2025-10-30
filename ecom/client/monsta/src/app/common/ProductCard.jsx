@@ -9,14 +9,20 @@ export default function ProductCard({
   price,
 }) {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden w-[260px] mx-auto cursor-pointer">
+    <div
+      className="bg-white rounded-lg shadow-lg overflow-hidden mx-auto mb-3 cursor-pointer"
+      style={{ width: 260, minWidth: 260, maxWidth: 260, height: 380, minHeight: 380, maxHeight: 380, display: 'flex', flexDirection: 'column' }}
+    >
       {/* Product Image */}
-      <div className="relative w-full h-[160px] mb-2 bg-gray-100 flex items-center justify-center">
+      <div
+        className="relative mb-2 bg-gray-100 flex items-center justify-center"
+        style={{ width: '100%', height: 160 }}
+      >
         {image ? (
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             onError={e => {
               e.target.onerror = null;
               e.target.style.display = 'none';
@@ -25,15 +31,17 @@ export default function ProductCard({
         ) : null}
       </div>
       {/* Product Info */}
-      <div className="px-5 py-4 text-center">
-        <div className="text-gray-500 text-sm font-playfair text-black mb-1">{category}</div>
-        <div className="font-bold text-lg mb-3 font-playfair text-black">{name}</div>
-        <div> <hr className='border-t border-[#f2f2f2] w-full border-2 mb-2' /></div>
-        <div className="flex justify-center items-center gap-2 mb-5">
-          <span className="text-gray-400 line-through text-base">{oldPrice}</span>
-          <span className="text-[#C09578] font-semibold text-base">{price}</span>
+      <div className="px-5 py-4 text-center flex flex-col h-full justify-between" style={{ flex: 1 }}>
+        <div>
+          <div className="text-gray-500 text-sm font-playfair text-black mb-1">{category}</div>
+          <div className="font-bold text-lg mb-3 font-playfair text-black" style={{ minHeight: 44, maxHeight: 44, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{name}</div>
+          <div> <hr className='border-t border-[#f2f2f2] w-full border-2 mb-2' /></div>
+          <div className="flex justify-center items-center gap-2 mb-5">
+            <span className="text-gray-400 line-through text-base">{oldPrice}</span>
+            <span className="text-[#C09578] font-semibold text-base">{price}</span>
+          </div>
         </div>
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2 mt-auto">
           {/* Solid Heart Icon for Wishlist */}
           <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group cursor-pointer" aria-label="Add to Wishlist">
             <FaHeart className="text-black group-hover:text-[#C09578] text-[22px] transition-colors duration-150" />
