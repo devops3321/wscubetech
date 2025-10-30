@@ -196,11 +196,15 @@ const getProductById = async (req, res) => {
 // Get featured/best-selling/top-rated/upsell products (public)
 const getFeaturedProducts = async (req, res) => {
 	try {
-		const { type = "bestSelling", limit = 10 } = req.query;
+		const { type = "bestSelling", limit = 10, productType } = req.query;
 		let filter = { productStatus: true };
 		if (type === "bestSelling") filter.isBestSelling = true;
 		else if (type === "topRated") filter.isTopRated = true;
 		else if (type === "upsell") filter.isUpsell = true;
+		// Add productType filter for Featured, New Arrivals, On Sale
+		if (productType && ["Featured", "New Arrivals", "On Sale"].includes(productType)) {
+			filter.productType = productType;
+		}
 
 		let products = await productModel.find(filter)
 			.sort({ createdAt: -1 })
