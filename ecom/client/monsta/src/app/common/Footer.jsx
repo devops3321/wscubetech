@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { viewCompanyProfile } from '../../apiServices/addressUpdate';
 
-export default function Footer() {
+export default function Footer({ topRatedProducts = [], staticPath = "" }) {
   const [showScroll, setShowScroll] = useState(false);
   const [clientLoginUser, setClientLoginUser] = useState(null);
   const [companyInfo, setCompanyInfo] = useState({
@@ -137,28 +137,57 @@ export default function Footer() {
           {/* Top Rated Products */}
           <div>
             <h3 className="font-bold font-playfair text-[22px] md:text-[25px] text-black mb-6 md:mb-8">Top Rated Products</h3>
-            <div className="mb-4 flex items-center gap-3 border-b border-[#e5e5e5] pb-2">
-              <img src="https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1621171973378Isaac%20Chest%20of%20Drawer_.jpg" alt="Isaac Chest of Drawer" className="w-14 h-12 object-cover rounded" />
-              <div>
-                <div className="text-xs text-gray-500">Chest Of Drawers</div>
-                <a href="#" className="text-[#222] font-medium font-playfair text-sm hover:text-[#C09578] cursor-pointer">Isaac Chest of Drawer</a>
-                <div className='mt-2'>
-                  <span className="line-through text-xs text-gray-400 mr-2">Rs. 32,000</span>
-                  <span className="text-[#C09578] font-bold text-sm">Rs. 25,000</span>
+            {topRatedProducts && topRatedProducts.length > 0 ? (
+              topRatedProducts.map((prod, idx) => {
+                const categoryName = prod?.subCategory?.name || prod?.parentCategory?.name || '';
+                const oldPrice = prod?.actualPrice ? `Rs. ${Number(prod.actualPrice).toLocaleString('en-IN')}` : '';
+                const salePrice = prod?.salePrice ? `Rs. ${Number(prod.salePrice).toLocaleString('en-IN')}` : '';
+                const imgSrc = (() => {
+                  const raw = prod?.productImage || '';
+                  if (!raw) return '';
+                  if (/^https?:\/\//i.test(raw)) return raw;
+                  const base = (staticPath || '').replace(/\/+$/, '');
+                  const path = String(raw).replace(/^\/+/, '');
+                  return `${base}/${path}`;
+                })();
+                return (
+                  <div key={prod?._id || idx} className={idx === 0 ? "mb-4 flex items-center gap-3 border-b border-[#e5e5e5] pb-2" : "flex items-center gap-3"}>
+                    {imgSrc ? (
+                      <img src={imgSrc} alt={prod?.productName || 'Product'} className="w-14 h-12 object-cover rounded" />
+                    ) : (
+                      <div className="w-14 h-12 bg-gray-100 rounded" />
+                    )}
+                    <div>
+                      <div className="text-xs text-gray-500">{categoryName}</div>
+                      <Link href={`/product/${prod?._id || ''}`} className="text-[#222] font-medium font-playfair text-sm hover:text-[#C09578] cursor-pointer">
+                        {prod?.productName || 'Product'}
+                      </Link>
+                      <div className='mt-2'>
+                        {oldPrice ? <span className="line-through text-xs text-gray-400 mr-2">{oldPrice}</span> : null}
+                        {salePrice ? <span className="text-[#C09578] font-bold text-sm">{salePrice}</span> : null}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <>
+                <div className="mb-4 flex items-center gap-3 border-b border-[#e5e5e5] pb-2">
+                  <div className="w-14 h-12 bg-gray-100 rounded" />
+                  <div className="flex-1">
+                    <div className="h-3 bg-gray-100 w-24 mb-2 rounded" />
+                    <div className="h-4 bg-gray-100 w-40 rounded" />
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <img src="https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1617816851291Calina%20Swing%20Jhula__.jpg" alt="Calina Swing Jhula" className="w-14 h-12 object-cover rounded" />
-              <div>
-                <div className="text-xs text-gray-500">Wooden Jhula</div>
-                <Link href="#" className="text-[#222] font-medium font-playfair text-sm hover:text-[#C09578] cursor-pointer">Calina Swing Jhula</Link>
-                <div className='mt-2'>
-                  <span className="line-through text-xs text-gray-400 mr-2">Rs. 65,000</span>
-                  <span className="text-[#C09578] font-bold text-sm">Rs. 58,000</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-12 bg-gray-100 rounded" />
+                  <div className="flex-1">
+                    <div className="h-3 bg-gray-100 w-24 mb-2 rounded" />
+                    <div className="h-4 bg-gray-100 w-40 rounded" />
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
         {/* Footer Links */}

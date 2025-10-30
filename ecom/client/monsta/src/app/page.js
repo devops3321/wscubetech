@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import HomeBanner from "./components/home/Banner";
 import HomeCollection from "./components/home/Collections";
 import FeaturedProducts from "./components/home/FeaturedProducts";
