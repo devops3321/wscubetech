@@ -9,18 +9,24 @@ export default function ProductCard({
   price,
 }) {
   return (
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden w-[260px] mx-auto cursor-pointer">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden w-[260px] mx-auto cursor-pointer">
       {/* Product Image */}
       <div className="relative w-full h-[160px] mb-2 bg-gray-100 flex items-center justify-center">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
+        {image ? (
+          <img
+            src={image}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={e => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+            }}
+          />
+        ) : null}
       </div>
       {/* Product Info */}
       <div className="px-5 py-4 text-center">
-        <div className="text-gray-500 text-sm mb-4">{category}</div>
+        <div className="text-gray-500 text-sm font-playfair text-black mb-1">{category}</div>
         <div className="font-bold text-lg mb-3 font-playfair text-black">{name}</div>
         <div> <hr className='border-t border-[#f2f2f2] w-full border-2 mb-2' /></div>
         <div className="flex justify-center items-center gap-2 mb-5">

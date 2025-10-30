@@ -5,57 +5,12 @@ import ProductCard from '@/app/common/ProductCard'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const products = [
-    {
-        category: 'Cabinets and Sideboard',
-        name: 'Louise Cabinet',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/16253167208651620078433247Louise%20Cabinet_.jpg',
-        oldPrice: 'Rs. 28,000',
-        price: 'Rs. 23,000',
-    },
-    {
-        category: 'Bookshelves',
-        name: 'Erica Bookshelfs',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1620077669499Erica%20Bookshelfs_brown.jpg',
-        oldPrice: 'Rs. 38,000',
-        price: 'Rs. 30,000',
-    },
-    {
-        category: 'Side and End Tables',
-        name: 'Hrithvik Stool',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1617981904164Hrithvik%20Stool__.jpg',
-        oldPrice: 'Rs. 7,000',
-        price: 'Rs. 6,000',
-    },
-    {
-        category: 'Nest Of Tables',
-        name: 'Caroline Study Tables',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1617829052195Caroline%20Study%20Tables__.jpg',
-        oldPrice: 'Rs. 3,000',
-        price: 'Rs. 2,500',
-    },
-    {
-        category: 'Nest Of Tables',
-        name: 'Caroline Study Tables',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1617829052195Caroline%20Study%20Tables__.jpg',
-        oldPrice: 'Rs. 3,000',
-        price: 'Rs. 2,500',
-    },
-    {
-        category: 'Nest Of Tables',
-        name: 'Caroline Study Tables',
-        image: 'https://wscubetech.co/Assignments/furniture/storage/app/public/uploads/images/products/1617829052195Caroline%20Study%20Tables__.jpg',
-        oldPrice: 'Rs. 3,000',
-        price: 'Rs. 2,500',
-    },        
-];
-
-export default function BestSellingProducts() {
+export default function BestSellingProducts({ bestSellingProducts, staticPath = "" }) {
     const sliderRef = useRef(null);
 
     const settings = {
         dots: false,
-        infinite: products.length > 4,
+        infinite: bestSellingProducts.length > 4,
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 1,
@@ -109,11 +64,24 @@ export default function BestSellingProducts() {
                 </div>
                 <div className="custom-row product_row1 slick-initialized slick-slider">
                     <Slider ref={sliderRef} {...settings}>
-                        {products.map((product, idx) => (
-                            <div key={idx}>
-                                <ProductCard {...product} />
-                            </div>
-                        ))}
+                        {bestSellingProducts.map((product, idx) => {
+                            const categoryName = product?.subSubCategory?.name || product?.subSubCategory?.subsubcategoryName || "";
+                            // Build image URL using per-item or list-level staticPath
+                            let basePath = (product.staticPath || staticPath || "").replace(/\/+$/, "");
+                            let imageUrl = product.productImage ? `${basePath}/${product.productImage}` : '';
+                            const cardProps = {
+                                category: categoryName,
+                                name: product?.productName || product?.name || "",
+                                image: imageUrl,
+                                oldPrice: product?.actualPrice ? `Rs. ${product.actualPrice}` : "",
+                                price: product?.salePrice ? `Rs. ${product.salePrice}` : "",
+                            };
+                            return (
+                                <div key={idx}>
+                                    <ProductCard {...cardProps} />
+                                </div>
+                            );
+                        })}
                     </Slider>
                 </div>
             </div>
