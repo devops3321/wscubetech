@@ -56,14 +56,16 @@ export default function FeaturedProducts({ productTypes = [], productsByType = {
             }
             // Map API fields to ProductCard props
             const cardProps = {
+              ...product, // spread first
+              id: product._id || product.id || idx, // id last so it always wins
               category: product.subSubCategory?.name || product.subCategory?.name || product.parentCategory?.name || '',
               name: product.productName || product.name || '',
               image: imageUrl,
               oldPrice: product.actualPrice ? `Rs. ${product.actualPrice}` : '',
-              price: product.salePrice ? `Rs. ${product.salePrice}` : '',
-              ...product // pass all other fields as well
+              price: product.salePrice ? `Rs. ${product.salePrice}` : ''
             };
-            return <ProductCard key={idx} {...cardProps} />;
+            const productId = product._id || product.id || idx;
+            return <ProductCard key={productId} {...cardProps} />;
           })}
         </div>
       </div>

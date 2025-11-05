@@ -15,19 +15,23 @@ let checkToken = (req, res, next) => {
                 req.query.id = id;
                 return next();
             } else {
-                res.send({
+                res.status(401).json({
+                    success: false,
                     status: "failed",
                     message: "Invalid token"
                 });
             }
         } catch (err) {
-            res.send({
+            console.error('Token verification error:', err.message);
+            res.status(401).json({
+                success: false,
                 status: "failed",
                 message: "Invalid token"
             });
         }
     } else {
-        res.send({
+        res.status(401).json({
+            success: false,
             status: "failed",
             message: "Token is missing"
         });

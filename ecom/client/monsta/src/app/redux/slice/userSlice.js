@@ -24,7 +24,7 @@ const userSlice = createSlice({
             state.token = '';
             Cookies.remove("USER");
             Cookies.remove("TOKEN");
-            Cookies.remove("USER_EMAIL"); 
+            Cookies.remove("USER_EMAIL");
         },
     },
 });

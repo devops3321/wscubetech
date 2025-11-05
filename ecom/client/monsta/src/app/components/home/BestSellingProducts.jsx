@@ -69,15 +69,19 @@ export default function BestSellingProducts({ bestSellingProducts, staticPath = 
                             // Build image URL using per-item or list-level staticPath
                             let basePath = (product.staticPath || staticPath || "").replace(/\/+$/, "");
                             let imageUrl = product.productImage ? `${basePath}/${product.productImage}` : '';
+                            // Map API fields to ProductCard props - IMPORTANT: spread product to include _id
                             const cardProps = {
+                                ...product, // spread first
+                                id: product._id || product.id || idx, // id last so it always wins
                                 category: categoryName,
                                 name: product?.productName || product?.name || "",
                                 image: imageUrl,
                                 oldPrice: product?.actualPrice ? `Rs. ${product.actualPrice}` : "",
-                                price: product?.salePrice ? `Rs. ${product.salePrice}` : "",
+                                price: product?.salePrice ? `Rs. ${product.salePrice}` : ""
                             };
+                            const productId = product._id || product.id || idx;
                             return (
-                                <div key={idx}>
+                                <div key={productId}>
                                     <ProductCard {...cardProps} />
                                 </div>
                             );

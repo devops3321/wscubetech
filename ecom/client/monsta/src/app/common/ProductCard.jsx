@@ -1,9 +1,9 @@
-import React from 'react'
+
+import React, { useEffect, useMemo, useRef } from 'react';
 import { FaHeart } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, deleteCart } from '../redux/slice/cartSlice';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { addToCartAsync, deleteCartItemAsync, updateCartItemAsync, addToCartOptimistic } from '../redux/slice/cartSlice';
+import { toast } from 'react-toastify';
 
 export default function ProductCard({
   category,
@@ -15,28 +15,130 @@ export default function ProductCard({
 }) {
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.mycart.cartItem);
-  const productId = rest.id || rest._id || name;
-  const isInCart = cartItems.some(item => item.id === productId);
+  const cartLoading = useSelector(state => state.mycart.loading);
+  const cartError = useSelector(state => state.mycart.error);
+  const user = useSelector(state => state.myUser.user);
+  const userId = user?.userId || user?._id || user?.id;
+  const token = useSelector(state => state.myUser.token);
 
-  // Build a cart item object (id, name, price, image, etc.)
-  const handleAddToCart = () => {
-    const cartItem = {
-      id: productId,
-      name: name,
-      price: rest.salePrice || rest.price || price,
-      image: image,
-      category: category,
+  // Get product PID (unique product id)
+  const productPid = useMemo(() => {
+    const pid = rest.productId || rest._id || rest.id || rest.sku || rest.slug || name;
+    return pid ? String(pid) : null;
+  }, [rest.productId, rest._id, rest.id, rest.sku, rest.slug, name]);
+
+
+  // Compare as strings to ensure proper matching
+  const cartItem = useMemo(() => {
+    if (!productPid) return null;
+    return cartItems.find(item => String(item.pid) === String(productPid)) || null;
+  }, [cartItems, productPid]);
+  const isInCart = !!cartItem;
+  const cartQty = cartItem?.qty || 1;
+
+  // Extract price values - handle both string and number formats
+  const extractPrice = (priceValue) => {
+    if (priceValue === null || priceValue === undefined) return 0;
+    if (typeof priceValue === 'number') return priceValue;
+    if (typeof priceValue === 'string') {
+      const cleaned = priceValue.replace(/[^0-9.]/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  };
+
+  // Add to cart
+  const handleAddToCart = async () => {
+    if (!userId || !token) {
+      toast.error('Please login to add to cart');
+      return;
+    }
+    if (!productPid) {
+      toast.error('Product ID is missing. Cannot add to cart.');
+      return;
+    }
+    const priceValue = extractPrice(rest.salePrice || rest.price || price);
+    const actualPriceValue = extractPrice(oldPrice) || priceValue;
+    const cartItemObj = {
+      userId: String(userId),
+      pid: String(productPid),
+      name: String(name || ''),
+      price: priceValue,
       qty: 1,
-      ...rest
+      image: String(image || ''),
+      category: String(category || ''),
+      salePrice: extractPrice(rest.salePrice) || priceValue,
+      actualPrice: actualPriceValue
     };
-    dispatch(addToCart(cartItem));
-    toast.success('Product added to cart!');
+    // Optimistic update for immediate UI feedback
+    dispatch(addToCartOptimistic(cartItemObj));
+    try {
+      const backendCart = await dispatch(addToCartAsync({ cartItem: cartItemObj, token })).unwrap();
+      // Check if the product is in the backend response
+      const found = backendCart && backendCart.find && backendCart.find(i => String(i.pid) === String(productPid));
+      if (found) {
+        toast.success('Product added to cart!');
+      } else {
+        toast.error('Backend did not return the added product. Please check backend logic.');
+      }
+    } catch (error) {
+      toast.error(error || 'Failed to add to cart');
+    }
   };
 
-  const handleRemoveFromCart = () => {
-    dispatch(deleteCart({ id: productId }));
-    toast.info('Product removed from cart.');
+  // Remove from cart
+  const handleRemoveFromCart = async () => {
+    if (!userId || !token) {
+      toast.error('Please login to remove from cart');
+      return;
+    }
+    if (!productPid) {
+      toast.error('Product ID is missing. Cannot remove from cart.');
+      return;
+    }
+    try {
+  const backendCart = await dispatch(deleteCartItemAsync({ pid: String(productPid), userId: String(userId), token })).unwrap();
+      // Check if the product is still in the backend response
+      const found = backendCart && backendCart.cart && backendCart.cart.find && backendCart.cart.find(i => String(i.pid) === String(productPid));
+      if (!found) {
+        toast.info('Product removed from cart.');
+      } else {
+        toast.error('Backend did not remove the product. Please check backend logic.');
+      }
+    } catch (error) {
+      toast.error(error || 'Failed to remove from cart');
+    }
   };
+
+  // Update quantity in cart
+  const handleUpdateQty = async (newQty) => {
+    if (!userId || !token) {
+      toast.error('Please login to update cart');
+      return;
+    }
+    if (!productPid) {
+      toast.error('Product ID is missing. Cannot update cart.');
+      return;
+    }
+    if (newQty < 1) {
+      await handleRemoveFromCart();
+      return;
+    }
+    try {
+  const backendCart = await dispatch(updateCartItemAsync({ pid: String(productPid), qty: newQty, userId: String(userId), token })).unwrap();
+      // Check if the product is in the backend response with correct qty
+      const found = backendCart && backendCart.find && backendCart.find(i => String(i.pid) === String(productPid));
+      if (found && found.qty === newQty) {
+        // Success
+      } else {
+        toast.error('Backend did not update the product quantity. Please check backend logic.');
+      }
+    } catch (error) {
+      toast.error(error || 'Failed to update cart');
+    }
+  };
+
 
   return (
     <div
@@ -71,28 +173,33 @@ export default function ProductCard({
             <span className="text-[#C09578] font-semibold text-base">{price}</span>
           </div>
         </div>
-        <div className="flex justify-center gap-2 mt-auto">
-          {/* Solid Heart Icon for Wishlist */}
-          <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group cursor-pointer" aria-label="Add to Wishlist">
-            <FaHeart className="text-black group-hover:text-[#C09578] text-[22px] transition-colors duration-150" />
-          </button>
-          {isInCart ? (
-            <button
-              className="border border-red-400 rounded px-5 py-2 bg-red-100 text-red-700 font-medium hover:bg-red-500 hover:text-white transition-colors duration-150 cursor-pointer"
-              onClick={handleRemoveFromCart}
-            >
-              Remove
+        <div className="flex flex-col gap-2 mt-auto">
+          {/* Wishlist and Add to Cart/Remove/Qty side by side */}
+          <div className="flex justify-center gap-2 mb-2">
+            <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group cursor-pointer" aria-label="Add to Wishlist">
+              <FaHeart className="text-black group-hover:text-[#C09578] text-[22px] transition-colors duration-150" />
             </button>
-          ) : (
-            <button
-              className="border border-gray-300 rounded px-5 py-2 bg-[#f7f7f7] text-gray-700 font-medium hover:bg-[#C09578] hover:text-white transition-colors duration-150 cursor-pointer"
-              onClick={handleAddToCart}
-            >
-              Add To Cart
-            </button>
-          )}
+            {!isInCart ? (
+              <button
+                className="border border-gray-300 rounded px-5 py-2 bg-[#f7f7f7] text-gray-700 font-medium hover:bg-[#C09578] hover:text-white transition-colors duration-150 cursor-pointer"
+                onClick={handleAddToCart}
+                disabled={cartLoading}
+              >
+                Add To Cart
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  className="border border-red-400 rounded px-4 py-2 bg-red-100 text-red-700 font-medium hover:bg-red-500 hover:text-white transition-colors duration-150 cursor-pointer"
+                  onClick={handleRemoveFromCart}
+                  disabled={cartLoading}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       </div>
     </div>
   )

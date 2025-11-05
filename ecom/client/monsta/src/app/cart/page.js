@@ -1,26 +1,134 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import Breadcrumb from '../common/Breadcrumb';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { deleteCart, updateQuantity } from '../redux/slice/cartSlice';
+import { updateCartItemAsync, deleteCartItemAsync, fetchCartItems } from '../redux/slice/cartSlice';
+import { toast } from 'react-toastify';
 
 export default function Cart() {
   const dispatch = useDispatch();
   const cart = useSelector(state => state.mycart.cartItem);
+  const loading = useSelector(state => state.mycart.loading);
+  const error = useSelector(state => state.mycart.error);
+  const user = useSelector(state => state.myUser.user);
+  const userId = user?.userId || user?._id || user?.id;
+  const token = useSelector(state => state.myUser.token);
 
-  const handleQtyChange = (id, newQty) => {
+  // Debug: Log cart state changes
+  useEffect(() => {
+    console.log('Cart page - Cart state updated:', {
+      itemCount: cart?.length || 0,
+      items: cart?.map(item => ({ id: item.id, name: item.name, qty: item.qty })),
+      loading,
+      error
+    });
+  }, [cart, loading, error]);
+
+  // Fetch cart items on mount and when component becomes visible
+  useEffect(() => {
+    if (userId && token) {
+      console.log('Cart page - Fetching cart items for userId:', userId);
+      dispatch(fetchCartItems({ userId, token }))
+        .then((result) => {
+          console.log('Cart page - Cart items fetched:', result.payload?.length || 0, 'items');
+        })
+        .catch((error) => {
+          console.error('Cart page - Failed to fetch cart items:', error);
+        });
+    }
+  }, [userId, token, dispatch]);
+
+  // Refetch when the page becomes visible or window gets focus (in case user navigated from another page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && userId && token) {
+        console.log('Cart page - Page visible, refetching cart items');
+        dispatch(fetchCartItems({ userId, token }));
+      }
+    };
+    
+    const handleFocus = () => {
+      if (userId && token) {
+        console.log('Cart page - Window focused, refetching cart items');
+        dispatch(fetchCartItems({ userId, token }));
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [userId, token, dispatch]);
+
+  const handleQtyChange = async (pid, newQty) => {
     if (newQty < 1) newQty = 1;
-    dispatch(updateQuantity({ id, qty: newQty }));
+    if (!userId || !token) {
+      toast.error('Please login to update cart');
+      return;
+    }
+    try {
+      console.log('[Cart Page] handleQtyChange called with:', { pid, newQty, userId, token });
+      const result = await dispatch(updateCartItemAsync({ pid, qty: newQty, userId, token })).unwrap();
+      console.log('[Cart Page] handleQtyChange backend response:', result);
+    } catch (error) {
+      toast.error(error || 'Failed to update cart');
+      console.error('[Cart Page] Failed to update cart item:', error);
+    }
   };
 
-  const handleRemove = (id) => {
-    dispatch(deleteCart({ id }));
+  const handleRemove = async (pid) => {
+    if (!userId || !token) {
+      toast.error('Please login to remove from cart');
+      return;
+    }
+    try {
+      console.log('[Cart Page] handleRemove called with pid:', pid);
+      await dispatch(deleteCartItemAsync({ pid, userId, token })).unwrap();
+      toast.success('Item removed from cart');
+    } catch (error) {
+      toast.error(error || 'Failed to remove item');
+    }
   };
 
-  const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
+  const handleClearCart = async () => {
+    if (!userId || !token) {
+      toast.error('Please login to clear cart');
+      return;
+    }
+    try {
+      // Remove all items one by one or implement a clear cart API
+      for (const item of cart) {
+        console.log('[Cart Page] handleClearCart removing item:', item);
+        await dispatch(deleteCartItemAsync({ pid: item.pid, userId, token })).unwrap();
+      }
+      toast.success('Cart cleared');
+    } catch (error) {
+      toast.error(error || 'Failed to clear cart');
+    }
+  };
 
-  if (!cart.length) {
+  const total = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.qty || 1)), 0);
+
+  // Show loading state while fetching
+  if (loading && (!cart || cart.length === 0)) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Breadcrumb pageName={"Shopping Cart"} />
+        <div className="max-w-4xl mx-auto px-4 py-16">
+          <div className="text-center bg-white rounded-2xl shadow-lg p-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C09578] mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading cart items...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cart || !cart.length) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Breadcrumb pageName={"Shopping Cart"} />
@@ -67,10 +175,11 @@ export default function Cart() {
             </div>
             <div className="mt-4 sm:mt-0">
               <button
-                onClick={() => cart.forEach(item => handleRemove(item.id))}
-                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer"
+                onClick={handleClearCart}
+                disabled={loading}
+                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Clear Cart
+                {loading ? 'Clearing...' : 'Clear Cart'}
               </button>
             </div>
           </div>
@@ -80,7 +189,7 @@ export default function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cart.map(item => (
-              <div key={item.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div key={item.pid} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-col sm:flex-row">
                   {/* Product Image */}
                   <div className="sm:w-48 h-48 sm:h-auto">
@@ -120,9 +229,9 @@ export default function Cart() {
                         {/* Price */}
                         <div className="mb-6">
                           <div className="flex items-center space-x-2">
-                            <span className="text-2xl font-bold text-black">₹{item.price.toLocaleString()}</span>
-                            {item.originalPrice && (
-                              <span className="text-lg text-gray-500 line-through">₹{item.originalPrice.toLocaleString()}</span>
+                            <span className="text-2xl font-bold text-black">₹{Number(item.price || 0).toLocaleString()}</span>
+                            {(item.actualPrice || item.originalPrice) && (
+                              <span className="text-lg text-gray-500 line-through">₹{Number(item.actualPrice || item.originalPrice || 0).toLocaleString()}</span>
                             )}
                           </div>
                         </div>
@@ -133,8 +242,9 @@ export default function Cart() {
                         {/* Quantity Controls */}
                         <div className="flex items-center border border-gray-300 rounded-lg">
                           <button 
-                            onClick={() => handleQtyChange(item.id, Math.max(1, item.qty - 1))}
-                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                            onClick={() => handleQtyChange(item.pid, Math.max(1, item.qty - 1))}
+                            disabled={loading}
+                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
@@ -142,8 +252,9 @@ export default function Cart() {
                           </button>
                           <span className="px-4 py-2 text-center text-black border-x border-gray-300 min-w-[60px]">{item.qty}</span>
                           <button 
-                            onClick={() => handleQtyChange(item.id, item.qty + 1)}
-                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                            onClick={() => handleQtyChange(item.pid, item.qty + 1)}
+                            disabled={loading}
+                            className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-100 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -154,13 +265,14 @@ export default function Cart() {
                         {/* Item Total */}
                         <div className="text-right">
                           <p className="text-sm text-gray-600">Item Total</p>
-                          <p className="text-2xl font-bold text-black">₹{(item.price * item.qty).toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-black">₹{(Number(item.price || 0) * Number(item.qty || 1)).toLocaleString()}</p>
                         </div>
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => handleRemove(item.id)}
-                          className="flex items-center px-4 py-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer"
+                          onClick={() => handleRemove(item.pid)}
+                          disabled={loading}
+                          className="flex items-center px-4 py-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Remove from cart"
                         >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

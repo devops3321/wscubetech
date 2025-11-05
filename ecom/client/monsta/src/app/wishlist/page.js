@@ -43,8 +43,8 @@ export default function Wishlist() {
   // Set to [] for empty wishlist, or demoWishlist for demo data
   const [wishlist, setWishlist] = useState(demoWishlist);
 
-  const handleRemove = (id) => {
-    setWishlist(wishlist => wishlist.filter(item => item.id !== id));
+  const handleRemove = (pid) => {
+    setWishlist(wishlist => wishlist.filter(item => item.pid !== pid));
   };
 
   if (!wishlist.length) {
@@ -120,7 +120,7 @@ export default function Wishlist() {
                 )}
                 {/* Remove Button */}
                 <button
-                  onClick={() => handleRemove(item.id)}
+                  onClick={() => handleRemove(item.pid)}
                   className="absolute top-4 right-4 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center text-red-500 hover:bg-opacity-100 hover:text-red-700 transition-all duration-200 shadow-lg cursor-pointer"
                   title="Remove from wishlist"
                 >
