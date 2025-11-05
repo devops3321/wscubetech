@@ -108,10 +108,6 @@ const wishlistSlice = createSlice({
                     state.wishlist = [];
                 }
                 state.staticImagePath = action.payload.staticImagePath || "";
-                // Debug log in development
-                if (process.env.NODE_ENV === 'development') {
-                    console.log("[WISHLIST SLICE] Setting staticImagePath:", action.payload.staticImagePath);
-                }
                 state.lastUpdated = new Date().toISOString();
                 state.error = null;
             })

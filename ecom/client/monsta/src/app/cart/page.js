@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateCartItemAsync, deleteCartItemAsync, fetchCartItems } from '../redux/slice/cartSlice';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 export default function Cart() {
   const dispatch = useDispatch();
@@ -70,18 +71,63 @@ export default function Cart() {
   };
 
   const handleClearCart = async () => {
+    if (!cart || cart.length === 0) {
+      toast.info('Cart is already empty');
+      return;
+    }
     if (!userId || !token) {
       toast.error('Please login to clear cart');
       return;
     }
+    
+    // Confirm action with SweetAlert2
+    const result = await Swal.fire({
+      title: 'Clear Cart?',
+      text: `Are you sure you want to remove all ${cart.length} items from your cart? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, clear it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
     try {
+      // Show loading alert
+      Swal.fire({
+        title: 'Clearing cart...',
+        text: 'Please wait while we remove all items.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       // Remove all items one by one or implement a clear cart API
       for (const item of cart) {
         await dispatch(deleteCartItemAsync({ pid: item.pid, userId, token })).unwrap();
       }
-      toast.success('Cart cleared');
+      
+      // Show success alert
+      Swal.fire({
+        title: 'Cleared!',
+        text: 'Your cart has been cleared successfully.',
+        icon: 'success',
+        confirmButtonColor: '#C09578'
+      });
     } catch (error) {
-      toast.error(error || 'Failed to clear cart');
+      Swal.fire({
+        title: 'Error',
+        text: error?.message || 'Some items could not be removed. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33'
+      });
     }
   };
 
@@ -150,7 +196,7 @@ export default function Cart() {
             <div className="mt-4 sm:mt-0">
               <button
                 onClick={handleClearCart}
-                disabled={loading}
+                disabled={loading || !cart || cart.length === 0}
                 className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Clearing...' : 'Clear Cart'}
