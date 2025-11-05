@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 export default function Cart() {
   const dispatch = useDispatch();
   const cart = useSelector(state => state.mycart.cartItem);
+  const staticImagePath = useSelector(state => state.mycart.staticImagePath || "");
   const loading = useSelector(state => state.mycart.loading);
   const error = useSelector(state => state.mycart.error);
   const user = useSelector(state => state.myUser.user);
@@ -161,15 +162,38 @@ export default function Cart() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.map(item => (
+            {cart.map(item => {
+              // Build image URL using staticImagePath if image is present
+              let imageUrl = item.image || '';
+              if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+                let basePath = (staticImagePath || "").replace(/\/+$/, "");
+                const imagePath = String(imageUrl).replace(/^\/+/, "");
+                if (basePath && imagePath) {
+                  imageUrl = `${basePath}/${imagePath}`;
+                } else if (imagePath) {
+                  imageUrl = imagePath;
+                } else {
+                  imageUrl = "/no-image.png";
+                }
+              } else if (!imageUrl) {
+                imageUrl = "/no-image.png";
+              }
+              return (
               <div key={item.pid} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-col sm:flex-row">
                   {/* Product Image */}
-                  <div className="sm:w-48 h-48 sm:h-auto">
+                  <div className="sm:w-48 h-48 sm:h-auto bg-gray-100 flex items-center justify-center overflow-hidden">
                     <img
-                      src={item.image}
+                      src={imageUrl}
                       alt={item.name}
-                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        const currentSrc = e.target.src;
+                        if (currentSrc && !currentSrc.includes('/no-image.png') && !currentSrc.includes('data:')) {
+                          e.target.onerror = null;
+                          e.target.src = "/no-image.png";
+                        }
+                      }}
                     />
                   </div>
                   
@@ -258,7 +282,8 @@ export default function Cart() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Order Summary */}

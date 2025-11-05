@@ -14,7 +14,8 @@ const getAllcarts = async (req, res) => {
 		}
 		const cart = await cartModel.findOne({ userId });
 		const cartItems = cart ? cart.products : [];
-		res.status(200).json({ success: true, cart: cartItems, message: "Cart items fetched successfully" });
+		const staticImagePath = process.env.PRODUCT_IMAGE_PATH || "";
+		res.status(200).json({ success: true, cart: cartItems, staticImagePath, message: "Cart items fetched successfully" });
 	} catch (err) {
 		res.status(500).json({ success: false, message: "Error fetching cart items", error: err.message });
 	}
@@ -111,10 +112,12 @@ const addToCart = async (req, res) => {
 
 		// Ensure we always return an array, even if empty
 		const cartItems = Array.isArray(cart.products) ? cart.products : [];
+		const staticImagePath = process.env.PRODUCT_IMAGE_PATH || "";
 
 		res.status(200).json({
 			success: true,
 			cart: cartItems,
+			staticImagePath,
 			message: "Added to cart",
 			itemCount: cartItems.length
 		});
@@ -156,8 +159,9 @@ const updateCartItem = async (req, res) => {
 		   product.qty = productQty;
 		   cart.markModified('products');
 		   await cart.save();
+		   const staticImagePath = process.env.PRODUCT_IMAGE_PATH || "";
 
-		   res.status(200).json({ success: true, cart: cart.products });
+		   res.status(200).json({ success: true, cart: cart.products, staticImagePath });
 	} catch (err) {
 		res.status(500).json({ success: false, message: "Error updating cart item", error: err.message });
 	}
@@ -200,8 +204,9 @@ const deleteCartItem = async (req, res) => {
 		if (!result) {
 			return res.status(500).json({ success: false, message: "Failed to delete cart item from database" });
 		}
+		const staticImagePath = process.env.PRODUCT_IMAGE_PATH || "";
 
-		res.status(200).json({ success: true, cart: result.products });
+		res.status(200).json({ success: true, cart: result.products, staticImagePath });
 	} catch (err) {
 		res.status(500).json({ success: false, message: "Error deleting cart item", error: err.message });
 	}

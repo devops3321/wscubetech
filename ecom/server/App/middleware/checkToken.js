@@ -13,6 +13,8 @@ let checkToken = (req, res, next) => {
                 req.query = req.query || {};
                 req.body.id = id;
                 req.query.id = id;
+                // Set req.user for downstream controllers
+                req.user = { _id: id };
                 return next();
             } else {
                 res.status(401).json({

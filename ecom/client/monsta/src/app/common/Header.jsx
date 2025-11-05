@@ -53,6 +53,7 @@ export default function Header() {
     }
 
     let cart = useSelector((mystore) => mystore.mycart.cartItem);
+    let staticImagePath = useSelector((mystore) => mystore.mycart.staticImagePath || "");
     let user = useSelector((store) => store.myUser.user);
     let userId = user?.userId || user?._id || user?.id;
     let token = useSelector((store) => store.myUser.token);
@@ -503,12 +504,35 @@ export default function Header() {
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        {cart.map((item) => (
+                                        {cart.map((item) => {
+                                            // Build image URL using staticImagePath if image is present
+                                            let imageUrl = item.image || '';
+                                            if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+                                                let basePath = (staticImagePath || "").replace(/\/+$/, "");
+                                                const imagePath = String(imageUrl).replace(/^\/+/, "");
+                                                if (basePath && imagePath) {
+                                                    imageUrl = `${basePath}/${imagePath}`;
+                                                } else if (imagePath) {
+                                                    imageUrl = imagePath;
+                                                } else {
+                                                    imageUrl = "/no-image.png";
+                                                }
+                                            } else if (!imageUrl) {
+                                                imageUrl = "/no-image.png";
+                                            }
+                                            return (
                                             <div key={item.pid || item._id || item.id} className="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg">
                                                 <img
-                                                    src={item.image || "https://via.placeholder.com/60x60"}
+                                                    src={imageUrl}
                                                     alt={item.title || item.name}
                                                     className="w-16 h-16 object-cover rounded"
+                                                    onError={(e) => {
+                                                        const currentSrc = e.target.src;
+                                                        if (currentSrc && !currentSrc.includes('/no-image.png') && !currentSrc.includes('data:')) {
+                                                            e.target.onerror = null;
+                                                            e.target.src = "/no-image.png";
+                                                        }
+                                                    }}
                                                 />
                                                 <div className="flex-1">
                                                     <h3 className="font-medium text-black text-sm">{item.title || item.name}</h3>
@@ -542,7 +566,8 @@ export default function Header() {
                                                     </button>
                                                 </div>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>

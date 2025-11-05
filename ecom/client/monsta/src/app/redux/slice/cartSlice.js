@@ -23,7 +23,10 @@ export const fetchCartItems = createAsyncThunk(
             if (isSuccess) {
                 // Ensure we return an array and handle null/undefined
                 const cartItems = response.cart || [];
-                return Array.isArray(cartItems) ? cartItems : [];
+                return {
+                    cart: Array.isArray(cartItems) ? cartItems : [],
+                    staticImagePath: response.staticImagePath || ""
+                };
             } else {
                 // Handle different error response formats
                 const errorMsg = response.error || response.message || 'Failed to fetch cart items';
@@ -43,9 +46,12 @@ export const addToCartAsync = createAsyncThunk(
         try {
             const response = await addToCartAPI(cartItem, token);
             if (response.success) {
-                // Ensure we return an array
+                // Return both cart and staticImagePath
                 const cartItems = response.cart || [];
-                return Array.isArray(cartItems) ? cartItems : [];
+                return {
+                    cart: Array.isArray(cartItems) ? cartItems : [],
+                    staticImagePath: response.staticImagePath || ""
+                };
             } else {
                 // Handle different error response formats
                 const errorMsg = response.error || response.message || 'Failed to add item to cart';
@@ -66,7 +72,10 @@ export const updateCartItemAsync = createAsyncThunk(
             const response = await updateCartItemAPI(pid, qty, userId, token);
             if (response.success) {
                 const cartItems = response.cart || [];
-                return Array.isArray(cartItems) ? cartItems : [];
+                return {
+                    cart: Array.isArray(cartItems) ? cartItems : [],
+                    staticImagePath: response.staticImagePath || ""
+                };
             } else {
                 const errorMsg = response.error || response.message || 'Failed to update cart item';
                 return rejectWithValue(errorMsg);
@@ -86,7 +95,11 @@ export const deleteCartItemAsync = createAsyncThunk(
             const response = await deleteCartItemAPI(pid, userId, token);
             if (response.success) {
                 const cartItems = response.cart || [];
-                return { pid, cart: Array.isArray(cartItems) ? cartItems : [] };
+                return {
+                    pid,
+                    cart: Array.isArray(cartItems) ? cartItems : [],
+                    staticImagePath: response.staticImagePath || ""
+                };
             } else {
                 const errorMsg = response.error || response.message || 'Failed to delete cart item';
                 return rejectWithValue(errorMsg);
@@ -102,6 +115,7 @@ const cartSlice = createSlice({
     name: "cart",
     initialState: {
         cartItem: [], // Always start empty, fetch from database
+        staticImagePath: "",
         loading: false,
         error: null,
         lastUpdated: null
@@ -136,9 +150,17 @@ const cartSlice = createSlice({
             })
             .addCase(fetchCartItems.fulfilled, (state, action) => {
                 state.loading = false;
-                // Always update with server data from database
-                if (action.payload && Array.isArray(action.payload)) {
-                    state.cartItem = action.payload;
+                // Handle new response structure with cart and staticImagePath
+                if (action.payload && typeof action.payload === 'object') {
+                    if (Array.isArray(action.payload.cart)) {
+                        state.cartItem = action.payload.cart;
+                    } else if (Array.isArray(action.payload)) {
+                        // Backward compatibility: if payload is directly an array
+                        state.cartItem = action.payload;
+                    } else {
+                        state.cartItem = [];
+                    }
+                    state.staticImagePath = action.payload.staticImagePath || "";
                 } else {
                     state.cartItem = [];
                 }
@@ -156,9 +178,23 @@ const cartSlice = createSlice({
             })
             .addCase(addToCartAsync.fulfilled, (state, action) => {
                 state.loading = false;
-                // Ensure we have an array and update with all items from server
-                const newCartItems = Array.isArray(action.payload) ? action.payload : [];
-                state.cartItem = newCartItems;
+                // Handle response with cart array and staticImagePath
+                if (action.payload && typeof action.payload === 'object') {
+                    if (Array.isArray(action.payload.cart)) {
+                        state.cartItem = action.payload.cart;
+                    } else if (Array.isArray(action.payload)) {
+                        state.cartItem = action.payload;
+                    } else {
+                        state.cartItem = [];
+                    }
+                    if (action.payload.staticImagePath) {
+                        state.staticImagePath = action.payload.staticImagePath;
+                    }
+                } else if (Array.isArray(action.payload)) {
+                    state.cartItem = action.payload;
+                } else {
+                    state.cartItem = [];
+                }
                 state.lastUpdated = new Date().toISOString();
                 state.error = null;
             })
@@ -173,7 +209,23 @@ const cartSlice = createSlice({
             })
             .addCase(updateCartItemAsync.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cartItem = action.payload || [];
+                // Handle response with cart array and staticImagePath
+                if (action.payload && typeof action.payload === 'object') {
+                    if (Array.isArray(action.payload.cart)) {
+                        state.cartItem = action.payload.cart;
+                    } else if (Array.isArray(action.payload)) {
+                        state.cartItem = action.payload;
+                    } else {
+                        state.cartItem = [];
+                    }
+                    if (action.payload.staticImagePath) {
+                        state.staticImagePath = action.payload.staticImagePath;
+                    }
+                } else if (Array.isArray(action.payload)) {
+                    state.cartItem = action.payload;
+                } else {
+                    state.cartItem = [];
+                }
                 state.lastUpdated = new Date().toISOString();
                 state.error = null;
             })
@@ -188,7 +240,23 @@ const cartSlice = createSlice({
             })
             .addCase(deleteCartItemAsync.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cartItem = action.payload.cart || [];
+                // Handle response with cart array and staticImagePath
+                if (action.payload && typeof action.payload === 'object') {
+                    if (Array.isArray(action.payload.cart)) {
+                        state.cartItem = action.payload.cart;
+                    } else if (Array.isArray(action.payload)) {
+                        state.cartItem = action.payload;
+                    } else {
+                        state.cartItem = [];
+                    }
+                    if (action.payload.staticImagePath) {
+                        state.staticImagePath = action.payload.staticImagePath;
+                    }
+                } else if (Array.isArray(action.payload)) {
+                    state.cartItem = action.payload;
+                } else {
+                    state.cartItem = [];
+                }
                 state.lastUpdated = new Date().toISOString();
                 state.error = null;
             })

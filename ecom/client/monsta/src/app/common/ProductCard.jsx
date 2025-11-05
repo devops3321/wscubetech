@@ -1,9 +1,15 @@
-
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { FaHeart } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCartAsync, deleteCartItemAsync, updateCartItemAsync, addToCartOptimistic } from '../redux/slice/cartSlice';
 import { toast } from 'react-toastify';
+import {
+  fetchWishlistItems,
+  addToWishlistAsync,
+  deleteWishlistItemAsync,
+  addToWishlistOptimistic,
+  removeFromWishlistOptimistic
+} from '../redux/slice/wishlistSlice';
 
 export default function ProductCard({
   category,
@@ -26,6 +32,59 @@ export default function ProductCard({
     const pid = rest.productId || rest._id || rest.id || rest.sku || rest.slug || name;
     return pid ? String(pid) : null;
   }, [rest.productId, rest._id, rest.id, rest.sku, rest.slug, name]);
+
+  // Wishlist state from Redux
+  const wishlist = useSelector(state => state.myWishlist.wishlist);
+  const wishlistLoading = useSelector(state => state.myWishlist.loading);
+  // Check if product is in wishlist by comparing product._id with productPid
+  const isInWishlist = wishlist.some(item => {
+    const productId = item?.product?._id || item?.product;
+    return String(productId) === String(productPid);
+  });
+
+  // Fetch wishlist on mount if needed
+  React.useEffect(() => {
+    if (token && wishlist.length === 0) {
+      dispatch(fetchWishlistItems(token));
+    }
+  }, [token, dispatch]);
+  // Add to wishlist using asyncThunk
+  const handleAddToWishlist = async () => {
+    if (!userId || !token) {
+      toast.error('Please login to add to wishlist');
+      return;
+    }
+    if (!productPid) {
+      toast.error('Product ID is missing. Cannot add to wishlist.');
+      return;
+    }
+    try {
+      await dispatch(addToWishlistAsync({ productId: productPid, token })).unwrap();
+      await dispatch(fetchWishlistItems(token)); // <-- Add this line
+      toast.success('Added to wishlist!');
+    } catch (error) {
+      toast.error(error?.message || 'Failed to add to wishlist');
+    }
+  };
+
+  // Remove from wishlist using asyncThunk
+  const handleRemoveFromWishlist = async () => {
+    if (!userId || !token) {
+      toast.error('Please login to remove from wishlist');
+      return;
+    }
+    if (!productPid) {
+      toast.error('Product ID is missing. Cannot remove from wishlist.');
+      return;
+    }
+    try {
+      await dispatch(deleteWishlistItemAsync({ productId: productPid, token })).unwrap();
+      await dispatch(fetchWishlistItems(token));
+      toast.info('Removed from wishlist.');
+    } catch (error) {
+      toast.error(error?.message || 'Failed to remove from wishlist');
+    }
+  };
 
 
   // Compare as strings to ensure proper matching
@@ -176,8 +235,13 @@ export default function ProductCard({
         <div className="flex flex-col gap-2 mt-auto">
           {/* Wishlist and Add to Cart/Remove/Qty side by side */}
           <div className="flex justify-center gap-2 mb-2">
-            <button className="border border-gray-300 rounded px-3 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group cursor-pointer" aria-label="Add to Wishlist">
-              <FaHeart className="text-black group-hover:text-[#C09578] text-[22px] transition-colors duration-150" />
+            <button
+              className={`border rounded px-3 py-2 flex items-center justify-center transition-colors duration-150 group cursor-pointer ${isInWishlist ? 'bg-[#C09578] border-[#C09578] text-white' : 'bg-white border-gray-300 text-black hover:bg-gray-100'}`}
+              aria-label={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              onClick={isInWishlist ? handleRemoveFromWishlist : handleAddToWishlist}
+              disabled={wishlistLoading}
+            >
+              <FaHeart className={`text-[22px] transition-colors duration-150 ${isInWishlist ? 'text-white' : 'group-hover:text-[#C09578] text-black'}`} />
             </button>
             {!isInCart ? (
               <button
@@ -202,5 +266,5 @@ export default function ProductCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
