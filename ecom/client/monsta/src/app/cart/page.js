@@ -15,27 +15,10 @@ export default function Cart() {
   const userId = user?.userId || user?._id || user?.id;
   const token = useSelector(state => state.myUser.token);
 
-  // Debug: Log cart state changes
-  useEffect(() => {
-    console.log('Cart page - Cart state updated:', {
-      itemCount: cart?.length || 0,
-      items: cart?.map(item => ({ id: item.id, name: item.name, qty: item.qty })),
-      loading,
-      error
-    });
-  }, [cart, loading, error]);
-
   // Fetch cart items on mount and when component becomes visible
   useEffect(() => {
     if (userId && token) {
-      console.log('Cart page - Fetching cart items for userId:', userId);
-      dispatch(fetchCartItems({ userId, token }))
-        .then((result) => {
-          console.log('Cart page - Cart items fetched:', result.payload?.length || 0, 'items');
-        })
-        .catch((error) => {
-          console.error('Cart page - Failed to fetch cart items:', error);
-        });
+      dispatch(fetchCartItems({ userId, token }));
     }
   }, [userId, token, dispatch]);
 
@@ -43,21 +26,16 @@ export default function Cart() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && userId && token) {
-        console.log('Cart page - Page visible, refetching cart items');
         dispatch(fetchCartItems({ userId, token }));
       }
     };
-    
     const handleFocus = () => {
       if (userId && token) {
-        console.log('Cart page - Window focused, refetching cart items');
         dispatch(fetchCartItems({ userId, token }));
       }
     };
-    
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
-    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
@@ -71,12 +49,9 @@ export default function Cart() {
       return;
     }
     try {
-      console.log('[Cart Page] handleQtyChange called with:', { pid, newQty, userId, token });
-      const result = await dispatch(updateCartItemAsync({ pid, qty: newQty, userId, token })).unwrap();
-      console.log('[Cart Page] handleQtyChange backend response:', result);
+      await dispatch(updateCartItemAsync({ pid, qty: newQty, userId, token })).unwrap();
     } catch (error) {
       toast.error(error || 'Failed to update cart');
-      console.error('[Cart Page] Failed to update cart item:', error);
     }
   };
 
@@ -86,7 +61,6 @@ export default function Cart() {
       return;
     }
     try {
-      console.log('[Cart Page] handleRemove called with pid:', pid);
       await dispatch(deleteCartItemAsync({ pid, userId, token })).unwrap();
       toast.success('Item removed from cart');
     } catch (error) {
@@ -102,7 +76,6 @@ export default function Cart() {
     try {
       // Remove all items one by one or implement a clear cart API
       for (const item of cart) {
-        console.log('[Cart Page] handleClearCart removing item:', item);
         await dispatch(deleteCartItemAsync({ pid: item.pid, userId, token })).unwrap();
       }
       toast.success('Cart cleared');
