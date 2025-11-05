@@ -110,13 +110,13 @@ export default function Cart() {
           <div className="text-center bg-white rounded-2xl shadow-lg p-12">
             <div className="mb-8">
               <div className="mx-auto w-24 h-24 bg-[#C09578] bg-opacity-10 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-12 h-12 text-[#C09578]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-white " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <circle cx="9" cy="21" r="1" />
                   <circle cx="20" cy="21" r="1" />
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold text-black mb-4">Your Cart is Empty</h2>
+              <h2 className="text-3xl font-bold text-black mb-4 font-playfair">Your Cart is Empty</h2>
               <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
                 Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
               </p>
