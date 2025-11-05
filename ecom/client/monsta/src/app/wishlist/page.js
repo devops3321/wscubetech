@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FaHeart } from "react-icons/fa";
 import { fetchWishlistItems, deleteWishlistItemAsync, clearWishlist } from "../redux/slice/wishlistSlice";
 import { addToCartAsync, addToCartOptimistic } from "../redux/slice/cartSlice";
 import { toast } from "react-toastify";
@@ -161,11 +162,9 @@ export default function Wishlist() {
           <div className="text-center bg-white rounded-2xl shadow-lg p-12">
             <div className="mb-8">
               <div className="mx-auto w-24 h-24 bg-[#C09578] bg-opacity-10 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-12 h-12 text-[#C09578]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
+                <FaHeart className="text-white text-5xl" />
               </div>
-              <h2 className="text-3xl font-bold text-black mb-4">Your Wishlist is Empty</h2>
+              <h2 className="text-3xl font-bold font-playfair text-black mb-4">Your Wishlist is Empty</h2>
               <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
                 Start building your dream furniture collection by adding items to your wishlist
               </p>
@@ -191,7 +190,7 @@ export default function Wishlist() {
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-black mb-2">My Wishlist</h1>
+              <h1 className="text-3xl font-bold font-playfair text-black mb-2">My Wishlist</h1>
               <p className="text-gray-600">{wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved</p>
             </div>
             <div className="mt-4 sm:mt-0">
@@ -251,9 +250,9 @@ export default function Wishlist() {
                 </div>
                 <div className="p-4 flex flex-col flex-1">
                   <div className="mb-1">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide">{category}</span>
+                    <span className="text-xs text-gray-500 uppercase tracking-wide font-playfair">{category}</span>
                   </div>
-                  <h3 className="text-base font-bold text-black line-clamp-2 min-h-[2.5rem]">{product.productName}</h3>
+                  <h3 className="text-base font-bold font-playfair text-black line-clamp-2 min-h-[2.5rem]">{product.productName}</h3>
                   <div className="mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="text-lg font-bold text-black">₹{product.salePrice?.toLocaleString() || product.actualPrice?.toLocaleString() || 0}</span>
