@@ -3,9 +3,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { fetchWishlistItems, deleteWishlistItemAsync } from "../redux/slice/wishlistSlice";
+import { fetchWishlistItems, deleteWishlistItemAsync, clearWishlist } from "../redux/slice/wishlistSlice";
 import { addToCartAsync, addToCartOptimistic } from "../redux/slice/cartSlice";
 import { toast } from "react-toastify";
+import Swal from 'sweetalert2';
 
 export default function Wishlist() {
   const dispatch = useDispatch();
@@ -75,6 +76,78 @@ export default function Wishlist() {
     router.push(`/product-details?id=${productId}`);
   };
 
+  const handleClearWishlist = async () => {
+    if (!wishlist || wishlist.length === 0) {
+      toast.info('Wishlist is already empty');
+      return;
+    }
+    if (!token) {
+      toast.error('Please login to clear wishlist');
+      return;
+    }
+    
+    // Confirm action with SweetAlert2
+    const result = await Swal.fire({
+      title: 'Clear Wishlist?',
+      text: `Are you sure you want to remove all ${wishlist.length} items from your wishlist? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, clear it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      // Show loading alert
+      Swal.fire({
+        title: 'Clearing wishlist...',
+        text: 'Please wait while we remove all items.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Delete all items one by one
+      const deletePromises = wishlist.map(item => {
+        const productId = item?.product?._id || item?.product;
+        if (productId) {
+          return dispatch(deleteWishlistItemAsync({ productId, token })).unwrap();
+        }
+        return Promise.resolve();
+      });
+      
+      await Promise.all(deletePromises);
+      
+      // Clear local state
+      dispatch(clearWishlist());
+      
+      // Show success alert
+      Swal.fire({
+        title: 'Cleared!',
+        text: 'Your wishlist has been cleared successfully.',
+        icon: 'success',
+        confirmButtonColor: '#C09578'
+      });
+    } catch (error) {
+      // Even if some deletions fail, clear the local state and show a message
+      dispatch(clearWishlist());
+      Swal.fire({
+        title: 'Error',
+        text: error?.message || 'Some items could not be removed. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#d33'
+      });
+    }
+  };
+
   if (wishlistLoading) {
     return <div className="min-h-screen flex items-center justify-center text-xl">Loading wishlist...</div>;
   }
@@ -120,6 +193,15 @@ export default function Wishlist() {
             <div>
               <h1 className="text-3xl font-bold text-black mb-2">My Wishlist</h1>
               <p className="text-gray-600">{wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved</p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <button
+                onClick={handleClearWishlist}
+                disabled={wishlistLoading || wishlist.length === 0}
+                className="px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {wishlistLoading ? 'Clearing...' : 'Clear Wishlist'}
+              </button>
             </div>
           </div>
         </div>

@@ -54,12 +54,15 @@ export default function Header() {
 
     let cart = useSelector((mystore) => mystore.mycart.cartItem);
     let staticImagePath = useSelector((mystore) => mystore.mycart.staticImagePath || "");
+    let wishlist = useSelector((mystore) => mystore.myWishlist.wishlist || []);
     let user = useSelector((store) => store.myUser.user);
     let userId = user?.userId || user?._id || user?.id;
     let token = useSelector((store) => store.myUser.token);
 
     // Dynamic cart count: sum of all item quantities
     let cartCount = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    // Wishlist count: number of items in wishlist
+    let wishlistCount = wishlist.length;
 
     // Backend-synced cart actions
     const handleUpdateQty = async (pid, qty) => {
@@ -155,16 +158,21 @@ export default function Header() {
                     </div>
                     {/* Wishlist */}
                     <Link href={"/wishlist"} className="w-full sm:w-auto">
-                        <button className="border border-gray-200 rounded px-4 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group w-full sm:w-auto cursor-pointer">
-                            <svg
-                                width="20"
-                                height="20"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                                className="text-black group-hover:text-[#C09578] transition-colors duration-150"
-                            >
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                            </svg>
+                        <button className="border border-gray-200 rounded px-4 py-2 bg-white flex items-center justify-center hover:bg-gray-100 transition-colors duration-150 group w-full sm:w-auto cursor-pointer relative">
+                            <span className="relative flex items-center">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                    className="text-black group-hover:text-[#C09578] transition-colors duration-150"
+                                >
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
+                                {wishlistCount > 0 && (
+                                    <span className="absolute -top-3 -right-4 bg-[#C09578] text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{wishlistCount}</span>
+                                )}
+                            </span>
                         </button>
                     </Link>
                     {/* Cart */}
