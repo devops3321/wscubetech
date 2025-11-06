@@ -231,11 +231,42 @@ export default function ProductListing({ initialProducts = [], initialPagination
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton Loaders */}
       {loading && products.length === 0 && (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C09578] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading products...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="skeleton-card" style={{ width: 260, minWidth: 260, maxWidth: 260, height: 380, minHeight: 380, maxHeight: 380, display: 'flex', flexDirection: 'column', margin: '0 auto' }}>
+              {/* Image Skeleton */}
+              <div className="skeleton" style={{ width: '100%', height: 160, marginBottom: '0.5rem' }}></div>
+              
+              {/* Content Skeleton */}
+              <div className="px-5 py-4 flex flex-col h-full justify-between" style={{ flex: 1 }}>
+                <div>
+                  {/* Category Skeleton */}
+                  <div className="skeleton mb-2" style={{ height: '14px', width: '60%', margin: '0 auto', borderRadius: '4px' }}></div>
+                  
+                  {/* Title Skeleton */}
+                  <div className="skeleton mb-3" style={{ height: '20px', width: '90%', margin: '0 auto 0.75rem', borderRadius: '4px' }}></div>
+                  <div className="skeleton mb-3" style={{ height: '20px', width: '70%', margin: '0 auto', borderRadius: '4px' }}></div>
+                  
+                  {/* Divider */}
+                  <div className="skeleton mb-2" style={{ height: '2px', width: '100%', borderRadius: '4px' }}></div>
+                  
+                  {/* Price Skeleton */}
+                  <div className="flex justify-center items-center gap-2 mb-5">
+                    <div className="skeleton" style={{ height: '16px', width: '60px', borderRadius: '4px' }}></div>
+                    <div className="skeleton" style={{ height: '16px', width: '80px', borderRadius: '4px' }}></div>
+                  </div>
+                </div>
+                
+                {/* Button Skeleton */}
+                <div className="flex justify-center gap-2 mt-auto">
+                  <div className="skeleton" style={{ height: '36px', width: '36px', borderRadius: '4px' }}></div>
+                  <div className="skeleton" style={{ height: '36px', width: '120px', borderRadius: '4px' }}></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

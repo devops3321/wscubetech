@@ -95,6 +95,131 @@ body {
   animation: fadeInSlideDown 0.5s ease-out forwards;
 }
 
+/* Shimmer loading animation for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #e0e0e0 40px,
+    #f0f0f0 80px
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Hourglass loading animation */
+@keyframes hourglassFlip {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sandFlow {
+  0% {
+    opacity: 0.4;
+    transform: scaleY(0.3);
+  }
+  25% {
+    opacity: 0.7;
+    transform: scaleY(0.8);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scaleY(0.3);
+  }
+  75% {
+    opacity: 0.7;
+    transform: scaleY(0.8);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scaleY(0.3);
+  }
+}
+
+@keyframes sandTop {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translateY(8px) scaleY(0.6);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes sandBottom {
+  0% {
+    opacity: 0.3;
+    transform: translateY(-8px) scaleY(0.6);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(0) scaleY(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-8px) scaleY(0.6);
+  }
+}
+
+.hourglass-container {
+  position: relative;
+}
+
+.hourglass {
+  animation: hourglassFlip 3s ease-in-out infinite;
+  transform-origin: center;
+  filter: drop-shadow(0 4px 6px rgba(192, 149, 120, 0.3));
+}
+
+.sand-top {
+  animation: sandTop 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sand-bottom {
+  animation: sandBottom 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sand-flow {
+  animation: sandFlow 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
 /* Cart page responsive improvements */
 @media (max-width: 640px) {
   .cart-item-mobile {

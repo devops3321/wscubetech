@@ -5,10 +5,12 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PageLoader from './components/common/PageLoader';
 
 export default function MainLayout({ children }) {
     return (
         <Provider store={store}>
+            <PageLoader />
             <AppHydrateUser />
             {children}
             {/* Single ToastContainer for the entire app */}
