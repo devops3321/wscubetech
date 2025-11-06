@@ -297,7 +297,7 @@ export default function ProductFilter({
             max="200000"
             value={priceRange.max}
             onChange={handlePriceRangeChange}
-            className="w-full accent-[#C09578]"
+            className="w-full accent-[#C09578] cursor-pointer"
           />
         </div>
         <div className="mb-2 text-black font-semibold">

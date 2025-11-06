@@ -275,7 +275,7 @@ export default function ProductListing({ initialProducts = [], initialPagination
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1 || loading}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-black"
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-black cursor-pointer"
               >
                 Previous
               </button>
@@ -297,7 +297,7 @@ export default function ProductListing({ initialProducts = [], initialPagination
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     disabled={loading}
-                    className={`px-4 py-2 border rounded ${
+                    className={`px-4 py-2 border rounded cursor-pointer ${
                       pagination.page === pageNum
                         ? 'bg-[#C09578] text-white border-[#C09578]'
                         : 'border-gray-300 hover:bg-gray-100 text-black'
@@ -311,7 +311,7 @@ export default function ProductListing({ initialProducts = [], initialPagination
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPage || loading}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-black"
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-black cursor-pointer"
               >
                 Next
               </button>
