@@ -6,6 +6,7 @@ import { logOut } from '../redux/slice/userSlice';
 import { updateCartItemAsync, deleteCartItemAsync } from '../redux/slice/cartSlice';
 import { redirect } from 'next/navigation';
 import { viewCompanyProfile } from '../../apiServices/addressUpdate';
+import { getCategoriesForFilter } from '../../apiServices/productService';
 
 export default function Header() {
     const [openMenu, setOpenMenu] = useState(null);
@@ -19,6 +20,7 @@ export default function Header() {
         phone: '',
         email: ''
     });
+    const [categories, setCategories] = useState([]);
 
     // Handles mouse enter for menu buttons
     const handleMenuOpen = (menu) => {
@@ -41,6 +43,75 @@ export default function Header() {
     const toggleMobileNav = () => {
         setMobileNavOpen((prev) => !prev);
         setOpenMenu(null);
+    };
+
+    // Helper function to find category/subcategory/subsubcategory by name
+    const findCategoryByName = (name, categoryName = null) => {
+        if (!name || categories.length === 0) return null;
+        
+        const searchName = name.toLowerCase().trim();
+        
+        for (const category of categories) {
+            // Check if category name matches (for LIVING, SOFA)
+            if (categoryName && category.categoryName?.toLowerCase().includes(categoryName.toLowerCase())) {
+                // If we're looking for a specific category, search within it
+                if (categoryName.toLowerCase() === 'living' || categoryName.toLowerCase() === 'sofa') {
+                    // Search in subcategories
+                    for (const subcat of category.subcategories || []) {
+                        if (subcat.subcategoryName?.toLowerCase().includes(searchName)) {
+                            return { type: 'subcategory', id: subcat._id };
+                        }
+                        // Search in subsubcategories
+                        for (const subsubcat of subcat.subsubcategories || []) {
+                            if (subsubcat.subsubcategoryName?.toLowerCase().includes(searchName)) {
+                                return { type: 'subsubcategory', id: subsubcat._id };
+                            }
+                        }
+                    }
+                }
+                return { type: 'category', id: category._id };
+            }
+            
+            // Search in subcategories
+            for (const subcat of category.subcategories || []) {
+                if (subcat.subcategoryName?.toLowerCase().includes(searchName)) {
+                    return { type: 'subcategory', id: subcat._id };
+                }
+                // Search in subsubcategories
+                for (const subsubcat of subcat.subsubcategories || []) {
+                    if (subsubcat.subsubcategoryName?.toLowerCase().includes(searchName)) {
+                        return { type: 'subsubcategory', id: subsubcat._id };
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+    // Helper function to build online store URL
+    const getOnlineStoreUrl = (categoryName, itemName = null) => {
+        if (itemName) {
+            const found = findCategoryByName(itemName, categoryName);
+            if (found) {
+                if (found.type === 'category') {
+                    return `/online-store?category=${found.id}&page=1`;
+                } else if (found.type === 'subcategory') {
+                    return `/online-store?subcategory=${found.id}&page=1`;
+                } else if (found.type === 'subsubcategory') {
+                    return `/online-store?subsubcategory=${found.id}&page=1`;
+                }
+            }
+            // Fallback to search if not found
+            return `/online-store?search=${encodeURIComponent(itemName)}&page=1`;
+        } else {
+            // Just category
+            const found = findCategoryByName(categoryName);
+            if (found && found.type === 'category') {
+                return `/online-store?category=${found.id}&page=1`;
+            }
+            // Fallback to search
+            return `/online-store?search=${encodeURIComponent(categoryName)}&page=1`;
+        }
     };
 
     let loginUser = useSelector((store) => store.myUser.user);
@@ -105,6 +176,19 @@ export default function Header() {
             }
         }
         fetchCompanyDetails();
+
+        // Fetch categories for menu links
+        async function fetchCategories() {
+            try {
+                const res = await getCategoriesForFilter();
+                if (res && res.status !== false && res.data) {
+                    setCategories(res.data);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch categories for header:', err);
+            }
+        }
+        fetchCategories();
     }, [loginUser]);
 
     useEffect(() => {
@@ -232,98 +316,98 @@ export default function Header() {
                                 onMouseEnter={() => handleMenuOpen('living')}
                                 onMouseLeave={handleMenuClose}
                             >
-                                <button
+                                <Link
+                                    href={getOnlineStoreUrl('living')}
                                     className="flex items-center justify-between w-full py-2 px-3 text-black font-bold rounded-sm hover:text-[#C09578] hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 md:w-auto transition-colors duration-300 cursor-pointer"
-                                    type="button"
                                 >
                                     LIVING
                                     <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                     </svg>
-                                </button>
+                                </Link>
                                 {/* MEGA MENU */}
                                 {openMenu === 'living' && (
                                     <div
-                                        className="absolute left-0 top-10 z-20 min-w-max bg-white shadow-lg rounded-lg py-6 px-8 mt-2"
+                                        className="absolute left-0 top-10 z-20 min-w-max bg-white shadow-lg rounded-lg py-6 px-8 mt-2 animate-flip-horizontal"
                                         onMouseEnter={() => handleMenuPersist('living')}
                                         onMouseLeave={handleMenuClose}
                                     >
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                                             {/* TABLES COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">TABLES</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">TABLES</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Side And End Tables')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Side And End Tables
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Nest Of Tables')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Nest Of Tables
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Coffee Table Sets')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Coffee Table Sets
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Coffee Tables')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Coffee Tables
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
                                             {/* LIVING STORAGE COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">LIVING STORAGE</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">LIVING STORAGE</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Prayer Units')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Prayer Units
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Display Unit')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Display Unit
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Shoe Racks')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Shoe Racks
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Chest Of Drawers')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Chest Of Drawers
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Cabinets And Sideboard')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Cabinets And Sideboard
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Bookshelves')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Bookshelves
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Tv Units')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Tv Units
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
                                             {/* MIRROR COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">MIRROR</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">MIRROR</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('living', 'Wooden Mirrors')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Wooden Mirrors
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -337,78 +421,78 @@ export default function Header() {
                                 onMouseEnter={() => handleMenuOpen('sofa')}
                                 onMouseLeave={handleMenuClose}
                             >
-                                <button
+                                <Link
+                                    href={getOnlineStoreUrl('sofa')}
                                     className="flex items-center justify-between w-full py-2 px-3 text-black font-bold rounded-sm hover:text-[#C09578] hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 md:w-auto transition-colors duration-300 cursor-pointer"
-                                    type="button"
                                 >
                                     SOFA
                                     <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                     </svg>
-                                </button>
+                                </Link>
                                 {/* SOFA MEGA MENU */}
                                 {openMenu === 'sofa' && (
                                     <div
-                                        className="absolute left-0 top-10 z-20 min-w-max bg-white shadow-lg rounded-lg py-6 px-8 mt-2"
+                                        className="absolute left-0 top-10 z-20 min-w-max bg-white shadow-lg rounded-lg py-6 px-8 mt-2 animate-flip-horizontal"
                                         onMouseEnter={() => handleMenuPersist('sofa')}
                                         onMouseLeave={handleMenuClose}
                                     >
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                                             {/* SOFA CUM BED COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">SOFA CUM BED</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">SOFA CUM BED</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', 'Wooden Sofa Cum Bed')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Wooden Sofa Cum Bed
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
                                             {/* SOFA SETS COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">SOFA SETS</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">SOFA SETS</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', 'L Shape Sofa')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             L Shape Sofa
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', '1 Seater Sofa')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             1 Seater Sofa
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', '2 Seater Sofa')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             2 Seater Sofa
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', '3 Seater Sofa')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             3 Seater Sofa
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', 'Wooden Sofa Sets')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Wooden Sofa Sets
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', 'Normal')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Normal
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
                                             {/* SWING JHULA COLUMN */}
                                             <div>
-                                                <h4 className="font-bold font-playfair mb-3 text-black text-base">SWING JHULA</h4>
-                                                <ul className="space-y-2 font-normal text-sm">
+                                                <h4 className="font-bold font-playfair mb-4 text-black text-lg">SWING JHULA</h4>
+                                                <ul className="space-y-3">
                                                     <li>
-                                                        <a href="#" className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                        <Link href={getOnlineStoreUrl('sofa', 'Wooden Jhula')} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                             Wooden Jhula
-                                                        </a>
+                                                        </Link>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -434,30 +518,30 @@ export default function Header() {
                                 {/* PAGES MEGA MENU */}
                                 {openMenu === 'pages' && (
                                     <div
-                                        className="absolute left-0 top-10 z-20 bg-white shadow-lg rounded-lg py-6 px-8 mt-2 w-fit min-w-[220px]"
+                                        className="absolute left-0 top-10 z-20 bg-white shadow-lg rounded-lg py-6 px-8 mt-2 w-fit min-w-[220px] animate-flip-horizontal"
                                         onMouseEnter={() => handleMenuPersist('pages')}
                                         onMouseLeave={handleMenuClose}
                                     >
                                         <div>
-                                            <h4 className="font-bold font-playfair mb-3 text-black text-base">PAGES</h4>
-                                            <ul className="space-y-2 font-normal text-sm">
+                                            <h4 className="font-bold font-playfair mb-4 text-black text-lg">PAGES</h4>
+                                            <ul className="space-y-3">
                                                 <li>
-                                                    <Link href={"/about-us"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                    <Link href={"/about-us"} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                         About Us
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href={"/cart"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                    <Link href={"/cart"} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                         Cart
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href={"/checkout"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                    <Link href={"/checkout"} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                         Checkout
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href={"/faq"} className="text-gray-700 hover:text-[#C09578] transition-colors duration-300 cursor-pointer">
+                                                    <Link href={"/faq"} className="text-gray-800 hover:text-[#C09578] transition-all duration-300 cursor-pointer text-base font-medium tracking-wide">
                                                         Frequently Asked Questions
                                                     </Link>
                                                 </li>

@@ -62,6 +62,39 @@ body {
   overflow: hidden;
 }
 
+/* Vertical flip animation for dropdown menus */
+@keyframes flipVertical {
+  0% {
+    transform: perspective(1000px) rotateX(-90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(1000px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-flip-horizontal {
+  animation: flipVertical 0.4s ease-out forwards;
+  transform-origin: top center;
+}
+
+/* Smooth fade in and slide down animation for clear filters button */
+@keyframes fadeInSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-slide-down {
+  animation: fadeInSlideDown 0.5s ease-out forwards;
+}
+
 /* Cart page responsive improvements */
 @media (max-width: 640px) {
   .cart-item-mobile {

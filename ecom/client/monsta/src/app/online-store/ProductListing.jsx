@@ -117,7 +117,6 @@ export default function ProductListing({ initialProducts = [], initialPagination
             // This is likely a browser extension error, not our code
             return;
           }
-          console.error('Error fetching products:', error);
           setProducts([]);
           setPagination(prev => ({ ...prev, totalCount: 0, totalPage: 1 }));
         }

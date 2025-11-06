@@ -144,10 +144,39 @@ export default function ProductFilter({
     setPriceRange(prev => ({ ...prev, max: value }));
   };
 
+  const handleClearAllFilters = () => {
+    const params = new URLSearchParams();
+    params.set('page', '1');
+    router.push(`/online-store?${params.toString()}`);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = 
+    searchParams.get('category') || 
+    searchParams.get('subcategory') || 
+    searchParams.get('subsubcategory') || 
+    searchParams.getAll('material').length > 0 || 
+    searchParams.getAll('color').length > 0 || 
+    searchParams.get('minPrice') || 
+    searchParams.get('maxPrice') || 
+    searchParams.get('search');
+
   return (
     <aside className="bg-white rounded-lg p-4 md:p-6 border w-full md:w-auto">
+      {/* Clear All Filters Button */}
+      {hasActiveFilters && (
+        <div className="mb-4 pb-4 border-b-2 border-gray-200 animate-fade-in-slide-down">
+          <button
+            onClick={handleClearAllFilters}
+            className="w-full bg-[#C09578] hover:bg-[#A07A5A] text-white font-bold px-4 py-2 rounded transition-colors duration-300 cursor-pointer"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
+      
       <div className='overflow-y-auto max-h-96 mb-4 pb-4 border-b-2 border-gray-200'>
-        <h2 className="font-bold text-2xl mb-6 font-playfair text-black">Categories</h2>
+        <h2 className="font-bold font-playfair text-lg mb-3 text-black">Categories</h2>
         
         {categories.length === 0 ? (
           <p className="text-gray-500">No categories available</p>
@@ -162,7 +191,7 @@ export default function ProductFilter({
                   checked={String(selectedCategory) === String(cat._id)}
                   onChange={() => handleCategoryChange(cat._id)}
                 />
-                <span className="text-gray-700 font-semibold">{cat.categoryName || cat.name}</span>
+                <span className="text-gray-700">{cat.categoryName || cat.name}</span>
               </label>
               
               {/* Subcategories - Always visible if they exist */}
@@ -177,7 +206,7 @@ export default function ProductFilter({
                           checked={String(selectedSubcategory) === String(subcat._id)}
                           onChange={() => handleSubcategoryChange(subcat._id)}
                         />
-                        <span className="text-gray-700 text-sm">{subcat.subcategoryName || subcat.name}</span>
+                        <span className="text-gray-700">{subcat.subcategoryName || subcat.name}</span>
                       </label>
                       
                       {/* Subsubcategories - Always visible if they exist */}
@@ -192,7 +221,7 @@ export default function ProductFilter({
                                   checked={String(selectedSubsubcategory) === String(subsubcat._id)}
                                   onChange={() => handleSubsubcategoryChange(subsubcat._id)}
                                 />
-                                <span className="text-gray-700 text-xs">{subsubcat.subsubcategoryName || subsubcat.name}</span>
+                                <span className="text-gray-700">{subsubcat.subsubcategoryName || subsubcat.name}</span>
                               </label>
                             </li>
                           ))}

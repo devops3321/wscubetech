@@ -72,21 +72,6 @@ const getAllProducts = async (req, res) => {
 			sortBy = "newest" // newest, oldest, priceLow, priceHigh, nameAsc, nameDesc
 		} = req.query;
 
-		// Debug logging in development
-		if (process.env.NODE_ENV === 'development') {
-			console.log('Received query params:', {
-				category,
-				subcategory,
-				subsubcategory,
-				material: Array.isArray(material) ? material : [material],
-				materialType: typeof material,
-				color: Array.isArray(color) ? color : [color],
-				colorType: typeof color,
-				minPrice,
-				maxPrice,
-				sortBy
-			});
-		}
 
 		const pageNum = Math.max(1, parseInt(page, 10) || 1);
 		const lim = Math.max(1, parseInt(limit, 10) || 10);
@@ -121,16 +106,6 @@ const getAllProducts = async (req, res) => {
 			if (validMaterialIds.length > 0) {
 				// MongoDB $in operator works with arrays - finds docs where material array contains any of these IDs
 				baseMatch.material = { $in: validMaterialIds };
-				
-				if (process.env.NODE_ENV === 'development') {
-					console.log('✅ Material filter applied:', {
-						count: validMaterialIds.length,
-						ids: validMaterialIds.map(id => id.toString()),
-						query: baseMatch.material
-					});
-				}
-			} else if (process.env.NODE_ENV === 'development') {
-				console.log('❌ Material filter - no valid ObjectIds found in:', material);
 			}
 		}
 		
@@ -145,38 +120,9 @@ const getAllProducts = async (req, res) => {
 			if (validColorIds.length > 0) {
 				// MongoDB $in operator works with arrays - finds docs where color array contains any of these IDs
 				baseMatch.color = { $in: validColorIds };
-				
-				if (process.env.NODE_ENV === 'development') {
-					console.log('✅ Color filter applied:', {
-						count: validColorIds.length,
-						ids: validColorIds.map(id => id.toString()),
-						query: baseMatch.color
-					});
-				}
-			} else if (process.env.NODE_ENV === 'development') {
-				console.log('❌ Color filter - no valid ObjectIds found in:', color);
 			}
 		}
 		
-		// Debug logging for baseMatch after all filters are applied
-		if (process.env.NODE_ENV === 'development') {
-			console.log('📋 Final baseMatch query:', {
-				productStatus: baseMatch.productStatus,
-				parentCategory: baseMatch.parentCategory ? baseMatch.parentCategory.toString() : null,
-				subCategory: baseMatch.subCategory ? baseMatch.subCategory.toString() : null,
-				subSubCategory: baseMatch.subSubCategory ? baseMatch.subSubCategory.toString() : null,
-				material: baseMatch.material ? {
-					operator: '$in',
-					count: baseMatch.material.$in.length,
-					ids: baseMatch.material.$in.map(id => id.toString())
-				} : null,
-				color: baseMatch.color ? {
-					operator: '$in',
-					count: baseMatch.color.$in.length,
-					ids: baseMatch.color.$in.map(id => id.toString())
-				} : null
-			});
-		}
 
 		// Build post-lookup match for price and search (after lookups)
 		const postMatch = {};
@@ -378,43 +324,6 @@ const getAllProducts = async (req, res) => {
 			}
 		];
 
-		// REDESIGNED: Comprehensive test before aggregation
-		if (process.env.NODE_ENV === 'development' && (baseMatch.material || baseMatch.color)) {
-			console.log('=== TESTING MATERIAL/COLOR FILTERS ===');
-			
-			// Test 1: Direct find query
-			try {
-				const directTest = await productModel.find(baseMatch).limit(3).lean();
-				console.log('✅ Direct find() query result:', directTest.length, 'products');
-				if (directTest.length > 0) {
-					console.log('Sample product:', {
-						name: directTest[0].productName,
-						material: directTest[0].material?.map(m => String(m)),
-						color: directTest[0].color?.map(c => String(c))
-					});
-				}
-			} catch (err) {
-				console.log('❌ Direct find() query error:', err.message);
-			}
-			
-			// Test 2: Check if any products have the requested material/color (using $in like our query)
-			if (baseMatch.material) {
-				const materialId = baseMatch.material.$in[0];
-				const productsWithMaterial = await productModel.countDocuments({
-					productStatus: true,
-					material: { $in: [materialId] }
-				});
-				console.log(`Products with material ${materialId.toString()} (using $in):`, productsWithMaterial);
-			}
-			if (baseMatch.color) {
-				const colorId = baseMatch.color.$in[0];
-				const productsWithColor = await productModel.countDocuments({
-					productStatus: true,
-					color: { $in: [colorId] }
-				});
-				console.log(`Products with color ${colorId.toString()} (using $in):`, productsWithColor);
-			}
-		}
 
 		const [countAggRes, dataAggRes] = await Promise.all([
 			productModel.aggregate(countPipeline),
@@ -423,17 +332,6 @@ const getAllProducts = async (req, res) => {
 
 		const totalCount = Array.isArray(countAggRes) && countAggRes.length ? countAggRes[0].totalCount : 0;
 		const products = Array.isArray(dataAggRes) ? dataAggRes : [];
-		
-		// Debug: Log aggregation results
-		if (process.env.NODE_ENV === 'development' && (baseMatch.material || baseMatch.color)) {
-			console.log('=== AGGREGATION RESULTS ===');
-			console.log('Total count from aggregation:', totalCount);
-			console.log('Products returned:', products.length);
-			if (products.length > 0) {
-				console.log('First product material:', products[0].material);
-				console.log('First product color:', products[0].color);
-			}
-		}
 
 		return res.status(200).json({
 			status: true,

@@ -44,20 +44,16 @@ export default async function OnlineStore({ searchParams }) {
 
   try {
     const [productsRes, categoriesRes, materialsRes, colorsRes] = await Promise.all([
-      getAllProducts(productParams).catch((err) => {
-        console.warn('Failed to fetch products:', err.message);
+      getAllProducts(productParams).catch(() => {
         return { data: [], totalCount: 0, page: 1, totalPage: 1, staticPath: "", status: false };
       }),
-      getCategoriesForFilter().catch((err) => {
-        console.warn('Failed to fetch categories:', err.message);
+      getCategoriesForFilter().catch(() => {
         return { data: [], status: false };
       }),
-      getMaterialsForFilter().catch((err) => {
-        console.warn('Failed to fetch materials:', err.message);
+      getMaterialsForFilter().catch(() => {
         return { data: [], status: false };
       }),
-      getColorsForFilter().catch((err) => {
-        console.warn('Failed to fetch colors:', err.message);
+      getColorsForFilter().catch(() => {
         return { data: [], status: false };
       })
     ]);
@@ -67,15 +63,8 @@ export default async function OnlineStore({ searchParams }) {
     categoriesData = categoriesRes && categoriesRes.data ? categoriesRes : { data: categoriesRes?.data || [], status: categoriesRes?.status !== false };
     materialsData = materialsRes && materialsRes.data ? materialsRes : { data: materialsRes?.data || [], status: materialsRes?.status !== false };
     colorsData = colorsRes && colorsRes.data ? colorsRes : { data: colorsRes?.data || [], status: colorsRes?.status !== false };
-
-    // Debug logging
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Categories fetched:', categoriesData.data?.length || 0, 'items');
-      console.log('Materials fetched:', materialsData.data?.length || 0, 'items');
-      console.log('Colors fetched:', colorsData.data?.length || 0, 'items');
-    }
   } catch (error) {
-    console.error('Error fetching data:', error);
+    // Silently handle errors
   }
 
   return (
