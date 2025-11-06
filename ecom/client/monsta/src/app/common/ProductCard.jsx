@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { FaHeart } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCartAsync, deleteCartItemAsync, updateCartItemAsync, addToCartOptimistic } from '../redux/slice/cartSlice';
@@ -19,6 +20,7 @@ export default function ProductCard({
   price,
   ...rest
 }) {
+  const router = useRouter();
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.mycart.cartItem);
   const cartLoading = useSelector(state => state.mycart.loading);
@@ -199,10 +201,21 @@ export default function ProductCard({
   };
 
 
+  const handleCardClick = (e) => {
+    // Don't navigate if clicking on buttons
+    if (e.target.closest('button') || e.target.closest('svg') || e.target.closest('path')) {
+      return;
+    }
+    if (productPid) {
+      router.push(`/product-details?id=${productPid}`);
+    }
+  };
+
   return (
     <div
       className="bg-white rounded-lg shadow-lg overflow-hidden mx-auto mb-3 cursor-pointer"
       style={{ width: 260, minWidth: 260, maxWidth: 260, height: 380, minHeight: 380, maxHeight: 380, display: 'flex', flexDirection: 'column' }}
+      onClick={handleCardClick}
     >
       {/* Product Image */}
       <div
