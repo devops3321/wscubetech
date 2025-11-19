@@ -110,7 +110,7 @@ export default function LoginRegister() {
             if (!user || !user.email) throw new Error("Failed to get Google user info");
 
             // send providerId so backend can link/store provider-specific id
-            const resp = await axios.post(`${apiBaseurl}user/google-login`, {
+            const resp = await axios.post(`${apiBaseurl}/user/google-login`, {
                 userName: user.displayName,
                 userEmail: user.email,
                 providerId: user.uid
