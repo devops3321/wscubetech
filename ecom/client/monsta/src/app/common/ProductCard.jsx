@@ -140,9 +140,7 @@ export default function ProductCard({
       const found = backendCart && backendCart.find && backendCart.find(i => String(i.pid) === String(productPid));
       if (found) {
         toast.success('Product added to cart!');
-      } else {
-        toast.error('Backend did not return the added product. Please check backend logic.');
-      }
+      } 
     } catch (error) {
       toast.error(error || 'Failed to add to cart');
     }

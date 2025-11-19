@@ -130,27 +130,50 @@ export default function ProductDetails({ product, staticPath = '' }) {
       return;
     }
 
+    if (!product._id) {
+      toast.error('Product ID is missing. Cannot add to cart.');
+      return;
+    }
+
+    // Build cart item object with all required fields
+    const cartItemObj = {
+      userId: String(userId),
+      pid: String(product._id),
+      name: String(productName || ''),
+      price: displayPrice,
+      qty: 1,
+      image: String(images[0] || '/no-image.png'),
+      category: String(categoryName || ''),
+      salePrice: salePrice > 0 ? salePrice : undefined,
+      actualPrice: actualPrice
+    };
+
     try {
-      // Optimistic update
+      // Optimistic update for immediate UI feedback
       dispatch(addToCartOptimistic({
-        pid: product._id,
-        title: productName,
-        price: displayPrice,
-        image: images[0] || '/no-image.png',
-        qty: 1
+        pid: cartItemObj.pid,
+        name: cartItemObj.name,
+        price: cartItemObj.price,
+        image: cartItemObj.image,
+        qty: cartItemObj.qty,
+        category: cartItemObj.category,
+        salePrice: cartItemObj.salePrice,
+        actualPrice: cartItemObj.actualPrice
       }));
 
       // Backend sync
-      await dispatch(addToCartAsync({
-        pid: product._id,
-        qty: 1,
-        userId,
-        token
+      const backendCart = await dispatch(addToCartAsync({ 
+        cartItem: cartItemObj, 
+        token 
       })).unwrap();
 
-      toast.success('Product added to cart!');
+      // Check if the product is in the backend response
+      const found = backendCart && backendCart.find && backendCart.find(i => String(i.pid) === String(product._id));
+      if (found) {
+        toast.success('Product added to cart!');
+      } 
     } catch (error) {
-      toast.error('Failed to add product to cart');
+      toast.error(error || 'Failed to add product to cart');
     }
   };
 
