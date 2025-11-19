@@ -52,7 +52,16 @@ export default function Header() {
         const searchName = name.toLowerCase().trim();
         
         for (const category of categories) {
-            // Check if category name matches (for LIVING, SOFA)
+            // First check if the category name itself matches (when searching for a category directly)
+            if (!categoryName) {
+                const catName = category.categoryName?.toLowerCase().trim();
+                // Try exact match first, then partial match
+                if (catName === searchName || catName?.includes(searchName)) {
+                    return { type: 'category', id: category._id };
+                }
+            }
+            
+            // Check if category name matches (for LIVING, SOFA) when categoryName parameter is provided
             if (categoryName && category.categoryName?.toLowerCase().includes(categoryName.toLowerCase())) {
                 // If we're looking for a specific category, search within it
                 if (categoryName.toLowerCase() === 'living' || categoryName.toLowerCase() === 'sofa') {
