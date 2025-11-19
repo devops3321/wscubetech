@@ -355,6 +355,8 @@ const getProductById = async (req, res) => {
 			.populate('parentCategory', 'name _id')
 			.populate('subCategory', 'subcategoryName _id')
 			.populate('subSubCategory', 'subsubcategoryName _id')
+			.populate({ path: 'color', select: 'colorName colorCode _id', model: 'color' })
+			.populate('material', 'categoryName _id')
 			.lean();
 		if (!product || !product.productStatus) {
 			return res.status(404).json({ status: false, message: "Product not found" });
@@ -377,6 +379,31 @@ const getProductById = async (req, res) => {
 				_id: product.subSubCategory._id,
 				name: product.subSubCategory.subsubcategoryName || null
 			};
+		}
+		// Ensure color array is properly formatted
+		if (product.color && Array.isArray(product.color)) {
+			product.color = product.color.map(color => {
+				if (color && typeof color === 'object') {
+					return {
+						_id: color._id,
+						colorName: color.colorName || null,
+						colorCode: color.colorCode || null
+					};
+				}
+				return color;
+			});
+		}
+		// Ensure material array is properly formatted
+		if (product.material && Array.isArray(product.material)) {
+			product.material = product.material.map(material => {
+				if (material && typeof material === 'object') {
+					return {
+						_id: material._id,
+						categoryName: material.categoryName || null
+					};
+				}
+				return material;
+			});
 		}
 		res.status(200).json({
 			status: true,
