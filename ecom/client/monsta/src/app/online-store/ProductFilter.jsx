@@ -2,19 +2,19 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ProductFilter({ 
-  initialCategories = [], 
-  initialMaterials = [], 
+export default function ProductFilter({
+  initialCategories = [],
+  initialMaterials = [],
   initialColors = [],
   initialFilters = {}
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [categories, setCategories] = useState(initialCategories);
   const [materials, setMaterials] = useState(initialMaterials);
   const [colors, setColors] = useState(initialColors);
-  
+
   const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || '');
   const [selectedSubcategory, setSelectedSubcategory] = useState(initialFilters.subcategory || '');
   const [selectedSubsubcategory, setSelectedSubsubcategory] = useState(initialFilters.subsubcategory || '');
@@ -46,10 +46,10 @@ export default function ProductFilter({
 
   const updateURL = (updates) => {
     const params = new URLSearchParams(searchParams.toString());
-    
+
     // Reset page when filters change
     params.set('page', '1');
-    
+
     // Clear dependent filters when parent changes
     if (updates.category !== undefined) {
       params.delete('subcategory');
@@ -58,7 +58,7 @@ export default function ProductFilter({
     if (updates.subcategory !== undefined) {
       params.delete('subsubcategory');
     }
-    
+
     // Update filters
     Object.entries(updates).forEach(([key, value]) => {
       if (value === '' || (Array.isArray(value) && value.length === 0)) {
@@ -151,14 +151,14 @@ export default function ProductFilter({
   };
 
   // Check if any filters are active
-  const hasActiveFilters = 
-    searchParams.get('category') || 
-    searchParams.get('subcategory') || 
-    searchParams.get('subsubcategory') || 
-    searchParams.getAll('material').length > 0 || 
-    searchParams.getAll('color').length > 0 || 
-    searchParams.get('minPrice') || 
-    searchParams.get('maxPrice') || 
+  const hasActiveFilters =
+    searchParams.get('category') ||
+    searchParams.get('subcategory') ||
+    searchParams.get('subsubcategory') ||
+    searchParams.getAll('material').length > 0 ||
+    searchParams.getAll('color').length > 0 ||
+    searchParams.get('minPrice') ||
+    searchParams.get('maxPrice') ||
     searchParams.get('search');
 
   return (
@@ -174,50 +174,39 @@ export default function ProductFilter({
           </button>
         </div>
       )}
-      
+
       <div className='overflow-y-auto max-h-96 mb-4 pb-4 border-b-2 border-gray-200'>
         <h2 className="font-bold font-playfair text-lg mb-3 text-black">Categories</h2>
-        
+
         {categories.length === 0 ? (
           <p className="text-gray-500">No categories available</p>
         ) : (
           categories.map(cat => (
             <div key={cat._id} className="mb-6">
-              {/* Category Level */}
-              <label className="flex items-center cursor-pointer mb-2">
-                <input 
-                  type="checkbox" 
-                  className="accent-blue-600 mr-2" 
-                  checked={String(selectedCategory) === String(cat._id)}
-                  onChange={() => handleCategoryChange(cat._id)}
-                />
-                <span className="text-gray-700">{cat.categoryName || cat.name}</span>
-              </label>
-              
               {/* Subcategories - Always visible if they exist */}
               {cat.subcategories && cat.subcategories.length > 0 && (
-                <ul className="ml-6 mt-2 mb-2 space-y-2">
+                <ul className="mt-2 mb-2 space-y-2">
                   {cat.subcategories.map(subcat => (
                     <li key={subcat._id}>
-                      <label className="flex items-center cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          className="accent-blue-600 mr-2" 
+                      <label className="flex items-center font-playfair font-bold cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="accent-blue-600 mr-2"
                           checked={String(selectedSubcategory) === String(subcat._id)}
                           onChange={() => handleSubcategoryChange(subcat._id)}
                         />
                         <span className="text-gray-700">{subcat.subcategoryName || subcat.name}</span>
                       </label>
-                      
+
                       {/* Subsubcategories - Always visible if they exist */}
                       {subcat.subsubcategories && subcat.subsubcategories.length > 0 && (
-                        <ul className="ml-6 mt-2 space-y-2">
+                        <ul className="ml-2 mt-2 space-y-3">
                           {subcat.subsubcategories.map(subsubcat => (
                             <li key={subsubcat._id}>
                               <label className="flex items-center cursor-pointer">
-                                <input 
-                                  type="checkbox" 
-                                  className="accent-blue-600 mr-2" 
+                                <input
+                                  type="checkbox"
+                                  className="accent-blue-600 mr-2"
                                   checked={String(selectedSubsubcategory) === String(subsubcat._id)}
                                   onChange={() => handleSubsubcategoryChange(subsubcat._id)}
                                 />
@@ -244,9 +233,9 @@ export default function ProductFilter({
             {materials.map(material => (
               <li key={material._id}>
                 <label className="flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="accent-blue-600 mr-2" 
+                  <input
+                    type="checkbox"
+                    className="accent-blue-600 mr-2"
                     checked={selectedMaterials.some(id => String(id) === String(material._id))}
                     onChange={() => handleMaterialChange(material._id)}
                   />
@@ -266,15 +255,15 @@ export default function ProductFilter({
             {colors.map(color => (
               <li key={color._id}>
                 <label className="flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="accent-blue-600 mr-2" 
+                  <input
+                    type="checkbox"
+                    className="accent-blue-600 mr-2"
                     checked={selectedColors.some(id => String(id) === String(color._id))}
                     onChange={() => handleColorChange(color._id)}
                   />
                   <span className="text-gray-700">{color.colorName}</span>
                   {color.colorCode && (
-                    <span 
+                    <span
                       className="ml-2 w-4 h-4 rounded border border-gray-300 inline-block"
                       style={{ backgroundColor: color.colorCode }}
                       title={color.colorName}
@@ -303,7 +292,7 @@ export default function ProductFilter({
         <div className="mb-2 text-black font-semibold">
           Rs. {parseInt(priceRange.min).toLocaleString()} - Rs. {parseInt(priceRange.max).toLocaleString()}
         </div>
-        <button 
+        <button
           onClick={handlePriceFilter}
           className="bg-black text-white font-bold px-4 py-2 rounded hover:bg-[#C09578] cursor-pointer"
         >
