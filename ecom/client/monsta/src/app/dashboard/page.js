@@ -45,7 +45,7 @@ export default function Dashboard() {
 
     const fetchProfile = async () => {
       try {
-        const resp = await axios.get(`${apiBaseurl}user/get-profile`, {
+        const resp = await axios.get(`${apiBaseurl}/user/get-profile`, {
           params: { id: user.id }, // <-- use user.id here
           headers: { 'Authorization': `Bearer ${token}` }
         });
