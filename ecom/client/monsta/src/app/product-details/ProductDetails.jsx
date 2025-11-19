@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCartAsync, addToCartOptimistic } from '../redux/slice/cartSlice';
 import { toast } from 'react-toastify';
+import ProductSlider from './ProductSlider';
 
 export default function ProductDetails({ product, staticPath = '' }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -234,6 +235,26 @@ export default function ProductDetails({ product, staticPath = '' }) {
           </p>
         </div>
       )}
+      
+      {/* Best Selling Products Slider */}
+      <div className="mt-5">
+        <ProductSlider 
+          title="Best Selling Products" 
+          type="bestSelling" 
+          limit={8}
+          excludeProductId={product._id}
+        />
+      </div>
+      
+      {/* Upsell Products Slider */}
+      <div className="">
+        <ProductSlider 
+          title="You May Also Like" 
+          type="upsell" 
+          limit={8}
+          excludeProductId={product._id}
+        />
+      </div>
     </div>
   );
 }
