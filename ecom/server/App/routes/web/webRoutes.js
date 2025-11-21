@@ -6,6 +6,8 @@ const { testimonialRoutes } = require("./testimonialRoutes");
 const { productRoutes } = require("./productRoutes");
 const { cartRoutes } = require("./cartRoutes");
 const { wishlistRoutes } = require("./wishlistRoutes");
+const { orderRoutes } = require("./orderRoutes");
+const { addressRoutes } = require("./addressRoutes");
 
 webRoutes.use("/user", userAuthRoutes);
 
@@ -18,5 +20,9 @@ webRoutes.use('/product', productRoutes);
 webRoutes.use('/cart', cartRoutes);
 
 webRoutes.use('/wishlist', wishlistRoutes);
+
+webRoutes.use('/order', orderRoutes);
+
+webRoutes.use('/address', addressRoutes);
 
 module.exports = { webRoutes };
